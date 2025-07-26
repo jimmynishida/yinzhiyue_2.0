@@ -89,14 +89,15 @@
     <script>
         const terminal = document.getElementById('terminal');
 
+        // *** 修正檔案名稱 ***
         const dailyChallengeMap = [
-            { day: "週日 (深度策略)", games: ["terminal-hacker.html", "project-rewind.html"] }, // 組合七
-            { day: "週一 (記憶啟動)", games: ["nostalgic-memory.html", "neon-strike.html", "mental-math-hacker.html"] }, // 組合一
-            { day: "週二 (邏輯思維)", games: ["terminal-hacker.html", "voxel-decode.html", "word-commando.html"] }, // 組合二
-            { day: "週三 (視覺觀察)", games: ["project-rewind.html", "voxel-decode.html", "nostalgic-memory.html"] }, // 組合三
-            { day: "週四 (語言風暴)", games: ["word-commando.html", "neon-strike.html", "mental-math-hacker.html"] }, // 組合四
-            { day: "週五 (空間挑戰)", games: ["voxel-decode.html", "terminal-hacker.html", "project-rewind.html"] }, // 組合五 (細節獵人替代速算)
-            { day: "週六 (綜合反應)", games: ["neon-strike.html", "mental-math-hacker.html", "word-commando.html"] } // 組合六
+            { day: "週日 (深度策略)", games: ["terminal-hacker.html", "project-rewind.html"] },
+            { day: "週一 (記憶啟動)", games: ["nostalgic-memory.html", "neon-strike.html", "mental-math-hacker.html"] },
+            { day: "週二 (邏輯思維)", games: ["terminal-hacker.html", "voxel-decode.html", "word-commando.html"] },
+            { day: "週三 (視覺觀察)", games: ["project-rewind.html", "voxel-decode.html", "nostalgic-memory.html"] },
+            { day: "週四 (語言風暴)", games: ["word-commando.html", "neon-strike.html", "mental-math-hacker.html"] },
+            { day: "週五 (空間挑戰)", games: ["voxel-decode.html", "terminal-hacker.html", "project-rewind.html"] },
+            { day: "週六 (綜合反應)", games: ["neon-strike.html", "mental-math-hacker.html", "word-commando.html"] }
         ];
 
         const allGames = [
@@ -107,6 +108,9 @@
             { name: "方塊解碼 (空間)", file: "voxel-decode.html" },
             { name: "心算駭客", file: "mental-math-hacker.html" },
             { name: "時光機偵錯 (觀察)", file: "project-rewind.html" },
+             // 以下是之前整合但未在每日挑戰中使用的遊戲，也一併列出供自由練習
+            { name: "桌面清理大師", file: "desktop-cleanup.html" },
+            { name: "懷舊影視遊戲", file: "pop-culture.html" }
         ];
 
         let state = "boot";
@@ -178,7 +182,7 @@
             `;
             challenge.games.forEach((gameFile, index) => {
                 const game = allGames.find(g => g.file === gameFile);
-                challengeHTML += `<a href="${game.file}" target="_blank">${index + 1}. ${game.name}</a>`;
+                challengeHTML += `<a href="./${game.file}" target="_blank">${index + 1}. ${game.name}</a>`;
             });
             challengeHTML += `
                 </div>
@@ -195,8 +199,8 @@
                 <div class="prompt">自由練習：點擊以啟動遊戲</div>
                 <div class="game-list">
             `;
-            allGames.forEach(game => {
-                freePlayHTML += `<a href="${game.file}" target="_blank">${game.name}</a>`;
+            allGames.sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant')).forEach(game => {
+                freePlayHTML += `<a href="./${game.file}" target="_blank">${game.name}</a>`;
             });
             freePlayHTML += `
                 </div>
