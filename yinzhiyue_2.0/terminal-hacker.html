@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>Terminal Hacker</title>
+  <meta name="viewport" content="width=640, initial-scale=1">
+  <style>
+    /* CRT螢幕與終端機視覺效果 */
+    body {
+      background: #181c18;
+      margin: 0;
+      padding: 0;
+    }
+    .crt-screen {
+      width: 640px;
+      height: 480px;
+      background: #101d14;
+      color: #39ff14;
+      font-family: 'VT323', 'Consolas', monospace;
+      border-radius: 24px;
+      box-shadow: 0 0 48px #1f4d1a inset;
+      overflow: hidden;
+      position: relative;
+      margin: 40px auto;
+      border: 8px solid #2d2d2d;
+    }
+    .crt-overlay {
+      pointer-events: none;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(60,255,60,0.05) 0px,
+        rgba(0,0,0,0.07) 2px,
+        transparent 4px,
+        transparent 8px
+      );
+      z-index: 2;
+    }
+    .terminal-output {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 90%;
+      padding: 24px 16px 0 16px;
+      overflow-y: auto;
+      font-size: 1.2rem;
+      white-space: pre-wrap;
+      z-index: 1;
+      text-shadow: 0 0 2px #00ff88, 0 0 6px #003e1e;
+    }
+    .terminal-input {
+      position: absolute;
+      left: 16px;
+      bottom: 32px;
+      width: 90%;
+      background: transparent;
+      border: none;
+      color: #39ff14;
+      font-size: 1.2rem;
+      outline: none;
+      z-index: 3;
+      font-family: inherit;
+      letter-spacing: 2px;
+      caret-color: #f8ff5c;
+      filter: blur(0.3px);
+    }
+    .hidden { display: none; }
+    @import url('https://fonts.googleapis.com/css?family=VT323&display=swap');
+  </style>
+  <link href="https://fonts.googleapis.com/css?family=VT323&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="game-root"></div>
+  <!-- 音效 -->
+  <audio id="sfx-key" src="https://cdn.jsdelivr.net/gh/terkelg/retro-soundfx@main/sounds/keypress1.wav"></audio>
+  <audio id="sfx-floppy" src="https://cdn.jsdelivr.net/gh/terkelg/retro-soundfx@main/sounds/softclick1.wav"></audio>
+  <audio id="sfx-connect" src="https://cdn.jsdelivr.net/gh/terkelg/retro-soundfx@main/sounds/connect1.wav"></audio>
+  <audio id="sfx-error" src="https://cdn.jsdelivr.net/gh/terkelg/retro-soundfx@main/sounds/error1.wav"></audio>
+  <audio id="sfx-success" src="https://cdn.jsdelivr.net/gh/terkelg/retro-soundfx@main/sounds/success1.wav"></audio>
+  <audio id="sfx-alarm" src="https://cdn.jsdelivr.net/gh/terkelg/retro-soundfx@main/sounds/alarm1.wav"></audio>
+  <audio id="sfx-bsod" src="https://cdn.jsdelivr.net/gh/terkelg/retro-soundfx@main/sounds/error1.wav"></audio>
+  <!-- 背景音樂 -->
+  <audio id="bgm-chiptune01" src="https://cdn.pixabay.com/audio/2022/10/16/audio_12eb6f1e7b.mp3" loop></audio>
+  <audio id="bgm-synthwave01" src="https://cdn.pixabay.com/audio/2024/02/21/audio_186acb3e8b.mp3" loop></audio>
+  <audio id="bgm-synthwave02" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124b012aac.mp3" loop></audio>
+  <script>
+    // --- 音效管理 ---
+    class AudioManager {
+      constructor() {
+        this.sfx = {
+          key: document.getElementById('sfx-key'),
+          floppy: document.getElementById('sfx-floppy'),
+          connect: document.getElementById('sfx-connect'),
+          error: document.getElementById('sfx-error'),
+          success: document.getElementById('sfx-success'),
+          alarm: document.getElementById('sfx-alarm'),
+          bsod: document.getElementById('sfx-bsod')
+        };
+        this.bgmList = {
+          chiptune01: document.getElementById('bgm-chiptune01'),
+          synthwave01: document.getElementById('bgm-synthwave01'),
+          synthwave02: document.getElementById('bgm-synthwave02'),
+        };
+        this.bgm = null;
+      }
+      playSFX(name) {
+        if(this.sfx[name]) {
+          const snd = this.sfx[name].cloneNode();
+          snd.play();
+        }
+      }
+      playBGM(name) {
+        if(this.bgm) this.bgm.pause();
+        if(this.bgmList[name]) {
+          this.bgm = this.bgmList[name];
+          this.bgm.currentTime = 0;
+          this.bgm.volume = 0.5;
+          this.bgm.play();
+        }
+      }
+      stopBGM() {
+        if(this.bgm) this.bgm.pause();
+        this.bgm = null;
+      }
+    }
+
+    // --- 關卡資料 ---
+    const LEVELS = [
+      {
+        name: '教學關卡',
+        file: 'hello_world.bat',
+        bgm: 'chiptune01',
+        asciiArt: `
+ ________    __    __       ___      .______   .______        ______   
+|       /   |  |  |  |     /   \\     |   _  \\  |   _  \\      /  __  \\  
+\`\`\`--.  |   |  |  |  |    /  ^  \\    |  |_)  | |  |_)  |    |  |  |  | 
+    |  |   |  |  |  |   /  /_\\  \\   |   ___/  |      /     |  |  |  | 
+    |  |   |  \`--'  |  /  _____  \\  |  |      |  |\\  \\----.|  \`--'  | 
+    |__|    \\______/  /__/     \\__\\ | _|      | _| \`._____| \\______/  
+`,
+        description: '歡迎來到駭客世界！這是你的新手任務。\n任務：學習如何在終端機上操作和選擇關卡。',
+      },
+      {
+        name: 'Ping 測試',
+        file: 'ping_test.exe',
+        bgm: 'chiptune01',
+        asciiArt: `
+[====[▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓]====]
+|        電路板        |
+[----[▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒]----]
+`,
+        description: '任務：連接兩個「主機電源」節點。\n提示：用滑鼠一筆畫連線，不能交叉。',
+      },
+      {
+        name: '防火牆繞越',
+        file: 'firewall_bypass.exe',
+        bgm: 'synthwave01',
+        asciiArt: `
+   _____   __    __   ____  _        _  _ 
+  |  ___| |  |  |  | |  _ \\| |      | || |
+  | |__   |  |__|  | | |_) | |      | || |
+  |  __|  |   __   | |  _ <| |      | || |
+  | |___  |  |  |  | | |_) | |____  |_||_|
+  |_____| |__|  |__| |____/|______| (_)(_)
+  [防火牆圖示: █████  █    █   █████]
+`,
+        description: '任務：連接藍色「數據源」，避開紅色「防火牆」節點。\n碰到防火牆會觸發「ACCESS DENIED」警報。',
+      },
+      {
+        name: '數據大劫案',
+        file: 'data_heist.dll',
+        bgm: 'synthwave02',
+        asciiArt: `
+[出口]──■──○──●──◆──■──[出口]
+   |    ▲  (骷髏頭)   ▼
+   [移動病毒]  [數據封包]
+`,
+        description: '任務：連接兩個「出口節點」，必須經過三個「數據封包」，並避開巡邏的「病毒」。\n完成後將解鎖特殊佈景主題！',
+      },
+    ];
+
+    // --- 終端機UI ---
+    class TerminalUI {
+      constructor(container, audio) {
+        this.audio = audio;
+        this.screen = document.createElement('div');
+        this.screen.className = 'crt-screen';
+
+        this.crtOverlay = document.createElement('div');
+        this.crtOverlay.className = 'crt-overlay';
+
+        this.output = document.createElement('pre');
+        this.output.className = 'terminal-output';
+
+        this.input = document.createElement('input');
+        this.input.className = 'terminal-input';
+        this.input.type = 'text';
+
+        this.screen.appendChild(this.crtOverlay);
+        this.screen.appendChild(this.output);
+        this.screen.appendChild(this.input);
+
+        container.appendChild(this.screen);
+
+        this.input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            this.handleCommand(this.input.value);
+            this.input.value = '';
+          }
+        });
+        this.onCommand = () => {};
+      }
+
+      showBootSequence(callback) {
+        let bootLines = [
+          'A:> _',
+          'Booting Terminal Hacker OS v1.04...',
+          'Detecting modem... [OK]',
+          'Connecting to 14.4k modem...',
+          'Loading BBS interface...',
+          'Ready.',
+        ];
+        this.output.textContent = '';
+        let idx = 0;
+        const nextLine = () => {
+          if (idx < bootLines.length) {
+            this.output.textContent += bootLines[idx] + '\n';
+            this.audio.playSFX('floppy');
+            idx++;
+            setTimeout(nextLine, 700);
+          } else {
+            callback();
+          }
+        };
+        nextLine();
+      }
+
+      showWelcome(callback) {
+        this.output.textContent += `
+  ████████╗██╗  ██╗███████╗██╗   ██╗
+  ╚══██╔══╝██║  ██║██╔════╝╚██╗ ██╔╝
+     ██║   ███████║█████╗   ╚████╔╝ 
+     ██║   ██╔══██║██╔══╝    ╚██╔╝  
+     ██║   ██║  ██║███████╗   ██║   
+     ╚═╝   ╚═╝  ╚═╝╚══════╝   ╚═╝   
+  Terminal Hacker  [BBS v2.2]
+  ---------------------------------
+  輸入 help 以獲得指令列表
+  `;
+        this.input.style.display = '';
+        this.input.focus();
+        callback();
+      }
+
+      printLine(text) {
+        this.output.textContent += text + '\n';
+        this.output.scrollTop = this.output.scrollHeight;
+      }
+
+      clear() {
+        this.output.textContent = '';
+      }
+
+      setCommandHandler(handler) {
+        this.onCommand = handler;
+      }
+
+      handleCommand(cmd) {
+        this.printLine('A:> ' + cmd);
+        this.audio.playSFX('key');
+        this.onCommand(cmd.trim());
+      }
+    }
+
+    // --- 關卡管理 ---
+    class LevelManager {
+      constructor(ui, audio) {
+        this.ui = ui;
+        this.audio = audio;
+        this.currentLevelIdx = 0;
+        this.levelMap = {};
+        LEVELS.forEach((level, idx) => {
+          this.levelMap[level.file] = idx;
+        });
+      }
+
+      startLevelSelection() {
+        this.ui.setCommandHandler((cmd) => {
+          if (cmd === 'help') {
+            this.ui.printLine('可用指令：');
+            this.ui.printLine('  dir                # 列出任務檔案');
+            this.ui.printLine('  run <檔案名>        # 啟動關卡');
+            this.ui.printLine('  theme <主題名>      # 更換CRT配色');
+            this.ui.printLine('  clear              # 清除畫面');
+            return;
+          }
+          if (cmd === 'dir') {
+            this.listLevels();
+            return;
+          }
+          if (cmd.startsWith('run ')) {
+            const file = cmd.slice(4).trim();
+            if (this.levelMap[file] !== undefined) {
+              this.currentLevelIdx = this.levelMap[file];
+              this.loadLevel(LEVELS[this.currentLevelIdx]);
+            } else {
+              this.ui.printLine('找不到檔案：' + file);
+              this.audio.playSFX('error');
+            }
+            return;
+          }
+          if (cmd.startsWith('theme ')) {
+            this.ui.printLine('主題切換功能開發中...');
+            return;
+          }
+          if (cmd === 'clear') {
+            this.ui.clear();
+            return;
+          }
+          this.ui.printLine('無效指令，輸入 help 取得指令列表。');
+        });
+        this.ui.printLine('輸入 dir 查看可用關卡。');
+      }
+
+      listLevels() {
+        this.ui.printLine('A:>dir');
+        this.ui.printLine(`
+  目錄: \\MISSIONS
+  ---------------------------------
+  hello_world.bat       ping_test.exe
+  firewall_bypass.exe   data_heist.dll
+        `);
+      }
+
+      loadLevel(level) {
+        this.ui.clear();
+        this.audio.playBGM(level.bgm);
+        this.ui.printLine(`載入關卡：${level.name}`);
+        setTimeout(() => {
+          this.playLevel(level);
+        }, 1000);
+      }
+
+      playLevel(level) {
+        this.ui.printLine(level.asciiArt);
+        this.ui.printLine('\n' + level.description);
+        this.ui.printLine('\n[Enter] 鍵以開始...');
+        this.ui.setCommandHandler((cmd) => {
+          if (cmd === '') {
+            this.ui.printLine('（遊戲進行中... 範例省略）');
+            this.ui.printLine('你完成了任務！');
+            this.audio.playSFX('success');
+            this.audio.stopBGM();
+            this.startLevelSelection();
+          } else {
+            this.ui.printLine('請直接按 [Enter] 開始。');
+          }
+        });
+      }
+    }
+
+    // --- 遊戲主流程 ---
+    window.onload = function() {
+      const gameRoot = document.getElementById('game-root');
+      const audio = new AudioManager();
+      const terminal = new TerminalUI(gameRoot, audio);
+      const levels = new LevelManager(terminal, audio);
+
+      terminal.showBootSequence(() => {
+        terminal.showWelcome(() => {
+          levels.startLevelSelection();
+        });
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>桌面清理大師 - 90年代Windows桌面遊戲</title>
+  <style>
+  body, html {
+    width: 100vw; height: 100vh; margin: 0; padding: 0;
+    font-family: "MS Sans Serif", Arial, sans-serif;
+    background: #4682b4;
+    overflow: hidden;
+  }
+  .app {
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    position: relative;
+    font-family: "MS Sans Serif", Arial, sans-serif;
+  }
+  .desktop {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 80px;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    padding: 32px 24px;
+    z-index: 1;
+  }
+  .desktop-icon {
+    width: 70px;
+    height: 90px;
+    margin: 12px;
+    text-align: center;
+    cursor: grab;
+    transition: transform 0.1s;
+    user-select: none;
+    background: rgba(255,255,255,0.08);
+    border-radius: 7px;
+  }
+  .desktop-icon.dragging {
+    opacity: 0.5;
+    transform: scale(1.1);
+    z-index: 10;
+  }
+  .icon-label {
+    color: #243c5a;
+    font-size: 13px;
+    margin-top: 4px;
+    word-break: break-all;
+    text-shadow: 0 1px 1px #fff, 0px 1px 0 #bcd;
+  }
+  .taskbar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #c0c0c0;
+    border-top: 2px solid #888;
+    box-shadow: 0 -2px 8px #8888;
+    z-index: 99;
+    font-size: 15px;
+  }
+  .taskbar-section {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 0 20px;
+  }
+  .taskbar-section.right {
+    gap: 6px;
+  }
+  .start-btn {
+    background: #ececec;
+    border: 2px outset #fff;
+    color: #0b1d41;
+    font-size: 15px;
+    font-family: "MS Sans Serif", Arial, sans-serif;
+    padding: 4px 13px 4px 8px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  .ss-btn {
+    background: #ececec;
+    border: 1px solid #fff;
+    padding: 4px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .clock {
+    font-family: "MS Sans Serif", Arial, sans-serif;
+    font-size: 15px;
+    color: #143;
+    background: #e2e6f0;
+    border-radius: 3px;
+    padding: 2px 8px;
+  }
+  .dialog-backdrop {
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(40,60,160,0.25);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dialog {
+    background: #f2f2f2;
+    min-width: 320px;
+    border: 2px outset #fff;
+    box-shadow: 0 7px 24px #0008;
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: "MS Sans Serif", Arial, sans-serif;
+  }
+  .dialog-header {
+    background: #0b1d41;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .dialog-body {
+    padding: 16px;
+    color: #222;
+    font-size: 15px;
+  }
+  .system-msg {
+    font-size: 14px;
+    color: #0a58a4;
+    margin-top: 8px;
+  }
+  .dialog-footer {
+    padding: 8px;
+    text-align: right;
+    background: #ececec;
+  }
+  .dialog-footer button {
+    font-family: "MS Sans Serif", Arial, sans-serif;
+    font-size: 15px;
+    border: 1px solid #888;
+    border-radius: 3px;
+    background: #fff;
+    padding: 4px 16px;
+    cursor: pointer;
+  }
+  .recycle-bin {
+    position: absolute;
+    bottom: 60px;
+    right: 30px;
+    width: 60px;
+    height: 80px;
+    text-align: center;
+    z-index: 10;
+    transition: filter 0.2s, box-shadow 0.2s;
+    padding-top: 7px;
+  }
+  .recycle-bin.active {
+    filter: drop-shadow(0 0 6px #0af9);
+    box-shadow: 0 0 18px #8cf4;
+  }
+  .rb-label {
+    font-size: 13px;
+    color: #467;
+    margin-top: 5px;
+    text-shadow: 0 1px 1px #fff;
+  }
+  .bsod-bg {
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: #0b0f4c;
+    color: #fff;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bsod-box {
+    background: none;
+    font-family: "Consolas", "MS Gothic", monospace;
+    font-size: 18px;
+    color: #c7e1fa;
+    border: 2px solid #4a6fb2;
+    padding: 36px 48px;
+    border-radius: 16px;
+    box-shadow: 0 0 40px #000d;
+    text-align: left;
+  }
+  .screensaver-bg {
+    position: fixed;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: #000;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .ss-hint {
+    color: #fff;
+    font-size: 19px;
+    margin-top: 40px;
+    text-shadow: 0 0 8px #00a8, 0 0 4px #fff;
+  }
+  .pipes-ss, .stars-ss, .maze-ss {
+    width: 400px; height: 400px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  .pipes-ss { background-image: url('assets/ss-pipes.gif'); }
+  .stars-ss { background-image: url('assets/ss-stars.gif'); }
+  .maze-ss { background-image: url('assets/ss-maze.gif'); }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+/** --- 資料與工具 --- **/
+const icons = [
+  { label: "我的電腦", color: "gray", type: "computer", img: "assets/mycomputer.png" },
+  { label: "IE 瀏覽器", color: "blue", type: "ie", img: "assets/ie.png" },
+  { label: "資源回收筒", color: "gray", type: "recycle", img: "assets/recycle-empty.png" },
+  { label: "資料夾", color: "blue", type: "folder", img: "assets/folder-blue.png" },
+  { label: "資料夾", color: "yellow", type: "folder", img: "assets/folder-yellow.png" },
+  { label: "小畫家", color: "gray", type: "paint", img: "assets/paint.png" },
+  { label: "Word 文件", color: "gray", type: "word", img: "assets/word.png" },
+  { label: "紙牌遊戲", color: "green", type: "sol", img: "assets/solitaire.png" },
+  { label: "卡牌", color: "blue", type: "card", img: "assets/cardback.png" },
+  { label: "記事本", color: "gray", type: "notepad", img: "assets/notepad.png" }
+];
+const backgrounds = [
+  "assets/bg-bliss.jpg", "assets/bg-ocean.jpg", "assets/bg-maze.jpg"
+];
+const winSounds = {
+  tada: "assets/tada.wav",
+  chord: "assets/chord.wav",
+  error: "assets/error.wav",
+  recycle: "assets/recycle.wav",
+  bsod: "assets/bsod.wav"
+};
+const screensavers = ["pipes", "stars", "maze"];
+
+const instructions = [
+  {
+    title: "系統警告！",
+    message: "請快速刪除所有「藍色」的資料夾圖示，但保留「藍色」的 IE 瀏覽器圖示。",
+    targetFilter: icon => icon.type === "folder" && icon.color === "blue",
+    systemMsg: ""
+  },
+  {
+    title: "使用者指令",
+    message: "請將所有「灰色」的 Word 文件和記事本檔案丟入回收筒。",
+    targetFilter: icon =>
+      (icon.type === "word" || icon.type === "notepad") && icon.color === "gray",
+    systemMsg: ""
+  },
+  {
+    title: "系統警告！",
+    message: "請刪除所有「綠色」紙牌遊戲圖示，但不要動到「藍色」的卡牌圖示。",
+    targetFilter: icon => icon.type === "sol" && icon.color === "green",
+    systemMsg: ""
+  },
+  {
+    title: "使用者指令",
+    message: "請快速清理所有「黃色」的資料夾圖示。",
+    targetFilter: icon => icon.type === "folder" && icon.color === "yellow",
+    systemMsg: ""
+  }
+];
+function getRandomInstruction() {
+  return { ...instructions[Math.floor(Math.random()*instructions.length)] };
+}
+function generateIcons() {
+  const all = [...icons];
+  const arr = [];
+  for (let i = 0; i < 10; i++) {
+    const idx = Math.floor(Math.random()*all.length);
+    arr.push({ ...all[idx] });
+  }
+  return arr;
+}
+
+/** --- React-like UI --- **/
+const e = React.createElement;
+
+function DesktopIcon({icon, onDragStart, dragged}) {
+  return e("div", {
+    className: "desktop-icon" + (dragged ? " dragging" : ""),
+    draggable: true,
+    onDragStart: () => onDragStart(icon),
+    title: icon.label
+  }, [
+    e("img", {src: icon.img, alt: icon.label, style: {width:48, height:48}}, null),
+    e("span", {className: "icon-label"}, icon.label)
+  ]);
+}
+function Desktop({icons, onDragStart, draggedIcon}) {
+  return e("div", {className: "desktop"}, 
+    icons.map((icon, i) =>
+      e(DesktopIcon, {icon, onDragStart, dragged: draggedIcon===icon, key: i})
+    )
+  );
+}
+function Taskbar({score, timer, onReset, onScreensaver}) {
+  const [clock, setClock] = React.useState(new Date().toLocaleTimeString());
+  React.useEffect(() => {
+    const t = setInterval(() => setClock(new Date().toLocaleTimeString()), 1000);
+    return ()=>clearInterval(t);
+  }, []);
+  return e("div", {className:"taskbar"}, [
+    e("div", {className:"taskbar-section"},
+      e("button", {className:"start-btn", onClick:onReset},
+        e("img",{src:"assets/start.png", alt:"開始", style:{width:22,marginRight:4}}), "開始"
+      ),
+      e("span", null, "分數："+score),
+      e("span", null, "倒數："+timer+"s")
+    ),
+    e("div",{className:"taskbar-section right"},
+      e("button",{className:"ss-btn", onClick:onScreensaver},
+        e("img",{src:"assets/ss.png", alt:"螢幕保護", style:{width:22}})
+      ),
+      e("span",{className:"clock"}, clock)
+    )
+  ]);
+}
+function Dialog({title, message, systemMsg, onClose, icon="info", sound}) {
+  React.useEffect(() => { if(sound){ new Audio(sound).play(); } }, [sound]);
+  return e("div",{className:"dialog-backdrop"},
+    e("div",{className:"dialog"},[
+      e("div",{className:"dialog-header"},
+        e("img",{src:icon==="error"?"assets/error.png":"assets/info.png",style:{marginRight:8,width:24}},null),
+        e("span",{className:"dialog-title"},title)
+      ),
+      e("div",{className:"dialog-body"},[
+        message,
+        systemMsg?e("div",{className:"system-msg"},systemMsg):null
+      ]),
+      e("div",{className:"dialog-footer"},
+        e("button",{autoFocus:true, onClick:onClose},"確定")
+      )
+    ])
+  );
+}
+function RecycleBin({onDrop, contents, isActive}) {
+  return e("div",{
+    className:"recycle-bin"+(isActive?" active":""),
+    onDragOver: e=>e.preventDefault(),
+    onDrop:onDrop
+  },[
+    e("img", {src:contents.length?"assets/recycle-full.png":"assets/recycle-empty.png", alt:"資源回收筒", style:{width:48,height:48}},null),
+    e("div",{className:"rb-label"},"回收筒")
+  ]);
+}
+function BSOD() {
+  return e("div",{className:"bsod-bg"},
+    e("div",{className:"bsod-box"},
+      e("pre",null,
+`*** STOP: 0x0000001E (0x0000005,0x0000000,0x0000000,0x0000000)
+KMODE_EXCEPTION_NOT_HANDLED
+
+如果這是第一次看到這個螢幕，請重新啟動您的電腦。
+如持續發生，請聯絡您的系統管理員或技術支援人員。
+
+按下任何鍵繼續...`
+      )
+    )
+  );
+}
+function Screensaver({type, onExit}) {
+  React.useEffect(() => {
+    const exit = ()=>onExit();
+    window.addEventListener("mousemove",exit); window.addEventListener("keydown",exit);
+    return ()=>{window.removeEventListener("mousemove",exit);window.removeEventListener("keydown",exit);}
+  },[onExit]);
+  return e("div",{className:"screensaver-bg"},[
+    type==="pipes" && e("div",{className:"pipes-ss"}),
+    type==="stars" && e("div",{className:"stars-ss"}),
+    type==="maze" && e("div",{className:"maze-ss"}),
+    e("div",{className:"ss-hint"},"移動滑鼠或按任意鍵結束螢幕保護程式")
+  ]);
+}
+
+/** --- 主元件 --- **/
+function App() {
+  const GAME_DURATION = 60;
+  const BSOD_DURATION = 3000;
+  const SCREENSAVER_TIMEOUT = 30000;
+  const [desktopIcons, setDesktopIcons] = React.useState(generateIcons());
+  const [dialog, setDialog] = React.useState(getRandomInstruction());
+  const [gameState, setGameState] = React.useState("playing");
+  const [background, setBackground] = React.useState(backgrounds[0]);
+  const [recycleBinContents, setRecycleBinContents] = React.useState([]);
+  const [score, setScore] = React.useState(0);
+  const [timer, setTimer] = React.useState(GAME_DURATION);
+  const [sound, setSound] = React.useState(null);
+  const [draggedIcon, setDraggedIcon] = React.useState(null);
+  const [errorDialog, setErrorDialog] = React.useState(null);
+  const [screensaver, setScreensaver] = React.useState(null);
+
+  // Idle自動螢幕保護
+  React.useEffect(()=>{
+    if(gameState!=="playing")return;
+    let idleTimeout = setTimeout(()=>setGameState("screensaver"), SCREENSAVER_TIMEOUT);
+    const resetIdle = ()=>{
+      clearTimeout(idleTimeout);
+      idleTimeout = setTimeout(()=>setGameState("screensaver"), SCREENSAVER_TIMEOUT);
+    };
+    window.addEventListener("mousemove",resetIdle);
+    window.addEventListener("keydown",resetIdle);
+    return ()=>{
+      window.removeEventListener("mousemove",resetIdle);
+      window.removeEventListener("keydown",resetIdle);
+      clearTimeout(idleTimeout);
+    };
+  },[gameState]);
+
+  // 倒數計時
+  React.useEffect(()=>{
+    if(gameState!=="playing")return;
+    if(timer<=0){
+      setGameState("bsod"); setSound(winSounds.bsod);
+      setTimeout(()=>nextLevel(),BSOD_DURATION);
+      return;
+    }
+    const t=setTimeout(()=>setTimer(timer-1),1000); return ()=>clearTimeout(t);
+  },[timer,gameState]);
+
+  function resetGame() {
+    setBackground(backgrounds[Math.floor(Math.random()*backgrounds.length)]);
+    setDesktopIcons(generateIcons());
+    setDialog(getRandomInstruction());
+    setGameState("playing");
+    setRecycleBinContents([]);
+    setScore(0);
+    setTimer(GAME_DURATION);
+    setSound(null);
+    setDraggedIcon(null);
+    setErrorDialog(null);
+    setScreensaver(null);
+  }
+  function nextLevel() {
+    setDialog(getRandomInstruction());
+    setDesktopIcons(generateIcons());
+    setRecycleBinContents([]);
+    setGameState("playing");
+    setSound(null);
+    setTimer(GAME_DURATION);
+  }
+  function handleDragStart(icon) { setDraggedIcon(icon);}
+  function handleDropOnRecycleBin() {
+    if(!draggedIcon||!dialog)return;
+    // 判斷是否正確
+    const shouldDelete=dialog.targetFilter(draggedIcon);
+    if(shouldDelete){
+      setRecycleBinContents([...recycleBinContents,draggedIcon]);
+      setDesktopIcons(desktopIcons.filter(i=>i!==draggedIcon));
+      setSound(winSounds.recycle);
+      setScore(score+1);
+      // 全部刪除完畢
+      if(desktopIcons.filter(i=>i!==draggedIcon).filter(dialog.targetFilter).length===0){
+        setTimeout(()=>{
+          setDialog({...dialog,systemMsg:"恭喜完成清理！"});
+          setSound(winSounds.tada);
+        },300);
+      }
+    }else{
+      setErrorDialog("錯誤！這個圖示不應該被刪除。");
+      setSound(winSounds.error);
+    }
+    setDraggedIcon(null);
+  }
+  function handleCloseErrorDialog(){setErrorDialog(null);}
+  function handleDialogClose(){setDialog(null);}
+  function handleScreensaverExit(){
+    setGameState("playing"); setScreensaver(null); setTimer(GAME_DURATION);
+  }
+
+  // bg
+  React.useEffect(()=>{
+    document.querySelector(".app")?.setAttribute("style",`background-image:url(${background})`);
+  },[background]);
+
+  // 音效
+  React.useEffect(()=>{
+    if(sound){ new Audio(sound).play(); }
+  },[sound]);
+
+  // 螢幕保護
+  React.useEffect(()=>{
+    if(gameState==="screensaver"){
+      setScreensaver(screensavers[Math.floor(Math.random()*screensavers.length)]);
+    }
+  },[gameState]);
+
+  return e("div",{className:"app",style:{backgroundImage:`url(${background})`}},[
+    e(Taskbar,{score,timer,onReset:resetGame,onScreensaver:()=>setGameState("screensaver")}),
+    e(Desktop,{icons:desktopIcons,onDragStart:handleDragStart,draggedIcon}),
+    e(RecycleBin,{onDrop:handleDropOnRecycleBin,contents:recycleBinContents,isActive:!!draggedIcon}),
+    dialog && e(Dialog, {
+      title:dialog.title, message:dialog.message, systemMsg:dialog.systemMsg,
+      onClose:handleDialogClose, sound:winSounds.tada
+    }),
+    errorDialog && e(Dialog, {
+      title:"錯誤", message:errorDialog, onClose:handleCloseErrorDialog, icon:"error", sound:winSounds.error
+    }),
+    gameState==="bsod" && e(BSOD,{}),
+    gameState==="screensaver" && e(Screensaver,{type:screensaver,onExit:handleScreensaverExit})
+  ]);
+}
+/** --- 啟動 --- **/
+window.onload = function() {
+  const root = document.getElementById('root');
+  ReactDOM.render(React.createElement(App, null), root);
+};
+</script>
+<!-- CDN 載入 React (適合 demo) -->
+<script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+</body>
+</html>

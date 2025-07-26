@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>數據次元：方塊解碼</title>
+  <meta name="viewport" content="width=800, user-scalable=no">
+  <meta name="theme-color" content="#0f0">
+  <link rel="icon" href="https://em-content.zobj.net/source/microsoft-teams/363/laptop_1f4bb.png" />
+  <!-- Google Fonts: Press Start 2P -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin:0; padding:0; background: #101a10; }
+    body { font-family: 'Press Start 2P', monospace; }
+
+    .crt-frame {
+      box-shadow: 0 0 60px #0f0d, 0 0 8px #0a0;
+      border-radius: 28px;
+      padding: 18px 24px;
+      margin: 40px auto;
+      background: linear-gradient(150deg, #1f2d1f 80%, #243324 100%);
+      width: 720px;
+      height: 540px;
+      position: relative;
+      overflow: hidden;
+      max-width: 100vw;
+    }
+    .crt-glass {
+      border-radius: 24px;
+      box-shadow: 0 0 30px #060  inset;
+      background: #102010;
+      height: 100%;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .crt-inner {
+      position: absolute;
+      inset: 0;
+      padding: 18px;
+      color: #0f0;
+      font-size: 18px;
+      text-shadow: 0 0 8px #0f0b, 0 0 1px #0a0;
+      font-family: 'Press Start 2P', monospace;
+      z-index: 2;
+    }
+    .crt-scanlines {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,255,0,0.01) 0px,
+        rgba(0,255,0,0.03) 2px,
+        rgba(0,0,0,0.08) 3px,
+        transparent 4px
+      );
+      z-index: 1;
+    }
+
+    .crt-loading pre {
+      color: #0f0;
+      font-size: 22px;
+      margin: 80px auto;
+      text-shadow: 0 0 6px #0f0, 0 0 1px #080;
+      font-family: 'Press Start 2P', monospace;
+    }
+    .crt-blink {
+      animation: blink 1s steps(2, start) infinite;
+    }
+    @keyframes blink { to { opacity: 0; } }
+    .crt-title {
+      font-size: 2.2em;
+      text-align: center;
+      margin-top: 50px;
+      text-shadow: 0 0 16px #0f0b, 0 0 1px #0a0;
+      letter-spacing: 2px;
+    }
+    .crt-btn {
+      display: inline-block;
+      margin: 16px 8px;
+      padding: 10px 28px;
+      background: #141;
+      border: 2px solid #3f3;
+      border-radius: 7px;
+      font-family: 'Press Start 2P', monospace;
+      color: #0f0;
+      font-size: 1.1em;
+      text-shadow: 0 0 8px #0f0;
+      cursor: pointer;
+      box-shadow: 0 2px 0 #101, 0 0 8px #0f0b inset;
+      transition: background 0.1s;
+    }
+    .crt-btn:active { background: #0a1; }
+    .menu, .scoreboard, .crt-cutscene { text-align: center; }
+    .crt-panel {
+      margin: 50px auto;
+      padding: 34px;
+      background: #192519e0;
+      border-radius: 18px;
+      border: 2px solid #3f3;
+      box-shadow: 0 0 14px #0f0b, 0 0 1px #0a0;
+      color: #0f0;
+      max-width: 420px;
+    }
+    .crt-score-input {
+      width: 70px;
+      font-size: 1.4em;
+      text-align: center;
+      margin: 0 10px;
+      background: #111;
+      color: #3f3;
+      border: none;
+      border-bottom: 2px solid #3f3;
+      font-family: 'Press Start 2P', monospace;
+    }
+    .cube-selector {
+      margin: 28px auto;
+      text-align: center;
+    }
+    .question-text {
+      margin-bottom: 16px;
+      font-size: 1.1em;
+      text-shadow: 0 0 8px #0f0b, 0 0 1px #0a0;
+    }
+    .cube-options {
+      display: flex;
+      justify-content: center;
+      gap: 36px;
+    }
+    .cube-option {
+      perspective: 400px;
+      transition: box-shadow 0.12s;
+      box-shadow: 0 0 10px #0f0b;
+      border-radius: 7px;
+      padding: 8px;
+      background: #181;
+      cursor: pointer;
+      outline: none;
+    }
+    .cube-art {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto;
+      border-radius: 8px;
+      background: #121;
+      box-shadow: 0 0 6px #0f0b, 0 0 2px #0a0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cube-option:active, .cube-option:focus {
+      background: #0b1;
+      box-shadow: 0 0 20px #0f0b, 0 0 2px #0a0;
+    }
+    .game-hud {
+      font-size: 1em;
+      padding: 8px 0 16px 0;
+      display: flex;
+      justify-content: space-between;
+      width: 90%;
+      margin: 0 auto 8px auto;
+      text-shadow: 0 0 3px #0f0b, 0 0 1px #0a0;
+    }
+    @media (max-width: 750px) {
+      .crt-frame { width: 99vw; height: 99vw; min-height: 400px; }
+      .crt-inner { font-size: 14px; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="crt-frame">
+    <div class="crt-glass">
+      <div class="crt-scanlines"></div>
+      <div class="crt-inner" id="game-root"></div>
+    </div>
+  </div>
+<script>
+/** ==== 音效與BGM ==== */
+const AUDIO = {
+  arcadeBgm: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/arcade_bgm.mp3",
+  sfxRotate: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/rotate.wav",
+  sfxCorrect: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/correct.wav",
+  sfxError: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/error.wav",
+  sfxComplete: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/complete.wav",
+  msdosBoot: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/msdos_boot.mp3"
+};
+class AudioManager {
+  constructor() { this.bgm = null; this.sfx = null; }
+  play(src, volume = 1, loop = false) {
+    if (!src) return;
+    if (src.endsWith(".mp3")) {
+      if (this.bgm) { this.bgm.pause(); this.bgm = null; }
+      this.bgm = new Audio(src);
+      this.bgm.volume = volume;
+      this.bgm.loop = loop;
+      this.bgm.play();
+    } else {
+      if (this.sfx) { this.sfx.pause(); this.sfx = null; }
+      this.sfx = new Audio(src);
+      this.sfx.volume = volume;
+      this.sfx.play();
+    }
+  }
+  stop() {
+    if (this.bgm) { this.bgm.pause(); this.bgm = null; }
+    if (this.sfx) { this.sfx.pause(); this.sfx = null; }
+  }
+}
+const audio = new AudioManager();
+/** ==== 問題產生器 ==== */
+function generateQuestion() {
+  const answerIndex = Math.floor(Math.random() * 4);
+  return {
+    prompt: "找出唯一一個電路紋理不同的方塊：",
+    options: [0, 1, 2, 3].map(i => ({
+      render: () => {
+        const fill = i === answerIndex ? "#3f3" : "#0f0";
+        const symbol = i === answerIndex ? "?" : "#";
+        return `<svg width="48" height="48"><rect width="48" height="48" rx="8" fill="${fill}" />
+        <text x="24" y="36" text-anchor="middle" fill="#111" font-size="30" font-family="monospace">${symbol}</text></svg>`;
+      }
+    })),
+    answerIndex
+  };
+}
+/** ==== 劇情 Cutscene ==== */
+const cutscenes = [
+`1989年。網路深處。
+你是一名駭客，被神秘AI「創世者」鎖定。
+資料核心被重重防火牆防護，你必須解碼進入。
+
+任務：破解數據密碼，潛入AI的核心。`,
+`第一道防線已被突破，資料流如洪水般湧現。
+你感受到AI的監控，螢幕上的符號開始扭曲。
+一場智力的對決正式展開……`
+];
+/** ==== 遊戲主程式 ==== */
+const GAME_TIME = 90;
+let state = {
+  view: "loading", // loading, menu, arcade, scoreboard, cutscene
+  score: 0,
+  combo: 0,
+  timeLeft: GAME_TIME,
+  question: null,
+  initials: "",
+  showScoreboard: false,
+  cutIdx: 0,
+  timer: null
+};
+function setState(next) {
+  Object.assign(state, next);
+  render();
+}
+function loadingScreen() {
+  return `<div class="crt-loading"><pre>
+LOADING...
+C:\\GAME\\VOXEL.EXE
+<span class="crt-blink">█</span></pre></div>`;
+}
+function menuScreen() {
+  return `
+  <div class="menu">
+    <h1 class="crt-title">數據次元：方塊解碼</h1>
+    <button class="crt-btn" onclick="startArcade()">街機模式</button>
+    <button class="crt-btn" onclick="setCutscene(0)">劇情模式</button>
+    <button class="crt-btn" onclick="setState({view:'scoreboard'})">高分榜</button>
+  </div>`;
+}
+function gameHUD() {
+  return `<div class="game-hud">
+    <span>SCORE: ${state.score}</span>
+    <span>TIME: ${state.timeLeft}s</span>
+    <span>COMBO: ${state.combo}</span>
+  </div>`;
+}
+function cubeSelector() {
+  if (!state.question) return "";
+  let options = state.question.options.map((opt, idx) => `
+    <div class="cube-option"
+      tabindex="0"
+      onclick="selectCube(${idx})"
+      onmousedown="cubeRotateSfx()"
+      onmouseup="cubeRotateEnd()"
+      style="display:inline-block;">
+      <div class="cube-art">${opt.render()}</div>
+    </div>
+  `).join('');
+  return `<div class="cube-selector">
+    <div class="question-text">${state.question.prompt}</div>
+    <div class="cube-options">${options}</div>
+  </div>`;
+}
+function scoreboardScreen() {
+  // 高分榜: 使用 localStorage
+  let hs = getHighScores();
+  let rows = hs.map((h, i) =>
+    `<tr><td>${i+1}</td><td>${h.initials}</td><td>${h.score}</td></tr>`
+  ).join('');
+  return `<div class="scoreboard crt-panel">
+    <h2>HIGH SCORES</h2>
+    <table style="margin:0 auto;color:#0f0;font-size:1em"><tbody>${rows}</tbody></table>
+    <div style="margin-top:1em"><span>Your Score: ${state.score}</span></div>
+    <div>
+      <input class="crt-score-input" maxlength="3" value="${state.initials || ""}" oninput="inputInitials(this.value)" placeholder="AAA" />
+      <button class="crt-btn" onclick="submitInitials()">提交</button>
+    </div>
+    <button class="crt-btn" onclick="toMenu()">返回主選單</button>
+  </div>`;
+}
+function cutsceneScreen() {
+  return `<div class="crt-cutscene crt-panel"><pre>${cutscenes[state.cutIdx]}</pre>
+    <button class="crt-btn" onclick="nextCutscene()">繼續</button>
+  </div>`;
+}
+function render() {
+  const el = document.getElementById('game-root');
+  let html = "";
+  switch(state.view) {
+    case "loading": html = loadingScreen(); break;
+    case "menu": html = menuScreen(); break;
+    case "arcade":
+      html = gameHUD() + cubeSelector();
+      break;
+    case "scoreboard": html = scoreboardScreen(); break;
+    case "cutscene": html = cutsceneScreen(); break;
+  }
+  el.innerHTML = html;
+}
+function startArcade() {
+  setState({view:"arcade", score:0, combo:0, timeLeft:GAME_TIME, question: generateQuestion(), initials:""});
+  if (state.timer) clearInterval(state.timer);
+  audio.play(AUDIO.arcadeBgm, 0.6, true);
+  state.timer = setInterval(() => {
+    setState({timeLeft: state.timeLeft-1});
+    if (state.timeLeft <= 1) {
+      clearInterval(state.timer);
+      audio.stop();
+      setState({view:"scoreboard"});
+    }
+  }, 1000);
+}
+function selectCube(idx) {
+  if (!state.question) return;
+  if (idx === state.question.answerIndex) {
+    setState({score:state.score+100+state.combo*20, combo:state.combo+1});
+    audio.play(AUDIO.sfxCorrect, 1);
+    setTimeout(()=>setState({question: generateQuestion()}), 200);
+  } else {
+    setState({combo:0});
+    audio.play(AUDIO.sfxError, 1);
+    setTimeout(()=>setState({question: generateQuestion()}), 350);
+  }
+}
+function cubeRotateSfx() {
+  audio.play(AUDIO.sfxRotate, 0.8);
+}
+function cubeRotateEnd() {}
+function setCutscene(idx) {
+  setState({view:"cutscene", cutIdx:idx});
+}
+function nextCutscene() {
+  if (state.cutIdx<cutscenes.length-1) setState({cutIdx:state.cutIdx+1});
+  else toMenu();
+}
+function inputInitials(val) { setState({initials: val.replace(/[^A-Z0-9]/gi,"").slice(0,3).toUpperCase()}); }
+function submitInitials() {
+  if (!state.initials) return;
+  let hs = getHighScores();
+  hs.push({ initials: state.initials, score: state.score });
+  hs = hs.sort((a, b) => b.score - a.score).slice(0, 10);
+  localStorage.setItem("cube_hs", JSON.stringify(hs));
+  toMenu();
+}
+function toMenu() {
+  audio.stop();
+  setState({view:"menu", score:0, combo:0, question:null, initials:""});
+}
+function getHighScores() {
+  return JSON.parse(localStorage.getItem("cube_hs") || "[]");
+}
+/** ==== 載入流程 ==== */
+function boot() {
+  render();
+  audio.play(AUDIO.msdosBoot, 0.8);
+  setTimeout(()=>setState({view:"menu"}), 3000);
+}
+window.onload = boot;
+</script>
+</body>
+</html>

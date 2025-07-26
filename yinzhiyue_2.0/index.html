@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>智齡樂 Gym (Silver-Wisdom Gym 2.0)</title>
+    <meta name="viewport" content="width=800, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0d110d;
+            color: #00ff41;
+            font-family: 'VT323', monospace;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .crt-container {
+            width: 780px;
+            height: 580px;
+            background: #111;
+            border: 18px solid #333;
+            border-radius: 25px;
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.25), 0 0 15px rgba(255, 255, 255, 0.1) inset;
+            position: relative;
+            overflow: hidden;
+        }
+        .crt-screen {
+            background: #081408;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            font-size: 1.3rem;
+            line-height: 1.5em;
+            text-shadow: 0 0 5px #0f0, 0 0 10px rgba(0, 255, 65, 0.5);
+            white-space: pre-wrap;
+        }
+        .scanline-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0.2) 2px, rgba(0, 0, 0, 0) 4px);
+            z-index: 2;
+        }
+        a, .command-btn {
+            color: #39ff14;
+            text-decoration: underline;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: inherit;
+            padding: 0;
+        }
+        a:hover, .command-btn:hover {
+            background: #00ff41;
+            color: #0d110d;
+        }
+        .prompt::before { content: 'C:\\SWS_GYM> '; }
+        .cursor {
+            display: inline-block;
+            width: 0.7em;
+            height: 1.4em;
+            background: #00ff41;
+            animation: blink 1s steps(2, start) infinite;
+        }
+        @keyframes blink { to { visibility: hidden; } }
+        .hidden { display: none; }
+        .menu-options { margin-top: 2em; }
+        .menu-options .command-btn { font-size: 1.5em; margin: 0.5em 0; display: block; }
+        .game-list { margin-top: 1em; }
+        .game-list a { display: block; margin: 0.3em 0; }
+        .results-panel { border: 2px solid #00ff41; padding: 1em; margin-top: 1em; }
+    </style>
+</head>
+<body>
+    <div class="crt-container">
+        <div class="crt-screen" id="terminal">
+            </div>
+        <div class="scanline-overlay"></div>
+    </div>
+
+    <script>
+        const terminal = document.getElementById('terminal');
+
+        const dailyChallengeMap = [
+            { day: "週日 (深度策略)", games: ["terminal-hacker.html", "project-rewind.html"] }, // 組合七
+            { day: "週一 (記憶啟動)", games: ["nostalgic-memory.html", "neon-strike.html", "mental-math-hacker.html"] }, // 組合一
+            { day: "週二 (邏輯思維)", games: ["terminal-hacker.html", "voxel-decode.html", "word-commando.html"] }, // 組合二
+            { day: "週三 (視覺觀察)", games: ["project-rewind.html", "voxel-decode.html", "nostalgic-memory.html"] }, // 組合三
+            { day: "週四 (語言風暴)", games: ["word-commando.html", "neon-strike.html", "mental-math-hacker.html"] }, // 組合四
+            { day: "週五 (空間挑戰)", games: ["voxel-decode.html", "terminal-hacker.html", "project-rewind.html"] }, // 組合五 (細節獵人替代速算)
+            { day: "週六 (綜合反應)", games: ["neon-strike.html", "mental-math-hacker.html", "word-commando.html"] } // 組合六
+        ];
+
+        const allGames = [
+            { name: "時光選物店", file: "nostalgic-memory.html" },
+            { name: "終端機駭客 (邏輯)", file: "terminal-hacker.html" },
+            { name: "文字特攻隊", file: "word-commando.html" },
+            { name: "霓虹衝擊 (專注)", file: "neon-strike.html" },
+            { name: "方塊解碼 (空間)", file: "voxel-decode.html" },
+            { name: "心算駭客", file: "mental-math-hacker.html" },
+            { name: "時光機偵錯 (觀察)", file: "project-rewind.html" },
+        ];
+
+        let state = "boot";
+
+        function render() {
+            terminal.innerHTML = '';
+            switch(state) {
+                case 'boot':
+                    bootSequence();
+                    break;
+                case 'menu':
+                    showMenu();
+                    break;
+                case 'challenge':
+                    showDailyChallenge();
+                    break;
+                case 'freeplay':
+                    showFreePlay();
+                    break;
+                case 'results':
+                    showResults();
+                    break;
+            }
+        }
+
+        async function typeText(text, delay = 50) {
+            for (let char of text) {
+                terminal.innerHTML += char;
+                terminal.scrollTop = terminal.scrollHeight;
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            terminal.innerHTML += '<br>';
+        }
+
+        async function bootSequence() {
+            const bootLines = [
+                'Silver-Wisdom BIOS v2.0...',
+                'Initializing Nostalgia Core...',
+                'C:\\> LOAD GYM.EXE',
+                ' ',
+                '歡迎來到「智齡樂 Gym」',
+                '一個為資深數位遊俠設計的腦力活化平台。',
+                ' '
+            ];
+            for (const line of bootLines) {
+                await typeText(line);
+            }
+            state = 'menu';
+            render();
+        }
+
+        function showMenu() {
+            terminal.innerHTML += `
+                <div class="prompt">請選擇模式：</div>
+                <div class="menu-options">
+                    <button class="command-btn" onclick="setState('challenge')">> 開始今日挑戰</button>
+                    <button class="command-btn" onclick="setState('freeplay')">> 自由練習模式</button>
+                </div>
+            `;
+        }
+
+        function showDailyChallenge() {
+            const today = new Date().getDay();
+            const challenge = dailyChallengeMap[today];
+            let challengeHTML = `
+                <div class="prompt">載入今日挑戰：${challenge.day}</div>
+                <p>請依序完成以下遊戲模組。完成後，點擊下方按鈕查看您的今日腦力指數。</p>
+                <div class="game-list">
+            `;
+            challenge.games.forEach((gameFile, index) => {
+                const game = allGames.find(g => g.file === gameFile);
+                challengeHTML += `<a href="${game.file}" target="_blank">${index + 1}. ${game.name}</a>`;
+            });
+            challengeHTML += `
+                </div>
+                <br>
+                <button class="command-btn" onclick="setState('results')">> 我已完成所有挑戰，查看報告</button>
+                <br>
+                <button class="command-btn" onclick="setState('menu')"><< 返回主選單</button>
+            `;
+            terminal.innerHTML = challengeHTML;
+        }
+        
+        function showFreePlay() {
+            let freePlayHTML = `
+                <div class="prompt">自由練習：點擊以啟動遊戲</div>
+                <div class="game-list">
+            `;
+            allGames.forEach(game => {
+                freePlayHTML += `<a href="${game.file}" target="_blank">${game.name}</a>`;
+            });
+            freePlayHTML += `
+                </div>
+                <br>
+                <button class="command-btn" onclick="setState('menu')"><< 返回主選單</button>
+            `;
+            terminal.innerHTML = freePlayHTML;
+        }
+
+        function showResults() {
+             const randomBPI = Math.floor(Math.random() * (950 - 750 + 1)) + 750;
+             const randomPercent = Math.floor(Math.random() * (95 - 75 + 1)) + 75;
+             const titles = ["記憶探索家", "光速反應者", "邏輯建築師", "空間魔術師"];
+             const randomTitle = titles[Math.floor(Math.random()*titles.length)];
+
+            let resultsHTML = `
+                <div class="prompt">您的今日腦力報告</div>
+                <div class="results-panel">
+                    <p>今日腦力指數 (BPI): ${randomBPI} / 1000</p>
+                    <p>您的表現超越了 ${randomPercent}% 的同齡使用者！</p>
+                    <p>今日稱號：${randomTitle}</p>
+                    <p>---</p>
+                    <p>[您的五維雷達圖將顯示於此]</p>
+                    <p>[勳章系統：恭喜您獲得了「晨練者」勳章！]</p>
+                </div>
+                <br>
+                <button class="command-btn" onclick="alert('分享功能將生成一張包含您今日成就的精美卡片！')">> 分享我的成就</button>
+                <br>
+                <button class="command-btn" onclick="setState('menu')"><< 返回主選單</button>
+            `;
+            terminal.innerHTML = resultsHTML;
+        }
+        
+        function setState(newState) {
+            state = newState;
+            render();
+        }
+
+        // Initial load
+        render();
+    </script>
+</body>
+</html>

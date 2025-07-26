@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>時光機偵錯檔案 Project Rewind: Glitch Archives</title>
+  <meta name="viewport" content="width=900, initial-scale=1.0" />
+  <!-- 字型引入 -->
+  <link href="https://fonts.googleapis.com/css?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin:0; padding:0; height:100%; background:#222; }
+    body { font-family:'VT323',monospace; }
+    #root { min-height: 100vh; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <!-- 音效與動圖素材直接用 base64 或可換成網路圖檔/音檔路徑 -->
+  <script>
+    // --- 資料與素材 ---
+    const assets = {
+      crtBg: "https://i.imgur.com/JxAiJ8B.jpg",
+      win95Logo: "https://i.imgur.com/wE2n8Rr.png",
+      folder: "https://i.imgur.com/4Z8e3Qh.png",
+      // 測試範例: 可用兩張不同的動圖
+      midnight_left: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHA5aGZ2Mjc1NGJoaHhla2J2bDhjZWVvN2Y4dnQwc30zN2kzZ3Y0eCZjdD1n/7OQCv9mh7lFQ/giphy.gif",
+      midnight_right: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTN3dGV3a3JpMHNkaDNkMjFqZm5uY2FjNmI2d29xZGM2cDdkczB1byZjdD1n/26tPoyDhjiJ2g7rEs/giphy.gif",
+      cgi_left: "https://i.imgur.com/BgZQyQ4.gif",   // 替換成早期CGI動圖
+      cgi_right: "https://i.imgur.com/4M3VhLL.gif",
+      // 音樂及音效(示意，建議可換成自己的mp3或ogg)
+      citypop: "https://cdn.pixabay.com/audio/2022/10/16/audio_12d6e7f8e2.mp3",
+      synth: "https://cdn.pixabay.com/audio/2022/10/16/audio_12e0f3e2e2.mp3",
+      vaporwave: "https://cdn.pixabay.com/audio/2022/03/15/audio_116b0c4402.mp3",
+      foundFx: "https://cdn.pixabay.com/audio/2022/03/15/audio_116b0c4402.mp3",
+      comboFx: "https://cdn.pixabay.com/audio/2022/11/16/audio_125b0e7bbd.mp3",
+      timeUpFx: "https://cdn.pixabay.com/audio/2022/03/15/audio_116b0be1b3.mp3",
+    };
+    // -- 關卡資料 --
+    const levels = [
+      {
+        id: "arcade-1",
+        folderName: "80's Arcade",
+        year: "1988",
+        name: "午夜賽車",
+        description: "奔馳於像素夜色的濱海公路，尋找時光錯誤！",
+        bgm: "synth",
+        theme: "pixel",
+        imgLeft: assets.midnight_left,
+        imgRight: assets.midnight_right,
+        diffSpots: [
+          { x: 0.32, y: 0.68, size: 0.07, desc: "車尾燈閃爍頻率" },
+          { x: 0.82, y: 0.25, size: 0.07, desc: "大樓窗戶亮燈" },
+          { x: 0.55, y: 0.85, size: 0.08, desc: "棕櫚樹搖擺幅度" }
+        ],
+        timeLimit: 70,
+      },
+      {
+        id: "cgi-1",
+        folderName: "95 Vaporwave",
+        year: "1995",
+        name: "虛擬幾何空間",
+        description: "初代CGI世界，尋找漂浮物體的異常。",
+        bgm: "vaporwave",
+        theme: "cgi",
+        imgLeft: assets.cgi_left,
+        imgRight: assets.cgi_right,
+        diffSpots: [
+          { x: 0.44, y: 0.53, size: 0.08, desc: "球體旋轉方向" },
+          { x: 0.13, y: 0.82, size: 0.07, desc: "地板貼圖" },
+          { x: 0.75, y: 0.63, size: 0.07, desc: "金屬反光" }
+        ],
+        timeLimit: 80,
+      },
+    ];
+  </script>
+  <!-- React 18/17 CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <!-- Howler 音效 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+  <script>
+    // --- BGM 播放器 ---
+    function playBGM(type) {
+      if(window._bgm) { try { window._bgm.stop(); } catch{} }
+      let src = assets.citypop;
+      if(type === "synth") src = assets.synth;
+      else if(type === "vaporwave") src = assets.vaporwave;
+      window._bgm = new Howl({ src: [src], loop: true, volume: 0.18 });
+      window._bgm.play();
+    }
+    function stopBGM() {
+      if(window._bgm) try{window._bgm.stop();}catch{}
+    }
+  </script>
+  <script>
+    const e = React.createElement;
+    // --- 主程式 ---
+    function App() {
+      const [screen, setScreen] = React.useState("desktop"); //"desktop"|"levelSelect"|"game"|"score"
+      const [selectedLevel, setSelectedLevel] = React.useState(null);
+      const [score, setScore] = React.useState(null);
+
+      // BGM 控制
+      React.useEffect(() => {
+        if(screen==="desktop"||screen==="levelSelect") playBGM("citypop");
+        if(screen==="game" && selectedLevel) playBGM(selectedLevel.bgm);
+        if(screen==="score") stopBGM();
+        return stopBGM;
+      }, [screen, selectedLevel]);
+
+      return e(React.Fragment, {},
+        screen === "desktop" && e(Desktop, { onEnter: ()=>setScreen("levelSelect") }),
+        screen === "levelSelect" && e(LevelSelect, {
+          levels, onSelect: lv => {setSelectedLevel(lv); setScreen("game");}
+        }),
+        screen === "game" && selectedLevel && e(GameLevel, {
+          level: selectedLevel,
+          onFinish: score => { setScore(score); setScreen("score"); },
+          onBack: ()=>setScreen("levelSelect")
+        }),
+        screen === "score" && score && e(ScoreSummary, {
+          score,
+          onBackToDesktop: ()=>{setScore(null); setSelectedLevel(null); setScreen("desktop")},
+          onReplay: ()=>{setScore(null); setScreen("game")}
+        })
+      );
+    }
+    // --- Desktop 桌面 ---
+    function Desktop({onEnter}) {
+      return e('div', {style:{
+        width:"100vw",height:"100vh",background:`url(${assets.crtBg}) center/cover no-repeat,#222`,
+        display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"
+      }},
+        e('img',{src:assets.win95Logo,style:{width:100,marginBottom:24}}),
+        e('div',{style:{color:"#0f0",fontSize:"2em",marginBottom:"2em",textShadow:"0 0 4px #0f0,0 0 8px #0f0"}},
+          "Project Rewind:\nGlitch Archives"
+        ),
+        e('button',{onClick:onEnter,style:{background:"#f0f0f0",border:"2px solid #888",fontSize:"1.5em",padding:"0.5em 3em",borderRadius:12,marginTop:"2em",fontFamily:"inherit",cursor:"pointer",boxShadow:"0 0 12px #fff7"}},
+          "進入桌面"
+        ),
+      );
+    }
+    // --- LevelSelect ---
+    function LevelSelect({levels,onSelect}) {
+      return e('div', {style:{
+        width:"100vw",height:"100vh",background:"#e0e0e0",fontFamily:"inherit"
+      }},
+        e('h2',{style:{fontSize:"2em",margin:"2em 0 1em 1em",color:"#333"}},"選擇關卡（點擊檔案夾進入）"),
+        e('div',{style:{display:"flex",flexWrap:"wrap",marginLeft:"2em"}},
+          levels.map(lv =>
+            e('div',{
+              key:lv.id,
+              onClick:()=>onSelect(lv),
+              style:{
+                width:150,height:120,margin:"1em 2em 1em 0",background:"#fbf4d6",
+                border:"2px solid #d8c16a",borderRadius:10,display:"flex",flexDirection:"column",
+                alignItems:"center",justifyContent:"center",fontSize:"1.2em",cursor:"pointer",boxShadow:"0 0 12px #bbb7",transition:"transform 0.1s"
+              },
+              onMouseOver: e=>e.currentTarget.style.transform="scale(1.08)",
+              onMouseOut: e=>e.currentTarget.style.transform=""
+            },
+              e('img',{src:assets.folder,style:{width:64,marginBottom:8},alt:""}),
+              e('span',null,lv.folderName),
+              e('span',{style:{fontSize:"0.9em",color:"#999"}},lv.year)
+            )
+          )
+        )
+      );
+    }
+    // --- GameLevel ---
+    function GameLevel({level,onFinish,onBack}) {
+      const [found, setFound] = React.useState(Array(level.diffSpots.length).fill(false));
+      const [combo, setCombo] = React.useState(0);
+      const [comboShow, setComboShow] = React.useState(false);
+      const [comboWord, setComboWord] = React.useState("");
+      const [timeLeft, setTimeLeft] = React.useState(level.timeLimit);
+      const [usingEagleEye, setUsingEagleEye] = React.useState(false);
+      const [toolCooldown, setToolCooldown] = React.useState(false);
+      const [paused, setPaused] = React.useState(false);
+
+      React.useEffect(()=>{
+        if(paused) return;
+        if(timeLeft<=0){
+          onFinish({
+            level,found:found.filter(Boolean).length,total:found.length,combo,timeLeft:0,grade:getGrade(found.filter(Boolean).length,found.length,combo,0)
+          });
+          new Howl({src:[assets.timeUpFx],volume:0.4}).play();
+          return;
+        }
+        const t=setTimeout(()=>setTimeLeft(t=>t-1),1000);
+        return ()=>clearTimeout(t);
+      },[timeLeft,paused,found,combo,onFinish,level]);
+
+      React.useEffect(()=>{
+        if(comboShow){
+          const t=setTimeout(()=>setComboShow(false),1100);
+          return ()=>clearTimeout(t);
+        }
+      },[comboShow]);
+
+      React.useEffect(()=>{
+        if(found.every(Boolean)){
+          setTimeout(()=>onFinish({
+            level,found:found.length,total:found.length,combo,timeLeft,grade:getGrade(found.length,found.length,combo,timeLeft)
+          }),700);
+        }
+      },[found,onFinish,combo,timeLeft,level]);
+
+      function handleImgClick(e,side){
+        if(paused) return;
+        const rect = e.target.getBoundingClientRect();
+        const x = (e.clientX - rect.left)/rect.width;
+        const y = (e.clientY - rect.top)/rect.height;
+        let hit=false, idx=-1;
+        level.diffSpots.forEach((d,i)=>{
+          if(found[i]) return;
+          const dx=Math.abs(d.x-x),dy=Math.abs(d.y-y);
+          const dist=Math.sqrt(dx*dx+dy*dy);
+          if(dist < d.size*1.1){ hit=true; idx=i; }
+        });
+        if(hit && idx>=0){
+          new Howl({src:[assets.foundFx],volume:0.45}).play();
+          setFound(fs=>{const n=[...fs];n[idx]=true;return n;});
+          setCombo(c=>c+1);
+          setComboShow(true);
+          setComboWord(praiseWords[Math.floor(Math.random()*praiseWords.length)]);
+          new Howl({src:[assets.comboFx],volume:0.33}).play();
+        } else {
+          setCombo(0);
+          setComboShow(true);
+          setComboWord("Miss!");
+        }
+      }
+      function useEagleEye(){
+        if(toolCooldown||usingEagleEye) return;
+        setUsingEagleEye(true); setToolCooldown(true);
+        setTimeout(()=>setUsingEagleEye(false),2200);
+        setTimeout(()=>setToolCooldown(false),7000);
+      }
+      function useTimePause(){
+        if(paused||toolCooldown) return;
+        setPaused(true); setToolCooldown(true);
+        setTimeout(()=>setPaused(false),5200);
+        setTimeout(()=>setToolCooldown(false),10000);
+      }
+      function useHint(){
+        if(toolCooldown) return;
+        setToolCooldown(true);
+        const i=found.findIndex(v=>!v);
+        if(i>=0) alert(`提示：有一處錯誤在「${level.diffSpots[i].desc}」附近（第${i+1}個差異）`);
+        setTimeout(()=>setToolCooldown(false),7000);
+      }
+      return e('div',{style:{
+        background:"#181c2a",minHeight:"100vh",color:"#fff",fontFamily:"inherit",display:"flex",flexDirection:"column",alignItems:"center"
+      }},
+        e('h2',{style:{marginTop:"1em",fontSize:"2em",color:"#ff9",textShadow:"0 0 9px #0ff8"}},`${level.year} - ${level.folderName} - ${level.name}`),
+        e('div',{style:{margin:"1.1em auto",maxWidth:650,fontSize:"1.3em",color:"#aac"}},level.description),
+        e(TimerBar, {percent:(timeLeft/level.timeLimit)*100}),
+        e('div',{style:{margin:"1em auto 0 0",display:"flex",gap:"2em"}},
+          e(ToolBtn,{onClick:useEagleEye,disabled:toolCooldown},"🦅 鷹眼放大鏡"),
+          e(ToolBtn,{onClick:useTimePause,disabled:toolCooldown},"⏱ 時光暫停"),
+          e(ToolBtn,{onClick:useHint,disabled:toolCooldown},"🛰️ 錯誤提示"),
+          e(ToolBtn,{onClick:onBack},"↩ 回關卡選單")
+        ),
+        e('div',{style:{display:"flex",margin:"2em 0 1em 0",alignItems:"flex-start",justifyContent:"center"}},
+          e(SplitImg,{onClick:e=>handleImgClick(e,"left")},
+            e('img',{src:level.imgLeft,alt:"",draggable:false,style:{width:"100%",height:"100%",objectFit:"cover"}}),
+            level.diffSpots.map((d,i)=>
+              (found[i]||usingEagleEye)?e(DiffCircle,{key:i,x:d.x,y:d.y,size:d.size,found:found[i]}):null
+            )
+          ),
+          e(SplitImg,{onClick:e=>handleImgClick(e,"right")},
+            e('img',{src:level.imgRight,alt:"",draggable:false,style:{width:"100%",height:"100%",objectFit:"cover"}}),
+            level.diffSpots.map((d,i)=>
+              (found[i]||usingEagleEye)?e(DiffCircle,{key:i,x:d.x,y:d.y,size:d.size,found:found[i]}):null
+            )
+          )
+        ),
+        e('div',{style:{
+          position:"absolute",left:"46vw",top:"25vh",fontSize:"2.2em",color:"#0fc",textShadow:"0 0 12px #fff,0 0 24px #0ff8",
+          opacity:comboShow?1:0,transition:"opacity 0.3s",pointerEvents:"none"
+        }},
+          comboWord, combo>1 ?` COMBO x${combo}!`:""
+        )
+      );
+    }
+    // --- ScoreSummary ---
+    function ScoreSummary({score,onBackToDesktop,onReplay}) {
+      return e('div',{style:{
+        width:"100vw",minHeight:"100vh",background:"linear-gradient(150deg,#2e2d60 0%,#114 100%)",
+        color:"#fff",fontFamily:"inherit",display:"flex",flexDirection:"column",alignItems:"center"
+      }},
+        e('div',{style:{
+          marginTop:"9vh",background:"#fff2",borderRadius:16,padding:"2.5em 3.5em",boxShadow:"0 0 19px #fff6",textAlign:"center"
+        }},
+          e('div',{style:{fontSize:"2.5em",color:"#ff0",marginBottom:"0.3em"}},
+            score.grade==="S級"?"🌟":score.grade==="A級"?"🎖":score.grade==="B級"?"✅":"🔎",
+            score.grade,"修復師"
+          ),
+          e('div',null,`已修正 ${score.found} / ${score.total} 個錯誤`),
+          e('div',null,`最高連擊數：${score.combo}`),
+          e('div',null,`剩餘時間：${score.timeLeft} 秒`),
+          e('div',{style:{marginTop:16,color:"#8ef"}},
+            score.grade==="S級" && "完美無瑕！你是傳說級修復專家！" ||
+            score.grade==="A級" && "接近完美！再接再厲！" ||
+            score.grade==="B級" && "不錯喔！多練習可以更好！" ||
+            "加油，下次會更棒！"
+          ),
+          e('button',{onClick:onReplay,style:BtnStyle},"重玩本關"),
+          e('button',{onClick:onBackToDesktop,style:BtnStyle},"返回桌面")
+        )
+      );
+    }
+    // --- 元件小工具 ---
+    function getGrade(found,total,combo,leftTime){
+      if(found===total && leftTime>20 && combo>=3) return "S級";
+      if(found===total && combo>=2) return "A級";
+      if(found>=total-1) return "B級";
+      return "C級";
+    }
+    const praiseWords = ["Cool!","Perfect!","Combo!","Nice!"];
+    function TimerBar({percent}) {
+      return e('div',{style:{
+        width:"60vw",maxWidth:600,height:18,background:"#444",borderRadius:8,margin:"1em auto",overflow:"hidden",position:"relative"
+      }},
+        e('div',{style:{
+          width:`${percent}%`,height:"100%",
+          background:"linear-gradient(90deg,#6ff 0%,#f0f 100%)",transition:"width 0.4s"
+        }})
+      );
+    }
+    function ToolBtn(props){ return e('button',Object.assign({style:{
+      fontFamily:"inherit",fontSize:"1.1em",padding:"0.2em 1.2em",borderRadius:8,border:"2px solid #ff9",
+      background:"#222",color:"#ff9",cursor:"pointer",marginRight:"1em"
+    }},props)); }
+    function SplitImg(props){ return e('div',Object.assign({style:{
+      width:330,height:220,margin:"0 20px",border:"3px solid #fff2",borderRadius:10,overflow:"hidden",boxShadow:"0 0 18px #fff3",background:"#111",position:"relative"
+    }},props)); }
+    function DiffCircle({x,y,size,found}) {
+      return e('div',{style:{
+        position:"absolute",left:x*330-330*0.5*0.04,top:y*220-220*0.5*0.04,
+        width:size*330*2,height:size*220*2,borderRadius:"50%",
+        background:found?"rgba(90,255,90,0.13)":"rgba(255,255,90,0.10)",
+        border:found?"2px solid #0f0":"2px dashed #ff9",pointerEvents:"none",
+        transition:"background 0.2s,border 0.2s"
+      }});
+    }
+    const BtnStyle = {
+      fontFamily:'inherit',background:"#1d1",color:"#fff",fontSize:"1.5em",
+      borderRadius:8,border:"none",padding:"0.3em 2em",margin:"1em 1.2em 0 1.2em",cursor:"pointer",boxShadow:"0 0 8px #0f07"
+    };
+    // --- 啟動 ---
+    ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+  </script>
+</body>
+</html>

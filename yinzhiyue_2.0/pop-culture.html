@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>懷舊影視與流行文化遊戲</title>
+  <style>
+    body { margin:0; background:#15152a; display:flex; flex-direction:column; align-items:center; }
+    #game-canvas { margin:30px 0 0 0; border-radius:34px; box-shadow:0 0 48px #000a; }
+    .credit { color:#fff; margin:8px; font-size:14px;}
+    .theme-btn { background:#333; color:#fff; border:none; margin:0 6px; padding:8px 20px; border-radius:8px; font-size:18px;}
+    .theme-btn.selected { background:#38a1db; color:#fff;}
+  </style>
+</head>
+<body>
+<div>
+  <button class="theme-btn selected" onclick="startGame(0)">回到未來</button>
+  <button class="theme-btn" onclick="startGame(1)">金剛戰士</button>
+</div>
+<canvas id="game-canvas" width="900" height="600"></canvas>
+<div class="credit">© 2025 Pop Culture Game Demo | 音效請自備 wav/mp3 或註解 sound 播放程式碼即可測試</div>
+<script>
+// ------------------------ 遊戲主程式開始 ----------------------------
+
+// 主題資源
+const THEMES = [
+  {
+    name: '回到未來',
+    colors: {main: '#38a1db', accent: '#fcb900', danger: '#1d1d1d'},
+    objects: [
+      {type: 'delorean', label: '時光車', color: '#bbbbbb'},
+      {type: 'crystal', label: '藍色能量水晶', color: '#38a1db'},
+      {type: 'vortex', label: '藍色時間亂流', color: '#4bbbe5'}
+    ],
+    successSound: 'bttf_time.wav', // 可用現有音效或自行更換
+    failSound: 'bttf_biff_laugh.wav',
+    quote: '「快！幫助博士收集所有“藍色”的能量水晶，但要避開“藍色”的時間亂流！」'
+  },
+  {
+    name: '金剛戰士',
+    colors: {main: '#e31e24', accent: '#f7e017', danger: '#000000'},
+    objects: [
+      {type: 'ranger', label: '紅戰士', color: '#e31e24'},
+      {type: 'ranger', label: '藍戰士', color: '#2274c0'},
+      {type: 'ranger', label: '黃戰士', color: '#f7e017'},
+      {type: 'ranger', label: '粉紅戰士', color: '#e870a2'},
+      {type: 'ranger', label: '黑戰士', color: '#000000'},
+      {type: 'zord', label: '機器獸', color: '#888888'}
+    ],
+    successSound: 'pr_sword.wav',
+    failSound: 'pr_rita_laugh.wav',
+    quote: '「It’s Morphin Time! 點擊所有紅戰士，避開黑戰士！」'
+  }
+];
+
+// VHS雜訊參數
+const VHS_NOISE_ALPHA = 0.13;
+const CANVAS_W = 900;
+const CANVAS_H = 600;
+const GAME_DURATION = 45;
+const OBJECTS_PER_ROUND = 10;
+
+// 音效載入
+function loadSound(src) {
+  const a = new Audio();
+  a.src = src;
+  a.preload = 'auto';
+  return a;
+}
+
+// VHS特效
+function drawVHSNoise(ctx, width, height) {
+  ctx.save();
+  ctx.globalAlpha = VHS_NOISE_ALPHA;
+  for (let i = 0; i < 30; i++) {
+    const y = Math.random() * height;
+    ctx.fillStyle = `rgba(200,200,200,${0.06 + Math.random()*0.07})`;
+    ctx.fillRect(0, y, width, 2 + Math.random()*2);
+  }
+  ctx.restore();
+}
+function drawScreenFrame(ctx, w, h) {
+  ctx.save();
+  ctx.strokeStyle = '#111';
+  ctx.lineWidth = 18;
+  ctx.beginPath();
+  ctx.moveTo(35, 10);
+  ctx.bezierCurveTo(0, h/2, 0, h/2, 35, h-10);
+  ctx.lineTo(w-35, h-10);
+  ctx.bezierCurveTo(w, h/2, w, h/2, w-35, 10);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+  ctx.save();
+  ctx.globalAlpha = 0.13;
+  ctx.strokeStyle = '#0ff';
+  ctx.beginPath();
+  ctx.arc(w/2, h/2, w/2-22, 0, 2*Math.PI);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// 遊戲主類別
+class PopCultureGame {
+  constructor(canvas, themeIndex = 0) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.theme = THEMES[themeIndex];
+    this.objects = [];
+    this.score = 0;
+    this.timeLeft = GAME_DURATION;
+    this.running = false;
+    this.roundEnded = false;
+    this.targetType = this.theme.objects[1].type;
+    this.dangerType = this.theme.objects[2]?.type;
+    // 音效可自行註解下兩行以方便測試
+    this.successSound = loadSound(this.theme.successSound);
+    this.failSound = loadSound(this.theme.failSound);
+    this.lastClickTime = 0;
+    this.init();
+  }
+  init() {
+    this.canvas.width = CANVAS_W;
+    this.canvas.height = CANVAS_H;
+    this.canvas.style.background = `linear-gradient(135deg, ${this.theme.colors.main} 60%, #222 100%)`;
+    this.score = 0;
+    this.timeLeft = GAME_DURATION;
+    this.running = true;
+    this.roundEnded = false;
+    this.spawnObjects();
+    this.runTimer();
+    this.canvas.onclick = e => this.handleClick(e);
+    this.render();
+  }
+  spawnObjects() {
+    this.objects = [];
+    for (let i = 0; i < OBJECTS_PER_ROUND; i++) {
+      let oType = 'neutral';
+      const r = Math.random();
+      if (r < 0.6) oType = this.targetType;
+      else if (r < 0.8 && this.dangerType) oType = this.dangerType;
+      const base = this.theme.objects.find(o=>o.type===oType) ||
+                   this.theme.objects[0];
+      this.objects.push({
+        ...base,
+        x: 60+Math.random()*(CANVAS_W-120),
+        y: 80+Math.random()*(CANVAS_H-160),
+        radius: 42+Math.random()*18,
+        clicked: false
+      });
+    }
+  }
+  handleClick(e) {
+    if (!this.running) return;
+    const rect = this.canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    let hit = null;
+    for (let obj of this.objects) {
+      if (obj.clicked) continue;
+      const dx = mx - obj.x, dy = my - obj.y;
+      if (dx*dx + dy*dy < obj.radius*obj.radius) {
+        hit = obj;
+        break;
+      }
+    }
+    if (!hit) return;
+    if (hit.type === this.targetType) {
+      hit.clicked = true;
+      this.score += 1;
+      // 如測試時沒音效檔，可註解下兩行
+      this.successSound.pause(); this.successSound.currentTime = 0;
+      this.successSound.play();
+    } else if (hit.type === this.dangerType) {
+      hit.clicked = true;
+      this.score -= 2;
+      this.failSound.pause(); this.failSound.currentTime = 0;
+      this.failSound.play();
+    } else {
+      hit.clicked = true;
+      this.score += 0;
+      this.failSound.pause(); this.failSound.currentTime = 0;
+      this.failSound.play();
+    }
+    this.lastClickTime = Date.now();
+    this.render();
+  }
+  runTimer() {
+    const tick = () => {
+      if (!this.running) return;
+      this.timeLeft -= 1;
+      if (this.timeLeft <= 0) {
+        this.timeLeft = 0;
+        this.running = false;
+        this.roundEnded = true;
+      }
+      this.render();
+      if (this.running) setTimeout(tick, 1000);
+    };
+    setTimeout(tick, 1000);
+  }
+  render() {
+    const ctx = this.ctx;
+    ctx.clearRect(0,0,CANVAS_W,CANVAS_H);
+
+    // VHS BG
+    drawVHSNoise(ctx, CANVAS_W, CANVAS_H);
+
+    // Title & Theme
+    ctx.font = 'bold 40px Arial';
+    ctx.fillStyle = this.theme.colors.accent;
+    ctx.textAlign = 'center';
+    ctx.fillText(this.theme.name, CANVAS_W/2, 52);
+
+    // Themed quote
+    ctx.font = '18px monospace';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(this.theme.quote, CANVAS_W/2, 82);
+
+    // Objects
+    for (let obj of this.objects) {
+      if (obj.clicked) continue;
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y, obj.radius, 0, 2*Math.PI);
+      ctx.shadowColor = obj.color;
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = obj.color;
+      ctx.globalAlpha = 0.93;
+      ctx.fill();
+      ctx.restore();
+
+      // Icon
+      ctx.save();
+      ctx.font = 'bold 22px Arial';
+      ctx.fillStyle = '#222';
+      ctx.textAlign = 'center';
+      ctx.fillText(obj.label, obj.x, obj.y+6);
+      ctx.restore();
+
+      // 特殊物件外型
+      if (obj.type === 'delorean') {
+        ctx.save();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.rect(obj.x-28, obj.y-12, 56, 24);
+        ctx.stroke();
+        ctx.restore();
+      }
+      if (obj.type === 'ranger') {
+        ctx.save();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(obj.x, obj.y, 17, 0, 2*Math.PI);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    // Score & Time
+    ctx.font = 'bold 28px Courier New';
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'left';
+    ctx.fillText(`得分: ${this.score}`, 50, CANVAS_H-30);
+    ctx.textAlign = 'right';
+    ctx.fillText(`剩餘時間: ${this.timeLeft}s`, CANVAS_W-50, CANVAS_H-30);
+
+    // Frame
+    drawScreenFrame(ctx, CANVAS_W, CANVAS_H);
+
+    // End screen
+    if (this.roundEnded) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.7)';
+      ctx.fillRect(0,0,CANVAS_W,CANVAS_H);
+      ctx.font = 'bold 56px Arial';
+      ctx.fillStyle = this.theme.colors.accent;
+      ctx.textAlign = 'center';
+      ctx.fillText('遊戲結束！', CANVAS_W/2, CANVAS_H/2-40);
+      ctx.font = 'bold 32px Arial';
+      ctx.fillStyle = '#fff';
+      ctx.fillText(`您的分數：${this.score}`, CANVAS_W/2, CANVAS_H/2+8);
+      ctx.font = '20px monospace';
+      ctx.fillText('點擊這裡重新開始', CANVAS_W/2, CANVAS_H/2+48);
+      ctx.restore();
+      this.canvas.onclick = () => location.reload();
+    }
+  }
+}
+
+// 啟動與主題切換
+let game;
+function startGame(themeIdx) {
+  document.querySelectorAll('.theme-btn').forEach((b,i)=>b.classList.toggle('selected',i===themeIdx));
+  if (game) game.running = false;
+  setTimeout(()=>{
+    game = new PopCultureGame(document.getElementById('game-canvas'), themeIdx);
+  },50);
+}
+startGame(0);
+
+// ------------------------ 遊戲主程式結束 ----------------------------
+</script>
+</body>
+</html>
