@@ -5,321 +5,64 @@
   <title>文字特攻隊：九零連線 (Word Commando: 90's Connect)</title>
   <meta name="viewport" content="width=600, initial-scale=1, maximum-scale=1, user-scalable=no">
   <style>
-    /* --- 90s/Win95 Pixel Art + Vaporwave CSS --- */
+    /* --- CSS styles are unchanged --- */
     @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
     body {
-      background: #222 url('https://i.imgur.com/nV7sAzL.png');
-      margin: 0;
-      min-height: 100vh;
-      font-family: 'VT323', 'monospace', 'DFKai-SB', 'MingLiU', sans-serif;
-      letter-spacing: 0.03em;
+      background: #222 url('https://i.imgur.com/nV7sAzL.png'); margin: 0; min-height: 100vh;
+      font-family: 'VT323', 'monospace', 'DFKai-SB', 'MingLiU', sans-serif; letter-spacing: 0.03em;
     }
-    .pixel-bg {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    .win95-window {
-      border: 3px solid #000;
-      background: #c3c7cb;
-      box-shadow: 4px 4px 0 #888;
-      min-width: 420px;
-      min-height: 300px;
-      max-width: 98vw;
-      position: relative;
-      margin: 40px auto;
-      z-index: 1;
-    }
-    .win95-titlebar {
-      background: #215dc6;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      padding: 2px 8px;
-      font-family: 'VT323', monospace;
-      font-size: 1.2rem;
-      user-select: none;
-    }
-    .win95-title {
-      flex: 1;
-      letter-spacing: 0.05em;
-    }
-    .win95-title-btns {
-      display: flex;
-      gap: 1px;
-    }
-    .win95-btn-icon {
-      border: 2px outset #fff;
-      background: #b3b3b3;
-      padding: 0 6px;
-      margin-left: 2px;
-      font-size: 1.1rem;
-      user-select: none;
-    }
-    .win95-content {
-      padding: 20px;
-      font-family: 'VT323', monospace;
-      background: #f7f7f7;
-      min-height: 220px;
-      position: relative;
-      z-index: 1;
-    }
-    .win95-btn {
-      border: 2px outset #fff;
-      background: #ededed;
-      padding: 2px 14px;
-      font-family: 'VT323', monospace;
-      font-size: 1.1rem;
-      margin: 2px;
-      box-shadow: 2px 2px #aaa;
-      cursor: pointer;
-    }
-    .win95-btn:active {
-      border-style: inset;
-    }
-    .start-btn {
-      font-size: 1.4rem;
-      margin-top: 32px;
-      background: #215dc6;
-      color: #fff;
-      border: 2px outset #fff;
-    }
-    .dialup-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 1.2rem;
-    }
-    .dialup-animation {
-      width: 72px;
-      height: 72px;
-      background: url('https://i.imgur.com/4uYlQst.gif') center/contain no-repeat;
-      margin: 20px 0;
-    }
-    .dialup-text {
-      margin-bottom: 12px;
-      font-family: 'VT323', monospace;
-      font-size: 1.2rem;
-      color: #215dc6;
-      text-shadow: 0 1px #fff, 1px 0 #000, 2px 2px #7c7d7e;
-    }
-    .dialup-status {
-      color: #444;
-    }
-    .level-select {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .folders-row {
-      display: flex;
-      gap: 28px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .folder-icon {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      margin: 16px 0;
-      width: 84px;
-      transition: filter 0.2s;
-    }
-    .folder-icon img {
-      width: 60px;
-      filter: drop-shadow(2px 2px #888);
-    }
-    .folder-label {
-      font-family: 'VT323', monospace;
-      margin-top: 2px;
-      font-size: 1.08rem;
-      color: #333;
-    }
-    .folder-icon:active, .folder-icon:focus {
-      filter: brightness(0.92);
-    }
-    .game-play {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .game-hud {
-      display: flex;
-      width: 100%;
-      justify-content: space-between;
-      font-family: 'VT323', monospace;
-      font-size: 1.1rem;
-      margin-bottom: 8px;
-    }
-    .timer {
-      color: #215dc6;
-      font-weight: bold;
-      font-size: 1.18rem;
-    }
-    .word-board {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin: 18px 0;
-    }
-    .word-btn {
-      font-family: 'DFKai-SB', 'MingLiU', 'VT323', monospace;
-      font-size: 1.12rem;
-      padding: 7px 15px;
-      border: 2px solid #7c7d7e;
-      border-radius: 4px;
-      background: #fafafa;
-      box-shadow: 2px 2px #bbb;
-      cursor: pointer;
-      transition: background 0.16s, color 0.16s;
-      outline: none;
-    }
-    .word-btn.selected {
-      background: #215dc6;
-      color: #fff;
-      border: 2px solid #444;
-    }
-    .word-btn.flash-hint {
-      animation: hint-flash 0.5s alternate 3;
-    }
-    @keyframes hint-flash {
-      0% { background: #fafafa; }
-      100% { background: #ff0; }
-    }
-    .game-actions {
-      margin-top: 10px;
-      display: flex;
-      gap: 14px;
-    }
-    .powerup-bar {
-      display: inline-flex;
-      align-items: center;
-      background: #ffeedd;
-      border: 1.5px solid #bba;
-      border-radius: 5px;
-      font-family: 'VT323', monospace;
-      padding: 2px 7px;
-      margin-left: 8px;
-      cursor: pointer;
-      box-shadow: 1px 1px #ccc;
-    }
-    .powerup-icon {
-      width: 22px;
-      margin-right: 6px;
-    }
-    .pager-box {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-    .pager-img {
-      width: 82px;
-    }
-    .pager-content {
-      margin-top: 7px;
-      font-family: 'VT323', monospace;
-      text-align: center;
-    }
-    .pager-beep {
-      color: #215dc6;
-      letter-spacing: 0.3em;
-      font-size: 1.1rem;
-    }
-    .pager-code {
-      font-size: 2.6rem;
-      color: #000;
-      font-family: 'VT323', monospace;
-      margin-bottom: 6px;
-    }
-    .pager-theme {
-      font-size: 1.1rem;
-      color: #333;
-    }
-    .game-timesup {
-      position: absolute;
-      left: 0; top: 0; right: 0; bottom: 0;
-      background: rgba(245,245,245,0.93);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.1rem;
-      font-family: 'VT323', monospace;
-      color: #215dc6;
-      text-shadow: 0 1px #fff, 1px 0 #000, 2px 2px #7c7d7e;
-      z-index: 3;
-    }
-    .timesup-text {
-      animation: blink 0.7s alternate infinite;
-    }
-    @keyframes blink {
-      0% { opacity: 1; }
-      100% { opacity: 0.3; }
-    }
-    .result-content {
-      text-align: center;
-      font-family: 'VT323', monospace;
-    }
-    .result-title {
-      font-size: 1.4rem;
-      color: #215dc6;
-      margin-bottom: 10px;
-      text-shadow: 0 1px #fff, 1px 0 #000, 2px 2px #7c7d7e;
-    }
-    .result-score {
-      font-size: 1.2rem;
-      margin: 8px 0;
-    }
-    .result-stat {
-      margin: 5px 0;
-    }
-    .result-actions {
-      margin-top: 18px;
-      display: flex;
-      justify-content: center;
-      gap: 22px;
-    }
-    .highscore-content {
-      text-align: center;
-    }
-    .highscore-list {
-      margin-bottom: 18px;
-    }
-    .highscore-list table {
-      width: 100%;
-      border-collapse: collapse;
-      font-family: 'VT323', monospace;
-      font-size: 1.13rem;
-      background: #fff;
-      margin-bottom: 8px;
-    }
-    .highscore-list th,
-    .highscore-list td {
-      border: 1.2px solid #aaa;
-      padding: 2.5px 7px;
-    }
-    .highscore-submit {
-      margin-top: 10px;
-      font-family: 'VT323', monospace;
-    }
-    input[type=text] {
-      font-family: 'VT323', monospace;
-      font-size: 1.18em;
-      padding: 2px 6px;
-      text-align: center;
-      letter-spacing: 0.1em;
-      border: 1.5px solid #888;
-      border-radius: 4px;
-    }
-    /* Responsive */
-    @media (max-width: 600px) {
-      .win95-window { min-width: 96vw; }
-      .win95-content { min-height: 140px; padding: 10px; }
-    }
+    .pixel-bg { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .win95-window { border: 3px solid #000; background: #c3c7cb; box-shadow: 4px 4px 0 #888; min-width: 420px; min-height: 300px; max-width: 98vw; position: relative; margin: 40px auto; z-index: 1; }
+    .win95-titlebar { background: #215dc6; color: #fff; display: flex; align-items: center; padding: 2px 8px; font-family: 'VT323', monospace; font-size: 1.2rem; user-select: none; }
+    .win95-title { flex: 1; letter-spacing: 0.05em; }
+    .win95-title-btns { display: flex; gap: 1px; }
+    .win95-btn-icon { border: 2px outset #fff; background: #b3b3b3; padding: 0 6px; margin-left: 2px; font-size: 1.1rem; user-select: none; }
+    .win95-content { padding: 20px; font-family: 'VT323', monospace; background: #f7f7f7; min-height: 220px; position: relative; z-index: 1; }
+    .win95-btn { border: 2px outset #fff; background: #ededed; padding: 2px 14px; font-family: 'VT323', monospace; font-size: 1.1rem; margin: 2px; box-shadow: 2px 2px #aaa; cursor: pointer; }
+    .win95-btn:active { border-style: inset; }
+    .start-btn { font-size: 1.4rem; margin-top: 32px; background: #215dc6; color: #fff; border: 2px outset #fff; }
+    .dialup-screen { display: flex; flex-direction: column; align-items: center; font-size: 1.2rem; }
+    .dialup-animation { width: 72px; height: 72px; background: url('https://i.imgur.com/4uYlQst.gif') center/contain no-repeat; margin: 20px 0; }
+    .dialup-text { margin-bottom: 12px; font-family: 'VT323', monospace; font-size: 1.2rem; color: #215dc6; text-shadow: 0 1px #fff, 1px 0 #000, 2px 2px #7c7d7e; }
+    .dialup-status { color: #444; }
+    .level-select { display: flex; flex-direction: column; align-items: center; }
+    .folders-row { display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; }
+    .folder-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; margin: 16px 0; width: 84px; transition: filter 0.2s; }
+    .folder-icon img { width: 60px; filter: drop-shadow(2px 2px #888); }
+    .folder-label { font-family: 'VT323', monospace; margin-top: 2px; font-size: 1.08rem; color: #333; }
+    .folder-icon:active, .folder-icon:focus { filter: brightness(0.92); }
+    .game-play { display: flex; flex-direction: column; align-items: center; }
+    .game-hud { display: flex; width: 100%; justify-content: space-between; font-family: 'VT323', monospace; font-size: 1.1rem; margin-bottom: 8px; }
+    .timer { color: #215dc6; font-weight: bold; font-size: 1.18rem; }
+    .word-board { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 18px 0; }
+    .word-btn { font-family: 'DFKai-SB', 'MingLiU', 'VT323', monospace; font-size: 1.12rem; padding: 7px 15px; border: 2px solid #7c7d7e; border-radius: 4px; background: #fafafa; box-shadow: 2px 2px #bbb; cursor: pointer; transition: background 0.16s, color 0.16s; outline: none; }
+    .word-btn.selected { background: #215dc6; color: #fff; border: 2px solid #444; }
+    .word-btn.flash-hint { animation: hint-flash 0.5s alternate 3; }
+    @keyframes hint-flash { 0% { background: #fafafa; } 100% { background: #ff0; } }
+    .game-actions { margin-top: 10px; display: flex; gap: 14px; }
+    .powerup-bar { display: inline-flex; align-items: center; background: #ffeedd; border: 1.5px solid #bba; border-radius: 5px; font-family: 'VT323', monospace; padding: 2px 7px; margin-left: 8px; cursor: pointer; box-shadow: 1px 1px #ccc; }
+    .powerup-icon { width: 22px; margin-right: 6px; }
+    .pager-box { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+    .pager-img { width: 82px; }
+    .pager-content { margin-top: 7px; font-family: 'VT323', monospace; text-align: center; }
+    .pager-beep { color: #215dc6; letter-spacing: 0.3em; font-size: 1.1rem; }
+    .pager-code { font-size: 2.6rem; color: #000; font-family: 'VT323', monospace; margin-bottom: 6px; }
+    .pager-theme { font-size: 1.1rem; color: #333; }
+    .game-timesup { position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(245,245,245,0.93); display: flex; align-items: center; justify-content: center; font-size: 2.1rem; font-family: 'VT323', monospace; color: #215dc6; text-shadow: 0 1px #fff, 1px 0 #000, 2px 2px #7c7d7e; z-index: 3; }
+    .timesup-text { animation: blink 0.7s alternate infinite; }
+    @keyframes blink { 0% { opacity: 1; } 100% { opacity: 0.3; } }
+    .result-content { text-align: center; font-family: 'VT323', monospace; }
+    .result-title { font-size: 1.4rem; color: #215dc6; margin-bottom: 10px; text-shadow: 0 1px #fff, 1px 0 #000, 2px 2px #7c7d7e; }
+    .result-score { font-size: 1.2rem; margin: 8px 0; }
+    .result-stat { margin: 5px 0; }
+    .result-actions { margin-top: 18px; display: flex; justify-content: center; gap: 22px; }
+    .highscore-content { text-align: center; }
+    .highscore-list { margin-bottom: 18px; }
+    .highscore-list table { width: 100%; border-collapse: collapse; font-family: 'VT323', monospace; font-size: 1.13rem; background: #fff; margin-bottom: 8px; }
+    .highscore-list th, .highscore-list td { border: 1.2px solid #aaa; padding: 2.5px 7px; }
+    .highscore-submit { margin-top: 10px; font-family: 'VT323', monospace; }
+    input[type=text] { font-family: 'VT323', monospace; font-size: 1.18em; padding: 2px 6px; text-align: center; letter-spacing: 0.1em; border: 1.5px solid #888; border-radius: 4px; }
+    @media (max-width: 600px) { .win95-window { min-width: 96vw; } .win95-content { min-height: 140px; padding: 10px; } }
   </style>
 </head>
 <body>
@@ -327,522 +70,202 @@
 <audio id="bgm" loop preload="auto"></audio>
 <audio id="sfx" preload="auto"></audio>
 <script>
-// --------- 遊戲主體、資料、UI、狀態管理 --------
-const THEMES = [
-  {
-    key: "star-movies", name: "周星馳電影", themeDesc: "星爺爆笑經典",
-    code: "9527", icon: "https://i.imgur.com/6z1r3Km.png",
-    bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune1.mp3",
-    words: ["賭聖", "9527", "無厘頭", "龍祥電影台", "重播"],
-    noise: ["林正英", "珍珠奶茶", "A面B面", "麥當勞", "大豬公", "ICQ", "超級賽亞人"],
-    creative: [["周星馳", "含笑半步癲"], ["龍祥電影台", "重播"]],
-  },{
-    key: "zombie", name: "香港殭屍片", themeDesc: "靈幻經典，暫時停止呼吸！",
-    code: "1985", icon: "https://i.imgur.com/9VwY3yg.png",
-    bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune2.mp3",
-    words: ["林正英", "暫時停止呼吸", "糯米", "桃木劍", "殭屍道長"],
-    noise: ["賭聖", "珍珠奶茶", "彈珠汽水", "龜派氣功", "大豬公", "ICQ", "Walkman"],
-    creative: [["林正英", "暫時停止呼吸"], ["糯米", "桃木劍", "殭屍道長"]],
-  },{
-    key: "dragonball", name: "七龍珠", themeDesc: "熱血動畫，天下第一武道會！",
-    code: "7407", icon: "https://i.imgur.com/kf4y0yA.png",
-    bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune3.mp3",
-    words: ["超級賽亞人", "龜派氣功", "天下第一武道會", "那美克星"],
-    noise: ["林正英", "珍珠奶茶", "A面B面", "賭聖", "大豬公", "ICQ", "螢幕保護程式"],
-    creative: [["超級賽亞人", "那美克星"], ["龜派氣功", "天下第一武道會"]],
-  },{
-    key: "pop-music", name: "四大天王", themeDesc: "粵語金曲，華語歌壇天王",
-    code: "4004", icon: "https://i.imgur.com/qVwM6pV.png",
-    bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune4.mp3",
-    words: ["黎明", "張學友", "郭富城", "劉德華", "對你愛不完"],
-    noise: ["Windows 95", "珍珠奶茶", "A面B面", "彈珠汽水", "大豬公", "ICQ", "超級賽亞人"],
-    creative: [["黎明", "對你愛不完"], ["郭富城", "劉德華"]],
-  },{
-    key: "cd-cassette", name: "卡帶與CD", themeDesc: "Walkman 的年代",
-    code: "8585", icon: "https://i.imgur.com/qVwM6pV.png",
-    bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune5.mp3",
-    words: ["Walkman", "A面B面", "歌詞本", "防跳針", "飛碟唱片"],
-    noise: ["Windows 95", "珍珠奶茶", "ICQ", "彈珠汽水", "大豬公", "賭聖"],
-    creative: [["Walkman", "A面B面"], ["歌詞本", "飛碟唱片"]],
-  },{
-    key: "my-first-pc", name: "我的第一台電腦", themeDesc: "撥接上網，ICQ、螢幕保護程式",
-    code: "1995", icon: "https://i.imgur.com/Xn2cB1p.png",
-    bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune3.mp3",
-    words: ["Windows 95", "撥接", "ICQ", "螢幕保護程式", "磁碟重組"],
-    noise: ["林正英", "珍珠奶茶", "A面B面", "彈珠汽水", "大豬公", "龜派氣功"],
-    creative: [["Windows 95", "撥接"], ["ICQ", "螢幕保護程式"]],
-  },{
-    key: "child-snack", name: "童年零食", themeDesc: "科學麵、彈珠汽水、跳跳糖",
-    code: "0039", icon: "https://i.imgur.com/zxBf7zH.png",
-    bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune5.mp3",
-    words: ["科學麵", "跳跳糖", "大豬公", "彈珠汽水"],
-    noise: ["林正英", "珍珠奶茶", "A面B面", "賭聖", "大豬公", "ICQ", "超級賽亞人"],
-    creative: [["科學麵", "彈珠汽水"], ["跳跳糖", "大豬公"]],
-  },{
-    key: "tea-shop", name: "泡沫紅茶店", themeDesc: "珍珠奶茶、厚片土司、小歇",
-    code: "1009", icon: "https://i.imgur.com/10wOW4N.png",
-    bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune4.mp3",
-    words: ["珍珠奶茶", "厚片土司", "小歇", "雜誌看到飽"],
-    noise: ["林正英", "賭聖", "A面B面", "彈珠汽水", "大豬公", "ICQ", "超級賽亞人"],
-    creative: [["珍珠奶茶", "厚片土司"], ["小歇", "雜誌看到飽"]],
-  }
-];
-// --- 音效檔案（可換成自己主機檔） ---
-const SFX = {
-  dialup: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/dialup.wav",
-  pager: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/pager.wav",
-  select: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/select.wav",
-  success: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/success.wav",
-  error: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/error.wav",
-  combo: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/combo.wav",
-  creative: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/creative.wav",
-  powerup: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/powerup.wav",
-};
-// --- 道具圖示 ---
+// --------- 遊戲資料 (與之前相同) --------
+const THEMES = [ { key: "star-movies", name: "周星馳電影", themeDesc: "星爺爆笑經典", code: "9527", icon: "https://i.imgur.com/6z1r3Km.png", bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune1.mp3", words: ["賭聖", "9527", "無厘頭", "龍祥電影台", "重播"], noise: ["林正英", "珍珠奶茶", "A面B面", "麥當勞", "大豬公", "ICQ", "超級賽亞人"], creative: [["周星馳", "含笑半步癲"], ["龍祥電影台", "重播"]], },{ key: "zombie", name: "香港殭屍片", themeDesc: "靈幻經典，暫時停止呼吸！", code: "1985", icon: "https://i.imgur.com/9VwY3yg.png", bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune2.mp3", words: ["林正英", "暫時停止呼吸", "糯米", "桃木劍", "殭屍道長"], noise: ["賭聖", "珍珠奶茶", "彈珠汽水", "龜派氣功", "大豬公", "ICQ", "Walkman"], creative: [["林正英", "暫時停止呼吸"], ["糯米", "桃木劍", "殭屍道長"]], },{ key: "dragonball", name: "七龍珠", themeDesc: "熱血動畫，天下第一武道會！", code: "7407", icon: "https://i.imgur.com/kf4y0yA.png", bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune3.mp3", words: ["超級賽亞人", "龜派氣功", "天下第一武道會", "那美克星"], noise: ["林正英", "珍珠奶茶", "A面B面", "賭聖", "大豬公", "ICQ", "螢幕保護程式"], creative: [["超級賽亞人", "那美克星"], ["龜派氣功", "天下第一武道會"]], }, ];
+const SFX = { dialup: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/dialup.wav", pager: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/pager.wav", select: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/select.wav", success: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/success.wav", error: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/error.wav", combo: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/combo.wav", creative: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/creative.wav", powerup: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/powerup.wav", };
 const FLOPPY = "https://i.imgur.com/YJjXcEo.png";
 const PAGER = "https://i.imgur.com/8b7b5Jv.png";
 
-// -- 工具函式
-function shuffle(arr) {
-  let a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-function sample(arr, n = 1) {
-  const s = shuffle(arr);
-  return n === 1 ? s[0] : s.slice(0, n);
-}
-function randomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-function playSFX(src) {
-  const sfx = document.getElementById("sfx");
-  sfx.src = src;
-  sfx.volume = 0.5;
-  sfx.currentTime = 0;
-  sfx.play();
-}
-function setBGM(src) {
-  const bgm = document.getElementById("bgm");
-  if (!src) {
-    bgm.pause();
-    bgm.currentTime = 0;
-    return;
-  }
-  bgm.src = src;
-  bgm.volume = 0.33;
-  bgm.play();
+// --- 遊戲邏輯 (與之前相同) ---
+function shuffle(arr) { let a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function sample(arr, n = 1) { const s = shuffle(arr); return n === 1 ? s[0] : s.slice(0, n); }
+function playSFX(src) { const sfx = document.getElementById("sfx"); sfx.src = src; sfx.volume = 0.5; sfx.currentTime = 0; sfx.play(); }
+function setBGM(src) { const bgm = document.getElementById("bgm"); if (!src) { bgm.pause(); bgm.currentTime = 0; return; } bgm.src = src; bgm.volume = 0.33; bgm.play(); }
+function loadScores() { try { return JSON.parse(localStorage.getItem("word-commando-scores") || "{}"); } catch { return {}; } }
+function saveScores(scores) { localStorage.setItem("word-commando-scores", JSON.stringify(scores)); }
+let GAME = { screen: "dialup", theme: null, timeLeft: 60, words: [], selectedIdx: [], score: 0, longest: 0, combo: 0, maxCombo: 0, powerUp: null, flashHintIdx: null, scores: loadScores(), lastScore: 0, };
+function resetGameState() { GAME.timeLeft = 60; GAME.words = []; GAME.selectedIdx = []; GAME.score = 0; GAME.longest = 0; GAME.combo = 0; GAME.maxCombo = 0; GAME.powerUp = null; GAME.flashHintIdx = null; }
+
+// --- 徹底重構的渲染邏輯 ---
+
+function createElement(tag, options = {}, children = []) {
+    const el = document.createElement(tag);
+    Object.keys(options).forEach(key => {
+        if (key === 'className') el.className = options[key];
+        else if (key === 'textContent') el.textContent = options[key];
+        else if (key === 'onclick') el.onclick = options[key];
+        else if (key === 'style') Object.assign(el.style, options[key]);
+        else el.setAttribute(key, options[key]);
+    });
+    children.forEach(child => {
+        if (child) el.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
+    });
+    return el;
 }
 
-// --- 本機 HighScore ---
-function loadScores() {
-  try {
-    return JSON.parse(localStorage.getItem("word-commando-scores") || "{}");
-  } catch { return {}; }
-}
-function saveScores(scores) {
-  localStorage.setItem("word-commando-scores", JSON.stringify(scores));
+function buildWindow(titleText, content, titleIconSrc = null) {
+    const titleChildren = [];
+    if (titleIconSrc) {
+        titleChildren.push(createElement('img', { src: titleIconSrc, style: { width: '22px', marginRight: '4px' } }));
+    }
+    titleChildren.push(createElement('span', { textContent: titleText }));
+
+    return createElement('div', { className: 'win95-window' }, [
+        createElement('div', { className: 'win95-titlebar' }, [
+            createElement('div', { className: 'win95-title' }, titleChildren),
+            createElement('div', { className: 'win95-title-btns' }, [
+                createElement('span', { className: 'win95-btn-icon', textContent: ' ' }),
+                createElement('span', { className: 'win95-btn-icon', textContent: '▢' }),
+                createElement('span', { className: 'win95-btn-icon', textContent: '✕' })
+            ])
+        ]),
+        createElement('div', { className: 'win95-content' }, [content])
+    ]);
 }
 
-let GAME = {
-  screen: "dialup", // dialup, level, pager, playing, timesup, result, highscore
-  theme: null,
-  timeLeft: 60,
-  words: [],
-  selectedIdx: [],
-  score: 0,
-  longest: 0,
-  combo: 0,
-  maxCombo: 0,
-  powerUp: null, // {type, expires}
-  flashHintIdx: null,
-  scores: loadScores(),
-  lastScore: 0,
-};
-function resetGameState() {
-  GAME.timeLeft = 60;
-  GAME.words = [];
-  GAME.selectedIdx = [];
-  GAME.score = 0;
-  GAME.longest = 0;
-  GAME.combo = 0;
-  GAME.maxCombo = 0;
-  GAME.powerUp = null;
-  GAME.flashHintIdx = null;
-}
-
-// -- 畫面渲染 --
-function render() {
-  const app = document.getElementById("app");
-  app.innerHTML = "";
-  app.appendChild(getScreenEl(GAME.screen));
-}
 function getScreenEl(screen) {
-  if (screen === "dialup") return dialupScreen();
-  if (screen === "level") return levelScreen();
-  if (screen === "pager") return pagerScreen();
-  if (screen === "playing") return gameScreen();
-  if (screen === "timesup") return timeupScreen();
-  if (screen === "result") return resultScreen();
-  if (screen === "highscore") return highscoreScreen();
-  return document.createTextNode("404");
+    const app = document.getElementById("app");
+    app.innerHTML = ""; // Clear the container
+    let screenElement;
+
+    if (screen === "dialup") screenElement = dialupScreen();
+    else if (screen === "level") screenElement = levelScreen();
+    else if (screen === "pager") screenElement = pagerScreen();
+    else if (screen === "playing") screenElement = gameScreen();
+    else if (screen === "timesup") screenElement = timeupScreen();
+    else if (screen === "result") screenElement = resultScreen();
+    else if (screen === "highscore") screenElement = highscoreScreen();
+    else screenElement = createElement('div', { textContent: "404 - Screen not found" });
+    
+    app.appendChild(screenElement);
 }
 
-// --- 畫面元件 ---
-// 1. 撥接動畫畫面
 function dialupScreen() {
-  let wrap = document.createElement("div");
-  wrap.className = "win95-window";
-  wrap.innerHTML = `
-    <div class="win95-titlebar">
-      <span class="win95-title">載入中...</span>
-      <div class="win95-title-btns">
-        <span class="win95-btn-icon">▁</span>
-        <span class="win95-btn-icon">▢</span>
-        <span class="win95-btn-icon">✕</span>
-      </div>
-    </div>
-    <div class="win95-content">
-      <div class="dialup-screen">
-        <div class="dialup-animation"></div>
-        <div class="dialup-text">正在連線到 90 年代...</div>
-        <div class="dialup-status" id="dialup-status">撥接音效中...</div>
-        <button class="win95-btn start-btn" id="start-btn" style="display:none;">START</button>
-      </div>
-    </div>
-  `;
-  setTimeout(() => playSFX(SFX.dialup), 150);
-  setTimeout(() => {
-    wrap.querySelector("#dialup-status").innerText = "連線成功！";
-    let btn = wrap.querySelector("#start-btn");
-    btn.style.display = "";
-    btn.onclick = () => {
-      GAME.screen = "level";
-      setBGM(null);
-      render();
-    };
-  }, 3800);
-  return wrap;
+    const statusDiv = createElement('div', { id: 'dialup-status', className: 'dialup-status', textContent: '撥接音效中...' });
+    const startBtn = createElement('button', { id: 'start-btn', className: 'win95-btn start-btn', textContent: 'START', style: { display: 'none' } });
+    startBtn.onclick = () => { GAME.screen = "level"; setBGM(null); getScreenEl(GAME.screen); };
+    const content = createElement('div', { className: 'dialup-screen' }, [ createElement('div', { className: 'dialup-animation' }), createElement('div', { className: 'dialup-text', textContent: '正在連線到 90 年代...' }), statusDiv, startBtn ]);
+    setTimeout(() => playSFX(SFX.dialup), 150);
+    setTimeout(() => { statusDiv.textContent = "連線成功！"; startBtn.style.display = ""; }, 3800);
+    return buildWindow('載入中...', content);
 }
-// 2. 關卡選擇（模仿 Win95 資料夾）
+
 function levelScreen() {
-  let win = document.createElement("div");
-  win.className = "win95-window";
-  win.innerHTML = `
-    <div class="win95-titlebar">
-      <span class="win95-title">關卡選擇</span>
-      <div class="win95-title-btns">
-        <span class="win95-btn-icon">▁</span>
-        <span class="win95-btn-icon">▢</span>
-        <span class="win95-btn-icon">✕</span>
-      </div>
-    </div>
-    <div class="win95-content">
-      <div class="level-select">
-        <div class="folders-row" id="folders-row">
-        </div>
-      </div>
-    </div>
-  `;
-  let row = win.querySelector("#folders-row");
-  THEMES.forEach(th => {
-    let d = document.createElement("div");
-    d.className = "folder-icon";
-    d.tabIndex = 0;
-    d.title = th.name;
-    d.innerHTML = `<img src="${th.icon}" alt="${th.name}"><div class="folder-label">${th.name}</div>`;
-    d.onclick = () => {
-      GAME.theme = th;
-      resetGameState();
-      setBGM(th.bgm);
-      GAME.screen = "pager"; render();
-    };
-    row.appendChild(d);
-  });
-  return win;
+    const foldersRow = createElement('div', { className: 'folders-row' });
+    THEMES.forEach(th => {
+        const folder = createElement('div', { className: 'folder-icon', tabIndex: 0, title: th.name }, [ createElement('img', { src: th.icon, alt: th.name }), createElement('div', { className: 'folder-label', textContent: th.name }) ]);
+        folder.onclick = () => { GAME.theme = th; resetGameState(); setBGM(th.bgm); GAME.screen = "pager"; getScreenEl(GAME.screen); };
+        foldersRow.appendChild(folder);
+    });
+    return buildWindow('關卡選擇', createElement('div', { className: 'level-select' }, [foldersRow]));
 }
-// 3. BBCall 開場與主題顯示
+
 function pagerScreen() {
-  let win = document.createElement("div");
-  win.className = "win95-window";
-  win.innerHTML = `
-    <div class="win95-titlebar">
-      <span class="win95-title">${GAME.theme.name}</span>
-      <div class="win95-title-btns">
-        <span class="win95-btn-icon">▁</span><span class="win95-btn-icon">▢</span><span class="win95-btn-icon">✕</span>
-      </div>
-    </div>
-    <div class="win95-content">
-      <div class="pager-box" id="pager-box">
-        <img src="${PAGER}" class="pager-img" alt="B.B.Call">
-        <div class="pager-content">
-          <div class="pager-beep" id="pager-beep">嗶——嗶——嗶——</div>
-          <div class="pager-code" id="pager-code" style="display:none;">${GAME.theme.code}</div>
-          <div class="pager-theme" id="pager-theme" style="display:none;">${GAME.theme.themeDesc}</div>
-        </div>
-      </div>
-    </div>
-  `;
-  setTimeout(() => playSFX(SFX.pager), 280);
-  setTimeout(() => {
-    win.querySelector("#pager-code").style.display = "";
-    win.querySelector("#pager-theme").style.display = "";
-  }, 1200);
-  setTimeout(() => {
-    // 準備題目
-    let pool = shuffle([...GAME.theme.words, ...sample(GAME.theme.noise, 16 - GAME.theme.words.length)]);
-    GAME.words = pool;
-    GAME.screen = "playing";
-    render();
-    startTimer();
-  }, 2450);
-  return win;
+    const codeDiv = createElement('div', { className: 'pager-code', textContent: GAME.theme.code, style: { display: 'none' } });
+    const themeDiv = createElement('div', { className: 'pager-theme', textContent: GAME.theme.themeDesc, style: { display: 'none' } });
+    const content = createElement('div', { className: 'pager-box' }, [ createElement('img', { src: PAGER, className: 'pager-img', alt: 'B.B.Call' }), createElement('div', { className: 'pager-content' }, [ createElement('div', { className: 'pager-beep', textContent: '嗶——嗶——嗶——' }), codeDiv, themeDiv ]) ]);
+    setTimeout(() => playSFX(SFX.pager), 280);
+    setTimeout(() => { codeDiv.style.display = ""; themeDiv.style.display = ""; }, 1200);
+    setTimeout(() => { let pool = shuffle([...GAME.theme.words, ...sample(GAME.theme.noise, 16 - GAME.theme.words.length)]); GAME.words = pool; GAME.screen = "playing"; getScreenEl(GAME.screen); startTimer(); }, 2450);
+    return buildWindow(GAME.theme.name, content);
 }
-// 4. 遊戲主畫面
+
 function gameScreen() {
-  let win = document.createElement("div");
-  win.className = "win95-window";
-  win.innerHTML = `
-    <div class="win95-titlebar">
-      <img src="${GAME.theme.icon}" style="width:22px;margin-right:4px;">
-      <span class="win95-title">${GAME.theme.name}</span>
-      <div class="win95-title-btns">
-        <span class="win95-btn-icon">▁</span><span class="win95-btn-icon">▢</span><span class="win95-btn-icon">✕</span>
-      </div>
-    </div>
-    <div class="win95-content">
-      <div class="game-play">
-        <div class="game-hud">
-          <span class="timer">🕒 <span id="timer">${GAME.timeLeft}</span>s</span>
-          <span>分數: <span id="score">${GAME.score}</span></span>
-          <span>Combo: <span id="combo">${GAME.combo}</span></span>
-          <span id="powerup-bar"></span>
-        </div>
-        <div class="word-board" id="word-board"></div>
-        <div class="game-actions">
-          <button class="win95-btn" id="submit-btn">送出連線</button>
-          <button class="win95-btn" id="cancel-btn">取消</button>
-        </div>
-      </div>
-    </div>
-  `;
-  // 詞彙按鈕
-  let board = win.querySelector("#word-board");
-  GAME.words.forEach((word, i) => {
-    let btn = document.createElement("button");
-    btn.className = "word-btn";
-    btn.innerText = word;
-    if (GAME.selectedIdx.includes(i)) btn.classList.add("selected");
-    if (GAME.flashHintIdx === i) btn.classList.add("flash-hint");
-    btn.onclick = () => {
-      if (!GAME.selectedIdx.includes(i)) {
-        GAME.selectedIdx.push(i);
-        playSFX(SFX.select);
-        render();
-      }
-    };
-    board.appendChild(btn);
-  });
-  // Powerup
-  let pbar = win.querySelector("#powerup-bar");
-  if (GAME.powerUp) {
-    let label = GAME.powerUp.type === "time" ? "時光倒流" : GAME.powerUp.type === "hint" ? "關鍵報告" : "雙倍火力";
-    let div = document.createElement("div");
-    div.className = "powerup-bar";
-    div.onclick = () => {
-      playSFX(SFX.powerup);
-      if (GAME.powerUp.type === "time") GAME.timeLeft += 15;
-      if (GAME.powerUp.type === "hint") {
-        let idx = GAME.words.findIndex(w => GAME.theme.words.includes(w));
-        GAME.flashHintIdx = idx;
-        setTimeout(() => { GAME.flashHintIdx = null; render(); }, 1500);
-      }
-      if (GAME.powerUp.type === "double") {
-        // 直接吃到後面得分*2
-      }
-      GAME.powerUp = null; render();
-    };
-    div.innerHTML = `<img src="${FLOPPY}" class="powerup-icon"><span class="powerup-label">${label}</span>`;
-    pbar.appendChild(div);
-  }
-  // 送出/取消
-  win.querySelector("#submit-btn").onclick = () => {
-    if (GAME.selectedIdx.length < 2) {
-      playSFX(SFX.error); GAME.selectedIdx = []; render(); return;
+    const board = createElement('div', { className: 'word-board' });
+    GAME.words.forEach((word, i) => {
+        const btn = createElement('button', { className: 'word-btn', textContent: word });
+        if (GAME.selectedIdx.includes(i)) btn.classList.add("selected");
+        if (GAME.flashHintIdx === i) btn.classList.add("flash-hint");
+        btn.onclick = () => { if (!GAME.selectedIdx.includes(i)) { GAME.selectedIdx.push(i); playSFX(SFX.select); getScreenEl(GAME.screen); } };
+        board.appendChild(btn);
+    });
+    const powerupBar = createElement('span');
+    if (GAME.powerUp) {
+        let label = GAME.powerUp.type === "time" ? "時光倒流" : GAME.powerUp.type === "hint" ? "關鍵報告" : "雙倍火力";
+        const div = createElement('div', { className: 'powerup-bar' }, [ createElement('img', { src: FLOPPY, className: 'powerup-icon' }), createElement('span', { className: 'powerup-label', textContent: label }) ]);
+        div.onclick = () => {
+            playSFX(SFX.powerup);
+            if (GAME.powerUp.type === "time") GAME.timeLeft += 15;
+            if (GAME.powerUp.type === "hint") { let idx = GAME.words.findIndex(w => GAME.theme.words.includes(w)); GAME.flashHintIdx = idx; setTimeout(() => { GAME.flashHintIdx = null; getScreenEl(GAME.screen); }, 1500); }
+            GAME.powerUp = null; getScreenEl(GAME.screen);
+        };
+        powerupBar.appendChild(div);
     }
-    let line = GAME.selectedIdx.map(i => GAME.words[i]);
-    let allCorrect = line.every(w => GAME.theme.words.includes(w));
-    if (allCorrect) {
-      playSFX(SFX.success);
-      let base = line.length === 2 ? 10 : line.length === 3 ? 30 : 70 + (line.length - 4) * 40;
-      let creative = 0;
-      if (GAME.theme.creative && GAME.theme.creative.some(combo => combo.every(w => line.includes(w)))) {
-        creative = 100;
-        playSFX(SFX.creative);
-        showCombo("內行！+100");
-      } else if (line.length > 2) {
-        playSFX(SFX.combo);
-        showCombo("COMBO x" + line.length + "!");
-      }
-      let total = (base + creative) * (GAME.powerUp && GAME.powerUp.type === "double" ? 2 : 1);
-      GAME.score += total;
-      GAME.longest = Math.max(GAME.longest, line.length);
-      GAME.combo += 1;
-      GAME.maxCombo = Math.max(GAME.maxCombo, GAME.combo);
-    } else {
-      playSFX(SFX.error); GAME.combo = 0;
-    }
-    GAME.selectedIdx = [];
-    render();
-  };
-  win.querySelector("#cancel-btn").onclick = () => { GAME.selectedIdx = []; render(); };
-  // PowerUp 隨機出現
-  if (!GAME.powerUp && Math.random() < 0.03) {
-    GAME.powerUp = {
-      type: sample(["time", "hint", "double"]),
-      expires: Date.now() + 10000,
+    const hud = createElement('div', { className: 'game-hud' }, [ createElement('span', { className: 'timer' }, [ `🕒 `, createElement('span', { id: 'timer', textContent: GAME.timeLeft }), 's' ]), createElement('span', { textContent: `分數: ${GAME.score}` }), createElement('span', { textContent: `Combo: ${GAME.combo}` }), powerupBar ]);
+    const submitBtn = createElement('button', { className: 'win95-btn', textContent: '送出連線' });
+    submitBtn.onclick = () => {
+        if (GAME.selectedIdx.length < 2) { playSFX(SFX.error); GAME.selectedIdx = []; getScreenEl(GAME.screen); return; }
+        let line = GAME.selectedIdx.map(i => GAME.words[i]);
+        let allCorrect = line.every(w => GAME.theme.words.includes(w));
+        if (allCorrect) { playSFX(SFX.success); let base = line.length === 2 ? 10 : line.length === 3 ? 30 : 70 + (line.length - 4) * 40; let creative = 0; if (GAME.theme.creative && GAME.theme.creative.some(combo => combo.every(w => line.includes(w)))) { creative = 100; playSFX(SFX.creative); showCombo("內行！+100"); } else if (line.length > 2) { playSFX(SFX.combo); showCombo("COMBO x" + line.length + "!"); } let total = (base + creative) * (GAME.powerUp && GAME.powerUp.type === "double" ? 2 : 1); GAME.score += total; GAME.longest = Math.max(GAME.longest, line.length); GAME.combo += 1; GAME.maxCombo = Math.max(GAME.maxCombo, GAME.combo); } else { playSFX(SFX.error); GAME.combo = 0; }
+        GAME.selectedIdx = []; getScreenEl(GAME.screen);
     };
-    render();
-  }
-  // 強制刷新倒數（防止冷靜事件）
-  win.querySelectorAll(".word-btn").forEach(b => b.onmousedown = () => {});
-  return win;
+    const cancelBtn = createElement('button', { className: 'win95-btn', textContent: '取消', onclick: () => { GAME.selectedIdx = []; getScreenEl(GAME.screen); } });
+    const content = createElement('div', { className: 'game-play' }, [ hud, board, createElement('div', { className: 'game-actions' }, [submitBtn, cancelBtn]) ]);
+    if (!GAME.powerUp && Math.random() < 0.03) { GAME.powerUp = { type: sample(["time", "hint", "double"]), expires: Date.now() + 10000 }; setTimeout(() => getScreenEl(GAME.screen), 50); }
+    return buildWindow(GAME.theme.name, content, GAME.theme.icon);
 }
+
 function showCombo(text) {
-  let el = document.createElement("div");
-  el.className = "game-timesup";
-  el.innerHTML = `<div class="timesup-text" style="font-size:2.3rem;">${text}</div>`;
-  document.querySelector(".win95-content").appendChild(el);
-  setTimeout(() => { if(el.parentNode) el.parentNode.removeChild(el); }, 900);
+    const el = createElement('div', { className: 'game-timesup' }, [ createElement('div', { className: 'timesup-text', style: { fontSize: '2.3rem' }, textContent: text }) ]);
+    document.querySelector(".win95-content").appendChild(el);
+    setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 900);
 }
-// 5. 時間到
+
 function timeupScreen() {
-  let win = document.createElement("div");
-  win.className = "win95-window";
-  win.innerHTML = `
-    <div class="win95-titlebar">
-      <span class="win95-title">${GAME.theme.name}</span>
-      <div class="win95-title-btns">
-        <span class="win95-btn-icon">▁</span><span class="win95-btn-icon">▢</span><span class="win95-btn-icon">✕</span>
-      </div>
-    </div>
-    <div class="win95-content">
-      <div class="game-timesup">
-        <div class="timesup-text">時間到！</div>
-      </div>
-    </div>
-  `;
-  setTimeout(() => {
-    GAME.screen = "result";
-    GAME.lastScore = GAME.score;
-    render();
-  }, 1500);
-  return win;
+    const content = createElement('div', { className: 'game-timesup' }, [ createElement('div', { className: 'timesup-text', textContent: '時間到！' }) ]);
+    setTimeout(() => { GAME.screen = "result"; GAME.lastScore = GAME.score; getScreenEl(GAME.screen); }, 1500);
+    return buildWindow(GAME.theme.name, content);
 }
-// 6. 結算畫面
+
 function resultScreen() {
-  let win = document.createElement("div");
-  win.className = "win95-window";
-  win.innerHTML = `
-    <div class="win95-titlebar">
-      <span class="win95-title">結算畫面</span>
-      <div class="win95-title-btns">
-        <span class="win95-btn-icon">▁</span><span class="win95-btn-icon">▢</span><span class="win95-btn-icon">✕</span>
-      </div>
-    </div>
-    <div class="win95-content">
-      <div class="result-content">
-        <div class="result-title">遊戲結束！</div>
-        <div class="result-score">分數：${GAME.score}</div>
-        <div class="result-stat">最長連線：${GAME.longest}</div>
-        <div class="result-stat">最大連擊：${GAME.maxCombo}</div>
-        <div class="result-actions">
-          <button class="win95-btn" id="highscore-btn">登錄 High Score</button>
-          <button class="win95-btn" id="restart-btn">返回關卡</button>
-        </div>
-      </div>
-    </div>
-  `;
-  win.querySelector("#highscore-btn").onclick = () => { GAME.screen = "highscore"; render(); };
-  win.querySelector("#restart-btn").onclick = () => { GAME.screen = "level"; setBGM(null); render(); };
-  return win;
+    const hsBtn = createElement('button', { className: 'win95-btn', textContent: '登錄 High Score', onclick: () => { GAME.screen = "highscore"; getScreenEl(GAME.screen); } });
+    const restartBtn = createElement('button', { className: 'win95-btn', textContent: '返回關卡', onclick: () => { GAME.screen = "level"; setBGM(null); getScreenEl(GAME.screen); } });
+    const content = createElement('div', { className: 'result-content' }, [ createElement('div', { className: 'result-title', textContent: '遊戲結束！' }), createElement('div', { className: 'result-score', textContent: `分數：${GAME.score}` }), createElement('div', { className: 'result-stat', textContent: `最長連線：${GAME.longest}` }), createElement('div', { className: 'result-stat', textContent: `最大連擊：${GAME.maxCombo}` }), createElement('div', { className: 'result-actions' }, [hsBtn, restartBtn]) ]);
+    return buildWindow('結算畫面', content);
 }
-// 7. HighScore 排行榜
+
 function highscoreScreen() {
-  let win = document.createElement("div");
-  win.className = "win95-window";
-  let scores = (GAME.scores[GAME.theme.key] || []).slice(0, 10);
-  win.innerHTML = `
-    <div class="win95-titlebar">
-      <span class="win95-title">High Score 排行榜</span>
-      <div class="win95-title-btns">
-        <span class="win95-btn-icon">▁</span><span class="win95-btn-icon">▢</span><span class="win95-btn-icon">✕</span>
-      </div>
-    </div>
-    <div class="win95-content">
-      <div class="highscore-content">
-        <div class="highscore-list">
-          <table>
-            <thead>
-              <tr><th>名次</th><th>名稱</th><th>分數</th></tr>
-            </thead>
-            <tbody id="score-tbody">
-              ${scores.map((hs,i)=>`<tr><td>${i+1}</td><td>${hs.name||""}</td><td>${hs.score}</td></tr>`).join("")}
-            </tbody>
-          </table>
-        </div>
-        <div class="highscore-submit" id="highscore-submit">
-          <span>輸入三個英文字母：</span>
-          <input type="text" id="hsname" maxlength="3" style="width:48px;">
-          <button class="win95-btn" id="hsok" disabled>登錄</button>
-        </div>
-      </div>
-    </div>
-  `;
-  let input = win.querySelector("#hsname");
-  let ok = win.querySelector("#hsok");
-  input.oninput = () => {
-    input.value = input.value.replace(/[^a-zA-Z]/g, "").toUpperCase();
-    ok.disabled = !(input.value.length === 3);
-  };
-  ok.onclick = () => {
-    let name = input.value.toUpperCase();
-    let arr = GAME.scores[GAME.theme.key] = (GAME.scores[GAME.theme.key]||[]);
-    arr.push({name, score: GAME.lastScore});
-    arr.sort((a,b)=>b.score-a.score);
-    arr.splice(10);
-    saveScores(GAME.scores);
-    render();
-    win.querySelector("#highscore-submit").innerHTML = `<button class="win95-btn" id="done-btn">返回選單</button>`;
-    win.querySelector("#done-btn").onclick = () => { GAME.screen = "level"; render(); };
-  };
-  return win;
+    let scores = (GAME.scores[GAME.theme.key] || []).slice(0, 10);
+    const tbody = createElement('tbody');
+    scores.forEach((hs, i) => { tbody.appendChild(createElement('tr', {}, [ createElement('td', { textContent: i + 1 }), createElement('td', { textContent: hs.name || "" }), createElement('td', { textContent: hs.score }) ])); });
+    const table = createElement('table', {}, [ createElement('thead', {}, [ createElement('tr', {}, [ createElement('th', { textContent: '名次' }), createElement('th', { textContent: '名稱' }), createElement('th', { textContent: '分數' }) ]) ]), tbody ]);
+    const input = createElement('input', { type: 'text', id: 'hsname', maxlength: 3, style: { width: '48px' } });
+    const okBtn = createElement('button', { className: 'win95-btn', id: 'hsok', disabled: true, textContent: '登錄' });
+    input.oninput = () => { input.value = input.value.replace(/[^a-zA-Z]/g, "").toUpperCase(); okBtn.disabled = !(input.value.length === 3); };
+    okBtn.onclick = () => {
+        let name = input.value.toUpperCase(); let arr = GAME.scores[GAME.theme.key] = (GAME.scores[GAME.theme.key] || []);
+        arr.push({ name, score: GAME.lastScore }); arr.sort((a, b) => b.score - a.score); arr.splice(10); saveScores(GAME.scores);
+        GAME.screen = 'highscore'; getScreenEl(GAME.screen); // Re-render
+        const submitDiv = document.getElementById('highscore-submit');
+        if (submitDiv) {
+            submitDiv.innerHTML = '';
+            const doneBtn = createElement('button', { className: 'win95-btn', textContent: '返回選單' });
+            doneBtn.onclick = () => { GAME.screen = 'level'; getScreenEl(GAME.screen); };
+            submitDiv.appendChild(doneBtn);
+        }
+    };
+    const content = createElement('div', { className: 'highscore-content' }, [ createElement('div', { className: 'highscore-list' }, [table]), createElement('div', { className: 'highscore-submit', id: 'highscore-submit' }, [ createElement('span', { textContent: '輸入三個英文字母：' }), input, okBtn ]) ]);
+    return buildWindow('High Score 排行榜', content);
 }
 
-// --- 倒數計時
 function startTimer() {
-  let tick = () => {
-    if (GAME.screen !== "playing") return;
-    if (GAME.timeLeft <= 0) {
-      GAME.screen = "timesup"; render(); return;
-    }
+  let timerId = setInterval(() => {
+    if (GAME.screen !== "playing") { clearInterval(timerId); return; }
+    if (GAME.timeLeft <= 0) { GAME.screen = "timesup"; getScreenEl(GAME.screen); clearInterval(timerId); return; }
     GAME.timeLeft--;
-    render();
-    // PowerUp 自動消失
-    if (GAME.powerUp && GAME.powerUp.expires < Date.now()) {
-      GAME.powerUp = null;
-      render();
-    }
-    setTimeout(tick, 1000);
-  };
-  setTimeout(tick, 1000);
+    const timerEl = document.getElementById('timer');
+    if (timerEl) timerEl.textContent = GAME.timeLeft;
+    if (GAME.powerUp && GAME.powerUp.expires < Date.now()) { GAME.powerUp = null; getScreenEl(GAME.screen); }
+  }, 1000);
 }
 
-// --- 啟動
-render();
+function renderApp() {
+    getScreenEl(GAME.screen);
+}
+
+// --- 啟動 ---
+renderApp();
 </script>
 </body>
 </html>

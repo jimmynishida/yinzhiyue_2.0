@@ -8,7 +8,7 @@
   <link rel="icon" href="https://em-content.zobj.net/source/microsoft-teams/363/laptop_1f4bb.png" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
-    /* --- CSS 樣式與之前相同，此處為節省篇幅省略，實際程式碼中是完整的 --- */
+    /* --- CSS 樣式與之前相同 --- */
     html, body { margin:0; padding:0; background: #101a10; }
     body { font-family: 'Press Start 2P', monospace; }
     .crt-frame { box-shadow: 0 0 60px #0f0d, 0 0 8px #0a0; border-radius: 28px; padding: 18px 24px; margin: 40px auto; background: linear-gradient(150deg, #1f2d1f 80%, #243324 100%); width: 720px; height: 540px; position: relative; overflow: hidden; max-width: 100vw; }
@@ -42,199 +42,96 @@
     </div>
   </div>
 <script>
-/** ==== 音效與BGM ==== */
-const AUDIO = {
-  arcadeBgm: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/arcade_bgm.mp3",
-  sfxRotate: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/rotate.wav",
-  sfxCorrect: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/correct.wav",
-  sfxError: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/error.wav",
-  sfxComplete: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/complete.wav",
-  msdosBoot: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/msdos_boot.mp3"
-};
-class AudioManager {
-  constructor() { this.bgm = null; this.sfx = null; }
-  play(src, volume = 1, loop = false) {
-    if (!src) return;
-    try {
-        if (src.endsWith(".mp3")) {
-            if (this.bgm) { this.bgm.pause(); this.bgm = null; }
-            this.bgm = new Audio(src); this.bgm.volume = volume; this.bgm.loop = loop; this.bgm.play();
-        } else {
-            if (this.sfx) { this.sfx.pause(); this.sfx = null; }
-            this.sfx = new Audio(src); this.sfx.volume = volume; this.sfx.play();
-        }
-    } catch (e) { console.error("Audio playback failed:", e); }
-  }
-  stop() {
-    if (this.bgm) { this.bgm.pause(); this.bgm = null; }
-    if (this.sfx) { this.sfx.pause(); this.sfx = null; }
-  }
-}
+/** ==== 音效與資料 (與之前相同) ==== */
+const AUDIO = { arcadeBgm: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/arcade_bgm.mp3", sfxRotate: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/rotate.wav", sfxCorrect: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/correct.wav", sfxError: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/error.wav", sfxComplete: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/complete.wav", msdosBoot: "https://cdn.jsdelivr.net/gh/jimmynishida/public-assets@main/audio/msdos_boot.mp3" };
+class AudioManager { constructor() { this.bgm = null; this.sfx = null; } play(src, volume = 1, loop = false) { if (!src) return; try { if (src.endsWith(".mp3")) { if (this.bgm) { this.bgm.pause(); this.bgm = null; } this.bgm = new Audio(src); this.bgm.volume = volume; this.bgm.loop = loop; this.bgm.play(); } else { if (this.sfx) { this.sfx.pause(); this.sfx = null; } this.sfx = new Audio(src); this.sfx.volume = volume; this.sfx.play(); } } catch (e) { console.error("Audio playback failed:", e); } } stop() { if (this.bgm) { this.bgm.pause(); this.bgm = null; } if (this.sfx) { this.sfx.pause(); this.sfx = null; } } }
 const audio = new AudioManager();
+const cutscenes = [ `1989年。網路深處。\n你是一名駭客，被神秘AI「創世者」鎖定。\n資料核心被重重防火牆防護，你必須解碼進入。\n\n任務：破解數據密碼，潛入AI的核心。`, `第一道防線已被突破，資料流如洪水般湧現。\n你感受到AI的監控，螢幕上的符號開始扭曲。\n一場智力的對決正式展開……` ];
 
-/** ==== 問題產生器 ==== */
+/** ==== 徹底修正的渲染邏輯 ==== */
+function createSVGElement(tag, attributes = {}) { const el = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const key in attributes) { el.setAttribute(key, attributes[key]); } return el; }
+
 function generateQuestion() {
   const answerIndex = Math.floor(Math.random() * 4);
   return {
     prompt: "找出唯一一個電路紋理不同的方塊：",
     options: [0, 1, 2, 3].map(i => ({
       render: () => {
-        // This returns an SVG string.
         const fill = i === answerIndex ? "#3f3" : "#0f0";
         const symbol = i === answerIndex ? "?" : "#";
-        return `<svg width="48" height="48"><rect width="48" height="48" rx="8" fill="${fill}" /><text x="24" y="36" text-anchor="middle" fill="#111" font-size="30" font-family="monospace">${symbol}</text></svg>`;
+        const svg = createSVGElement('svg', { width: 48, height: 48 });
+        const rect = createSVGElement('rect', { width: 48, height: 48, rx: 8, fill: fill });
+        const text = createSVGElement('text', { x: 24, y: 36, 'text-anchor': 'middle', fill: '#111', 'font-size': 30, 'font-family': 'monospace' });
+        text.textContent = symbol;
+        svg.append(rect, text);
+        return svg;
       }
     })),
     answerIndex
   };
 }
 
-/** ==== 劇情 Cutscene ==== */
-const cutscenes = [
-`1989年。網路深處。
-你是一名駭客，被神秘AI「創世者」鎖定。
-資料核心被重重防火牆防護，你必須解碼進入。
-
-任務：破解數據密碼，潛入AI的核心。`,
-`第一道防線已被突破，資料流如洪水般湧現。
-你感受到AI的監控，螢幕上的符號開始扭曲。
-一場智力的對決正式展開……`
-];
-
-/** ==== 遊戲主程式 ==== */
 const GAME_TIME = 90;
-let state = {
-  view: "loading", // loading, menu, arcade, scoreboard, cutscene
-  score: 0,
-  combo: 0,
-  timeLeft: GAME_TIME,
-  question: null,
-  initials: "",
-  cutIdx: 0,
-  timer: null
-};
+let state = { view: "loading", score: 0, combo: 0, timeLeft: GAME_TIME, question: null, initials: "", cutIdx: 0, timer: null };
 
-// --- 安全的 DOM 創建輔助函式 ---
 function createElement(tag, options = {}, children = []) {
     const el = document.createElement(tag);
     Object.keys(options).forEach(key => {
+        // REMOVED: The insecure `innerHTML` option is gone.
         if (key === 'className') el.className = options[key];
         else if (key === 'textContent') el.textContent = options[key];
         else if (key === 'onclick') el.onclick = options[key];
         else if (key === 'onmousedown') el.onmousedown = options[key];
         else if (key === 'oninput') el.oninput = options[key];
         else if (key === 'style') Object.assign(el.style, options[key]);
-        else if (key === 'innerHTML') el.innerHTML = options[key]; // Use with extreme caution
         else el.setAttribute(key, options[key]);
     });
-    children.forEach(child => child && el.appendChild(child));
+    children.forEach(child => {
+        if (child) el.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
+    });
     return el;
 }
 
-function setState(next) {
-  Object.assign(state, next);
-  render();
-}
+function setState(next) { Object.assign(state, next); render(); }
 
-// --- 各場景渲染函式 (已修改為安全版本) ---
 function renderLoadingScreen(container) {
-    container.appendChild(
-      createElement('div', { className: 'crt-loading' }, [
-        createElement('pre', { innerHTML: `LOADING...<br>C:\\GAME\\VOXEL.EXE<br><span class="crt-blink">█</span>` })
-      ])
-    );
+    const pre = createElement('pre', {}, [ 'LOADING...\nC:\\GAME\\VOXEL.EXE\n', createElement('span', { className: 'crt-blink' }, ['█']) ]);
+    container.appendChild(createElement('div', { className: 'crt-loading' }, [pre]));
 }
 
 function renderMenuScreen(container) {
-    container.appendChild(
-      createElement('div', { className: 'menu' }, [
-        createElement('h1', { className: 'crt-title', textContent: '數據次元：方塊解碼' }),
-        createElement('button', { className: 'crt-btn', textContent: '街機模式', onclick: startArcade }),
-        createElement('button', { className: 'crt-btn', textContent: '劇情模式', onclick: () => setCutscene(0) }),
-        createElement('button', { className: 'crt-btn', textContent: '高分榜', onclick: () => setState({ view: 'scoreboard' }) })
-      ])
-    );
+    container.appendChild( createElement('div', { className: 'menu' }, [ createElement('h1', { className: 'crt-title', textContent: '數據次元：方塊解碼' }), createElement('button', { className: 'crt-btn', textContent: '街機模式', onclick: startArcade }), createElement('button', { className: 'crt-btn', textContent: '劇情模式', onclick: () => setCutscene(0) }), createElement('button', { className: 'crt-btn', textContent: '高分榜', onclick: () => setState({ view: 'scoreboard' }) }) ]) );
 }
 
 function renderArcadeScreen(container) {
-    const hud = createElement('div', { className: 'game-hud' }, [
-        createElement('span', { textContent: `SCORE: ${state.score}` }),
-        createElement('span', { textContent: `TIME: ${state.timeLeft}s` }),
-        createElement('span', { textContent: `COMBO: ${state.combo}` })
-    ]);
-    
+    const hud = createElement('div', { className: 'game-hud' }, [ createElement('span', { textContent: `SCORE: ${state.score}` }), createElement('span', { textContent: `TIME: ${state.timeLeft}s` }), createElement('span', { textContent: `COMBO: ${state.combo}` }) ]);
     if (!state.question) return;
-    
     const optionsContainer = createElement('div', { className: 'cube-options' });
     state.question.options.forEach((opt, idx) => {
-        const cubeArt = createElement('div', { className: 'cube-art' });
-        const svgString = opt.render();
-        // Since the SVG string is generated internally and doesn't contain user input,
-        // we can use it, but this is the specific point Snyk flags.
-        cubeArt.innerHTML = svgString;
-
-        const cubeOption = createElement('div', {
-            className: 'cube-option',
-            tabindex: 0,
-            onclick: () => selectCube(idx),
-            onmousedown: cubeRotateSfx
-        }, [cubeArt]);
+        const cubeArt = createElement('div', { className: 'cube-art' }, [opt.render()]);
+        const cubeOption = createElement('div', { className: 'cube-option', tabindex: 0, onclick: () => selectCube(idx), onmousedown: cubeRotateSfx }, [cubeArt]);
         optionsContainer.appendChild(cubeOption);
     });
-
-    const selector = createElement('div', { className: 'cube-selector' }, [
-        createElement('div', { className: 'question-text', textContent: state.question.prompt }),
-        optionsContainer
-    ]);
-    
+    const selector = createElement('div', { className: 'cube-selector' }, [ createElement('div', { className: 'question-text', textContent: state.question.prompt }), optionsContainer ]);
     container.append(hud, selector);
 }
 
 function renderScoreboardScreen(container) {
     const hs = getHighScores();
     const tbody = createElement('tbody');
-    hs.forEach((h, i) => {
-        tbody.appendChild(createElement('tr', {}, [
-            createElement('td', { textContent: i + 1 }),
-            createElement('td', { textContent: h.initials }), // Safely set text
-            createElement('td', { textContent: h.score })    // Safely set text
-        ]));
-    });
-
-    const scoreInput = createElement('input', {
-        className: 'crt-score-input',
-        maxlength: 3,
-        value: state.initials || "",
-        placeholder: "AAA",
-        oninput: (e) => inputInitials(e.target.value)
-    });
-
-    const panel = createElement('div', { className: 'scoreboard crt-panel' }, [
-        createElement('h2', { textContent: 'HIGH SCORES' }),
-        createElement('table', { style: { margin: '0 auto', color: '#0f0', fontSize: '1em' } }, [tbody]),
-        createElement('div', { style: { marginTop: '1em' }, textContent: `Your Score: ${state.score}` }),
-        createElement('div', {}, [
-            scoreInput,
-            createElement('button', { className: 'crt-btn', textContent: '提交', onclick: submitInitials })
-        ]),
-        createElement('button', { className: 'crt-btn', textContent: '返回主選單', onclick: toMenu })
-    ]);
+    hs.forEach((h, i) => { tbody.appendChild(createElement('tr', {}, [ createElement('td', { textContent: i + 1 }), createElement('td', { textContent: h.initials }), createElement('td', { textContent: h.score }) ])); });
+    const scoreInput = createElement('input', { className: 'crt-score-input', maxlength: 3, value: state.initials || "", placeholder: "AAA", oninput: (e) => inputInitials(e.target.value) });
+    const panel = createElement('div', { className: 'scoreboard crt-panel' }, [ createElement('h2', { textContent: 'HIGH SCORES' }), createElement('table', { style: { margin: '0 auto', color: '#0f0', fontSize: '1em' } }, [tbody]), createElement('div', { style: { marginTop: '1em' }, textContent: `Your Score: ${state.score}` }), createElement('div', {}, [ scoreInput, createElement('button', { className: 'crt-btn', textContent: '提交', onclick: submitInitials }) ]), createElement('button', { className: 'crt-btn', textContent: '返回主選單', onclick: toMenu }) ]);
     container.appendChild(panel);
 }
 
 function renderCutsceneScreen(container) {
-    container.appendChild(
-        createElement('div', { className: 'crt-cutscene crt-panel' }, [
-            createElement('pre', { textContent: cutscenes[state.cutIdx] }), // Use textContent for safety
-            createElement('button', { className: 'crt-btn', textContent: '繼續', onclick: nextCutscene })
-        ])
-    );
+    container.appendChild( createElement('div', { className: 'crt-cutscene crt-panel' }, [ createElement('pre', { textContent: cutscenes[state.cutIdx] }), createElement('button', { className: 'crt-btn', textContent: '繼續', onclick: nextCutscene }) ]) );
 }
 
-// --- 主渲染函式 (已修改為安全版本) ---
 function render() {
   const el = document.getElementById('game-root');
-  el.innerHTML = ''; // Clear container first
+  el.innerHTML = '';
   switch(state.view) {
     case "loading": renderLoadingScreen(el); break;
     case "menu": renderMenuScreen(el); break;
@@ -245,60 +142,16 @@ function render() {
 }
 
 // --- 遊戲邏輯 (與之前相同) ---
-function startArcade() {
-  setState({view:"arcade", score:0, combo:0, timeLeft:GAME_TIME, question: generateQuestion(), initials:""});
-  if (state.timer) clearInterval(state.timer);
-  audio.play(AUDIO.arcadeBgm, 0.6, true);
-  state.timer = setInterval(() => {
-    setState({timeLeft: state.timeLeft-1});
-    if (state.timeLeft <= 0) {
-      clearInterval(state.timer);
-      audio.stop();
-      setState({view:"scoreboard"});
-    }
-  }, 1000);
-}
-function selectCube(idx) {
-  if (!state.question) return;
-  if (idx === state.question.answerIndex) {
-    setState({score:state.score+100+state.combo*20, combo:state.combo+1});
-    audio.play(AUDIO.sfxCorrect, 1);
-    setTimeout(()=>setState({question: generateQuestion()}), 200);
-  } else {
-    setState({combo:0});
-    audio.play(AUDIO.sfxError, 1);
-    setTimeout(()=>setState({question: generateQuestion()}), 350);
-  }
-}
+function startArcade() { setState({view:"arcade", score:0, combo:0, timeLeft:GAME_TIME, question: generateQuestion(), initials:""}); if (state.timer) clearInterval(state.timer); audio.play(AUDIO.arcadeBgm, 0.6, true); state.timer = setInterval(() => { setState({timeLeft: state.timeLeft-1}); if (state.timeLeft <= 0) { clearInterval(state.timer); audio.stop(); setState({view:"scoreboard"}); } }, 1000); }
+function selectCube(idx) { if (!state.question) return; if (idx === state.question.answerIndex) { setState({score:state.score+100+state.combo*20, combo:state.combo+1}); audio.play(AUDIO.sfxCorrect, 1); setTimeout(()=>setState({question: generateQuestion()}), 200); } else { setState({combo:0}); audio.play(AUDIO.sfxError, 1); setTimeout(()=>setState({question: generateQuestion()}), 350); } }
 function cubeRotateSfx() { audio.play(AUDIO.sfxRotate, 0.8); }
 function setCutscene(idx) { setState({view:"cutscene", cutIdx:idx}); }
-function nextCutscene() {
-  if (state.cutIdx<cutscenes.length-1) setState({cutIdx:state.cutIdx+1});
-  else toMenu();
-}
+function nextCutscene() { if (state.cutIdx<cutscenes.length-1) setState({cutIdx:state.cutIdx+1}); else toMenu(); }
 function inputInitials(val) { setState({initials: val.replace(/[^A-Z0-9]/gi,"").slice(0,3).toUpperCase()}); }
-function submitInitials() {
-  if (!state.initials) return;
-  let hs = getHighScores();
-  hs.push({ initials: state.initials, score: state.score });
-  hs = hs.sort((a, b) => b.score - a.score).slice(0, 10);
-  localStorage.setItem("cube_hs", JSON.stringify(hs));
-  toMenu();
-}
-function toMenu() {
-  audio.stop();
-  setState({view:"menu", score:0, combo:0, question:null, initials:""});
-}
-function getHighScores() {
-  return JSON.parse(localStorage.getItem("cube_hs") || "[]");
-}
-
-/** ==== 載入流程 ==== */
-function boot() {
-  render();
-  audio.play(AUDIO.msdosBoot, 0.8);
-  setTimeout(()=>setState({view:"menu"}), 3000);
-}
+function submitInitials() { if (!state.initials) return; let hs = getHighScores(); hs.push({ initials: state.initials, score: state.score }); hs = hs.sort((a, b) => b.score - a.score).slice(0, 10); localStorage.setItem("cube_hs", JSON.stringify(hs)); toMenu(); }
+function toMenu() { audio.stop(); setState({view:"menu", score:0, combo:0, question:null, initials:""}); }
+function getHighScores() { return JSON.parse(localStorage.getItem("cube_hs") || "[]"); }
+function boot() { render(); audio.play(AUDIO.msdosBoot, 0.8); setTimeout(()=>setState({view:"menu"}), 3000); }
 window.onload = boot;
 </script>
 </body>
