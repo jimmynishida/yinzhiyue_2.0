@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>時光修復室</title>
+    <meta name="viewport" content="width=600, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body { background: #3a3a4a; font-family: 'VT323', monospace; color: #fff; text-align: center; }
+        .workshop { width: 540px; margin: 30px auto; background: #252535; padding: 20px; border-radius: 15px; box-shadow: 0 0 40px #0008; border: 4px solid #555; }
+        .screen { border: 2px solid #111; background: #ddd; padding: 15px; border-radius: 10px; min-height: 300px; }
+        .item-display { position: relative; width: 256px; height: 256px; margin: 20px auto; background: #000; overflow: hidden; }
+        .item-img { width: 100%; image-rendering: pixelated; }
+        .item-img.blurry { filter: blur(8px) brightness(0.6); }
+        .repair-point { position: absolute; width: 30px; height: 30px; background: rgba(255, 255, 0, 0.7); border-radius: 50%; cursor: pointer; animation: pulse 1s infinite alternate; }
+        @keyframes pulse { 0% { transform: scale(0.9); box-shadow: 0 0 10px #ff0; } 100% { transform: scale(1.1); box-shadow: 0 0 20px #ff0; } }
+        .memory-tag-input { margin-top: 20px; text-align: center; }
+        .memory-tag-input textarea { width: 80%; height: 60px; font-family: inherit; font-size: 1.2em; padding: 10px; }
+        .btn { background: #4caf50; color: white; padding: 10px 20px; border: none; font-family: inherit; font-size: 1.2em; cursor: pointer; margin-top: 10px; border-radius: 5px; }
+        .collection-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; }
+        .collection-item { background: #555; padding: 10px; border-radius: 8px; }
+        .collection-item img { width: 80px; image-rendering: pixelated; }
+        .collection-item p { font-size: 0.9em; color: #ffc; margin-top: 5px; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <div class="workshop">
+        <h1 id="ws-title">時光修復室</h1>
+        <div id="game-container"></div>
+        <button class="btn" onclick="showCollection()">查看我的收藏</button>
+        <button class="btn" onclick="startGame()">開始新任務</button>
+    </div>
+
+<script>
+    const gameContainer = document.getElementById('game-container');
+    const wsTitle = document.getElementById('ws-title');
+
+    const repairableItems = [
+        { name: "Game Boy", img: "https://i.imgur.com/6Qm5n4Q.png", question: "當年，你最廢寢忘食的卡帶是哪一卷？", repairPoints: [{top: '40%', left: '45%'}] },
+        { name: "B.B. Call", img: "https://i.imgur.com/NZk0BSt.png", question: "你還記得以前常用的密碼嗎？ (例如 520)", repairPoints: [{top: '20%', left: '35%'}] },
+        { name: "電子雞", img: "https://i.imgur.com/2kQdLJH.png", question: "幫你的第一隻電子雞取過什麼名字？", repairPoints: [{top: '55%', left: '50%'}] }
+    ];
+
+    let currentItem = null;
+    let collection = JSON.parse(localStorage.getItem('timeCapsuleCollection')) || [];
+
+    function saveCollection() {
+        localStorage.setItem('timeCapsuleCollection', JSON.stringify(collection));
+    }
+
+    function startGame() {
+        currentItem = repairableItems[Math.floor(Math.random() * repairableItems.length)];
+        wsTitle.textContent = `修復任務：${currentItem.name}`;
+        gameContainer.innerHTML = ''; // Clear
+
+        const screen = createElement('div', {className: 'screen'});
+        const itemDisplay = createElement('div', {className: 'item-display'});
+        const itemImg = createElement('img', {src: currentItem.img, className: 'item-img blurry'});
+        
+        itemDisplay.appendChild(itemImg);
+        
+        // Create repair points
+        currentItem.repairPoints.forEach(pos => {
+            const point = createElement('div', {className: 'repair-point', style: {top: pos.top, left: pos.left}});
+            point.onclick = () => {
+                itemImg.classList.remove('blurry');
+                point.remove();
+                setTimeout(askForMemoryTag, 500);
+            };
+            itemDisplay.appendChild(point);
+        });
+        
+        screen.appendChild(itemDisplay);
+        screen.appendChild(createElement('p', {textContent: '物品訊號不穩定...請點擊閃爍區域進行修復！'}));
+        gameContainer.appendChild(screen);
+    }
+
+    function askForMemoryTag() {
+        wsTitle.textContent = '修復完成！請寫下你的回憶';
+        gameContainer.innerHTML = '';
+
+        const screen = createElement('div', {className: 'screen'});
+        const itemImg = createElement('img', {src: currentItem.img, className: 'item-img', style: {width: '128px', marginBottom: '15px'}});
+        const questionP = createElement('p', {textContent: currentItem.question});
+        
+        const inputDiv = createElement('div', {className: 'memory-tag-input'});
+        const textarea = createElement('textarea', {id: 'memory-input', placeholder: '在此輸入你的專屬回憶...'});
+        const saveBtn = createElement('button', {className: 'btn', textContent: '儲存到寶物架'});
+        
+        saveBtn.onclick = () => {
+            const memoryText = document.getElementById('memory-input').value;
+            if (memoryText.trim()) {
+                collection.push({ name: currentItem.name, img: currentItem.img, memory: memoryText });
+                saveCollection();
+                showCollection();
+            }
+        };
+        
+        inputDiv.append(textarea, saveBtn);
+        screen.append(itemImg, questionP, inputDiv);
+        gameContainer.appendChild(screen);
+    }
+    
+    function showCollection() {
+        wsTitle.textContent = '我的時光寶物架';
+        gameContainer.innerHTML = '';
+
+        const screen = createElement('div', {className: 'screen'});
+        if (collection.length === 0) {
+            screen.textContent = '你的寶物架還是空的，快去修復一些寶物吧！';
+        } else {
+            const grid = createElement('div', {className: 'collection-grid'});
+            collection.forEach(item => {
+                const itemDiv = createElement('div', {className: 'collection-item'}, [
+                    createElement('img', {src: item.img}),
+                    createElement('p', {textContent: item.memory})
+                ]);
+                grid.appendChild(itemDiv);
+            });
+            screen.appendChild(grid);
+        }
+        gameContainer.appendChild(screen);
+    }
+
+    // Helper to create elements
+    function createElement(tag, options = {}, children = []) {
+        const el = document.createElement(tag);
+        Object.assign(el, options);
+        for (const key in options.style) { el.style[key] = options.style[key]; }
+        children.forEach(child => el.appendChild(child));
+        return el;
+    }
+
+    // Initial load
+    startGame();
+</script>
+</body>
+</html>

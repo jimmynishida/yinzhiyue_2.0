@@ -63,20 +63,11 @@
             color: #0d110d;
         }
         .prompt::before { content: 'C:\\SWS_GYM> '; }
-        .cursor {
-            display: inline-block;
-            width: 0.7em;
-            height: 1.4em;
-            background: #00ff41;
-            animation: blink 1s steps(2, start) infinite;
-        }
-        @keyframes blink { to { visibility: hidden; } }
-        .hidden { display: none; }
         .menu-options { margin-top: 2em; }
         .menu-options .command-btn { font-size: 1.5em; margin: 0.5em 0; display: block; }
         .game-list { margin-top: 1em; }
         .game-list a { display: block; margin: 0.3em 0; }
-        .results-panel { border: 2px solid #00ff41; padding: 1em; margin-top: 1em; }
+        .results-panel, .quest-panel { border: 2px solid #00ff41; padding: 1em; margin-top: 1em; }
     </style>
 </head>
 <body>
@@ -89,7 +80,6 @@
     <script>
         const terminal = document.getElementById('terminal');
 
-        // *** 修正檔案名稱 ***
         const dailyChallengeMap = [
             { day: "週日 (深度策略)", games: ["terminal-hacker.html", "project-rewind.html"] },
             { day: "週一 (記憶啟動)", games: ["nostalgic-memory.html", "neon-strike.html", "mental-math-hacker.html"] },
@@ -108,9 +98,7 @@
             { name: "方塊解碼 (空間)", file: "voxel-decode.html" },
             { name: "心算駭客", file: "mental-math-hacker.html" },
             { name: "時光機偵錯 (觀察)", file: "project-rewind.html" },
-             // 以下是之前整合但未在每日挑戰中使用的遊戲，也一併列出供自由練習
-            { name: "桌面清理大師", file: "desktop-cleanup.html" },
-            { name: "懷舊影視遊戲", file: "pop-culture.html" }
+            { name: "[新] 時光修復室", file: "time-capsule-workshop.html" },
         ];
 
         let state = "boot";
@@ -118,21 +106,12 @@
         function render() {
             terminal.innerHTML = '';
             switch(state) {
-                case 'boot':
-                    bootSequence();
-                    break;
-                case 'menu':
-                    showMenu();
-                    break;
-                case 'challenge':
-                    showDailyChallenge();
-                    break;
-                case 'freeplay':
-                    showFreePlay();
-                    break;
-                case 'results':
-                    showResults();
-                    break;
+                case 'boot': bootSequence(); break;
+                case 'menu': showMenu(); break;
+                case 'challenge': showDailyChallenge(); break;
+                case 'freeplay': showFreePlay(); break;
+                case 'quest': showQuestLog(); break;
+                case 'results': showResults(); break;
             }
         }
 
@@ -146,18 +125,8 @@
         }
 
         async function bootSequence() {
-            const bootLines = [
-                'Silver-Wisdom BIOS v2.0...',
-                'Initializing Nostalgia Core...',
-                'C:\\> LOAD GYM.EXE',
-                ' ',
-                '歡迎來到「智齡樂 Gym」',
-                '一個為資深數位遊俠設計的腦力活化平台。',
-                ' '
-            ];
-            for (const line of bootLines) {
-                await typeText(line);
-            }
+            const bootLines = [ '...', '歡迎來到「智齡樂 Gym」', '一個為資深數位遊俠設計的腦力活化平台。', ' ' ];
+            for (const line of bootLines) { await typeText(line); }
             state = 'menu';
             render();
         }
@@ -167,80 +136,61 @@
                 <div class="prompt">請選擇模式：</div>
                 <div class="menu-options">
                     <button class="command-btn" onclick="setState('challenge')">> 開始今日挑戰</button>
+                    <button class="command-btn" onclick="setState('quest')">> 每週情懷任務 (新!)</button>
                     <button class="command-btn" onclick="setState('freeplay')">> 自由練習模式</button>
                 </div>
             `;
+        }
+        
+        function showQuestLog() {
+            let questHTML = `
+                <div class="prompt">讀取每週情懷任務...</div>
+                <div class="quest-panel">
+                    <h3>本週任務：我的音樂週</h3>
+                    <p>1. 完成 <a href="./word-commando.html" target="_blank">文字特攻隊</a> (主題:90年代歌手)</p>
+                    <p>2. 完成 <a href="./mental-math-hacker.html" target="_blank">心算駭客</a> (主題:計算CD花費)</p>
+                    <p>3. (線下任務) 本週，找一首當年的歌來聽！</p>
+                    <br>
+                    <button class="command-btn" onclick="alert('恭喜完成任務，獲得 [卡帶A面] 勳章！')">> 我已完成線下任務，回報！</button>
+                </div>
+                <br>
+                <button class="command-btn" onclick="setState('menu')"><< 返回主選單</button>
+            `;
+            terminal.innerHTML = questHTML;
         }
 
         function showDailyChallenge() {
             const today = new Date().getDay();
             const challenge = dailyChallengeMap[today];
-            let challengeHTML = `
-                <div class="prompt">載入今日挑戰：${challenge.day}</div>
-                <p>請依序完成以下遊戲模組。完成後，點擊下方按鈕查看您的今日腦力指數。</p>
-                <div class="game-list">
-            `;
+            let challengeHTML = `<div class="prompt">載入今日挑戰：${challenge.day}</div> <p>請依序完成以下遊戲。完成後，點擊下方按鈕查看您的今日腦力指數。</p> <div class="game-list">`;
             challenge.games.forEach((gameFile, index) => {
                 const game = allGames.find(g => g.file === gameFile);
-                challengeHTML += `<a href="./${game.file}" target="_blank">${index + 1}. ${game.name}</a>`;
+                if(game) challengeHTML += `<a href="./${game.file}" target="_blank">${index + 1}. ${game.name}</a>`;
             });
-            challengeHTML += `
-                </div>
-                <br>
-                <button class="command-btn" onclick="setState('results')">> 我已完成所有挑戰，查看報告</button>
-                <br>
-                <button class="command-btn" onclick="setState('menu')"><< 返回主選單</button>
-            `;
+            challengeHTML += `</div><br><button class="command-btn" onclick="setState('results')">> 我已完成，查看報告</button><br><button class="command-btn" onclick="setState('menu')"><< 返回主選單</button>`;
             terminal.innerHTML = challengeHTML;
         }
         
         function showFreePlay() {
-            let freePlayHTML = `
-                <div class="prompt">自由練習：點擊以啟動遊戲</div>
-                <div class="game-list">
-            `;
+            let freePlayHTML = `<div class="prompt">自由練習：點擊以啟動遊戲</div><div class="game-list">`;
             allGames.sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant')).forEach(game => {
                 freePlayHTML += `<a href="./${game.file}" target="_blank">${game.name}</a>`;
             });
-            freePlayHTML += `
-                </div>
-                <br>
-                <button class="command-btn" onclick="setState('menu')"><< 返回主選單</button>
-            `;
+            freePlayHTML += `</div><br><button class="command-btn" onclick="setState('menu')"><< 返回主選單</button>`;
             terminal.innerHTML = freePlayHTML;
         }
 
         function showResults() {
-             const randomBPI = Math.floor(Math.random() * (950 - 750 + 1)) + 750;
-             const randomPercent = Math.floor(Math.random() * (95 - 75 + 1)) + 75;
+             const randomBPI = 750 + Math.floor(Math.random() * 201);
+             const randomPercent = 75 + Math.floor(Math.random() * 21);
              const titles = ["記憶探索家", "光速反應者", "邏輯建築師", "空間魔術師"];
              const randomTitle = titles[Math.floor(Math.random()*titles.length)];
-
-            let resultsHTML = `
-                <div class="prompt">您的今日腦力報告</div>
-                <div class="results-panel">
-                    <p>今日腦力指數 (BPI): ${randomBPI} / 1000</p>
-                    <p>您的表現超越了 ${randomPercent}% 的同齡使用者！</p>
-                    <p>今日稱號：${randomTitle}</p>
-                    <p>---</p>
-                    <p>[您的五維雷達圖將顯示於此]</p>
-                    <p>[勳章系統：恭喜您獲得了「晨練者」勳章！]</p>
-                </div>
-                <br>
-                <button class="command-btn" onclick="alert('分享功能將生成一張包含您今日成就的精美卡片！')">> 分享我的成就</button>
-                <br>
-                <button class="command-btn" onclick="setState('menu')"><< 返回主選單</button>
-            `;
-            terminal.innerHTML = resultsHTML;
+             terminal.innerHTML = `<div class="prompt">您的今日腦力報告</div><div class="results-panel"><p>今日腦力指數 (BPI): ${randomBPI} / 1000</p><p>您的表現超越了 ${randomPercent}% 的同齡使用者！</p><p>今日稱號：${randomTitle}</p><p>---</p><p>[您的五維雷達圖將顯示於此]</p><p>[勳章系統：恭喜您獲得了「晨練者」勳章！]</p></div><br><button class="command-btn" onclick="alert('分享功能將生成一張包含您今日成就的精美卡片！')">> 分享我的成就</button><br><button class="command-btn" onclick="setState('menu')"><< 返回主選單</button>`;
         }
         
-        function setState(newState) {
-            state = newState;
-            render();
-        }
+        function setState(newState) { state = newState; render(); }
 
-        // Initial load
-        render();
+        render(); // Initial load
     </script>
 </body>
 </html>
