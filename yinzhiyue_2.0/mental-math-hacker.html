@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=1024" />
     <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono:400,700&display=swap" rel="stylesheet">
     <style>
-      /* --- CSS 樣式與之前相同，此處為節省篇幅省略，實際程式碼中是完整的 --- */
+      /* --- CSS 樣式與之前相同 --- */
       html, body, #root {
         width: 100vw;
         height: 100vh;
@@ -168,7 +168,6 @@
       }
       
       // ===== 音效與BGM管理 (簡易版) =====
-      // 假設音效檔案放在 /audio/ 資料夾
       function playS(src) { try { new Audio(src).play(); } catch(e) { console.error("Audio play failed", e); } }
 
       // ==== View State ====
@@ -196,7 +195,6 @@
         
         root.appendChild(crt);
 
-        // 根據場景渲染內容
         if(state.scene==="title") renderTitleScreen(crtContent);
         else if(state.scene==="mode") renderModeSelect(crtContent);
         else if(state.scene==="arcade") renderArcadeGame(crtContent);
@@ -228,9 +226,10 @@
           container.append(logo, pressStart, themeDiv, footer);
           
           let show = true;
-          setInterval(()=> {
+          const pressStartInterval = setInterval(()=> {
               const el = document.getElementById("pressstart");
               if (el) el.style.visibility = show ? "visible" : "hidden";
+              else clearInterval(pressStartInterval);
               show = !show;
           }, 500);
 
@@ -255,11 +254,11 @@
           if (!arcade) {
             arcade = { q: genArcadeQuestion(1), lvl: 1, input: "", phase: "countdown", stats: { score:0, correct:0, wrong:0, streak:0, maxStreak:0, fastest:9999, longest:0, startTime:Date.now(), leaderboard:[] }, msg: "3", timeUsed: 0, showOverlay: false, };
             setState({arcade});
-            // Countdown logic
             let count = 3;
             playS("/audio/countdown.mp3");
             const timer = setInterval(() => {
                 count--;
+                if (state.scene !== 'arcade') { clearInterval(timer); return; }
                 if (count === 0) {
                     arcade.phase = "question";
                     arcade.msg = "";
@@ -296,12 +295,12 @@
                   createElement('span', { style: { marginLeft: '30px' }, textContent: `耗時：${(arcade.timeUsed / 1000).toFixed(2)}秒` })
               );
           } else if (arcade.phase === "over" && arcade.showOverlay) {
-              renderOverlay(container, arcade); // Overlay covers the whole container
+              renderOverlay(container, arcade); 
           }
       }
 
       function renderQuestion(container, arcade) {
-          container.innerHTML = ''; // Clear container
+          container.innerHTML = ''; 
           const renderer = createElement('div', { className: 'question-renderer' });
           const row = createElement('div', { className: 'qr-row' });
           renderer.appendChild(row);
@@ -316,10 +315,9 @@
               value: arcade.input
           });
 
-          // Animate question appearance
           let phase = 0;
           function step() {
-              row.innerHTML = ''; // Clear row for each step
+              row.innerHTML = ''; 
               for(let i=0; i<arcade.q.exprs.length; i++) {
                   if (phase > i) row.appendChild(renderExpr(arcade.q.exprs[i]));
                   else row.appendChild(createElement('span', { className: 'qr-blank', textContent: '　' }));
@@ -339,11 +337,14 @@
           }
           step();
           
-          // Event handlers
           document.body.onkeydown = (e) => {
               if (state.arcade.phase !== "question") return;
               const currentInput = document.getElementById('answer-input');
               if (!currentInput) return;
+
+              // ***** BUG FIX STARTS HERE *****
+              e.preventDefault(); 
+              // ***** BUG FIX ENDS HERE *****
 
               if (e.key === "Enter") {
                   checkAnswer();
@@ -386,7 +387,6 @@
             svg.appendChild(g);
             return createElement('span', {className:'qr-op qr-minus'}, [svg]);
         }
-        // ... add other operators similarly
         return createElement('span', {className:'qr-blank', textContent: expr});
       }
 
@@ -430,7 +430,7 @@
       }
 
       function renderOverlay(container, arcade) {
-          document.body.onkeydown = null; // Disable game input
+          document.body.onkeydown = null; 
           let board = [];
           try { board = JSON.parse(localStorage.getItem("crthacker_arcade_lb") || "[]"); } catch {}
           let name = prompt("GAME OVER!\n請輸入3個英文字母作為代號：", "HCK") || "ANON";
