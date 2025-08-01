@@ -85,7 +85,6 @@
       const tutorialKey = 'tutorialShown_nostalgic_memory';
 
       React.useEffect(() => {
-        // 組件載入時，只執行一次，檢查是否需要顯示教學
         if (!sessionStorage.getItem(tutorialKey)) {
           setTutorialVisible(true);
         }
@@ -108,33 +107,50 @@
       const [questionData, setQuestionData] = React.useState(null);
       const [bgm, setBgm] = React.useState(null);
 
-      // --- 原有遊戲邏輯 (useEffect, functions) 不變 ---
-      React.useEffect(() => { if (phase === "VHS_INTRO") { sfx.modem().play(); setTimeout(() => setPhase("TITLE"), 4200); } }, [phase]);
-      React.useEffect(() => { if (phase === "TITLE" && !bgm) { const bgmAudio = chiptuneBGM(); setBgm(bgmAudio); bgmAudio.loop = true; bgmAudio.volume = 0.23; bgmAudio.play(); } }, [phase, bgm]);
+      // --- 遊戲邏輯 ---
+      React.useEffect(() => { 
+          if (isTutorialVisible) return; // 如果教學可見，則暫停遊戲邏輯
+          if (phase === "VHS_INTRO") { 
+              sfx.modem().play(); 
+              setTimeout(() => setPhase("TITLE"), 4200); 
+          } 
+      }, [phase, isTutorialVisible]);
+
+      React.useEffect(() => { 
+          if (isTutorialVisible) return; // 如果教學可見，則暫停遊戲邏輯
+          if (phase === "TITLE" && !bgm) { 
+              const bgmAudio = chiptuneBGM(); 
+              setBgm(bgmAudio); 
+              bgmAudio.loop = true; 
+              bgmAudio.volume = 0.23; 
+              bgmAudio.play(); 
+          } 
+      }, [phase, bgm, isTutorialVisible]);
+
       function startGame() { setScore(0); nextRound(); }
       function nextRound() { const mode = getRandomGameMode(); setMode(mode); const numItems = 3 + Math.floor(score / 2); const items = getRandomItems(numItems); setShelfItems(items); setPrompt(""); setPhase("MEMORY"); setTimeout(() => { sfx.vhs().play(); setPhase("QUESTION"); const qData = getModePrompt(mode, items); setPrompt(qData.prompt); setAnswer(qData.answer); setQuestionData(qData); if (mode === "FIND_DIFF") { setHiddenShelfItems(qData.changedItems); } }, 5000); }
       function handleClickItem(idx) { if (phase !== "QUESTION" || isTutorialVisible) return; let correct = false; if (mode === "FIND_ITEM" || mode === "FIND_ITEM_LOCATION") { correct = idx === answer; } else if (mode === "FIND_DIFF") { correct = idx === answer; } if (correct) { setFeedback("帥喔！"); sfx.coin().pause(); sfx.coin().currentTime=0; sfx.coin().play(); setScore(s => s + 1); } else { setFeedback("遜掉了～"); sfx.wrong().pause(); sfx.wrong().currentTime=0; sfx.wrong().play(); } setPhase("FEEDBACK"); setTimeout(() => nextRound(), 1800); }
       function handleChoice(i) { if (phase !== "QUESTION" || isTutorialVisible) return; const correct = i === answer; if (correct) { setFeedback("超懂行！"); sfx.coin().pause(); sfx.coin().currentTime=0; sfx.coin().play(); setScore(s => s + 1); } else { setFeedback("再猜猜看～"); sfx.wrong().pause(); sfx.wrong().currentTime=0; sfx.wrong().play(); } setPhase("FEEDBACK"); setTimeout(() => nextRound(), 1800); }
       function renderShelf(items, clickable) { return e( "div", { className: "shelf" }, items.map((item, i) => e( "div", { key: i, className: "shelf-slot", style: { cursor: clickable ? "pointer" : "default", filter: item ? "" : "brightness(0.4)", }, onClick: () => clickable && handleClickItem(i), }, item && e("img", { src: item.img, alt: item.name, className: "item-pixel", title: item.name, draggable: false, }) ) ) ); }
       
-      // --- CRT & VHS 效果元件 ---
       function CRTOverlay() { return e("div", { style: { pointerEvents: "none", position: "fixed", inset: 0, zIndex: 99, background: "repeating-linear-gradient(0deg, rgba(0,0,0,0.07) 0 2px, transparent 2px 6px)", mixBlendMode: "overlay", }, }); }
       function VHSNoise({ active }) { const ref = React.useRef(); React.useEffect(() => { let anim; function draw() { const canvas = ref.current; if (!canvas) return; const ctx = canvas.getContext("2d"); ctx.clearRect(0, 0, canvas.width, canvas.height); for (let y = 0; y < canvas.height; y += 4) { const alpha = Math.random() * 0.12 + 0.07; ctx.fillStyle = `rgba(240,240,240,${alpha})`; ctx.fillRect(0, y, canvas.width, 2); } if (Math.random() < 0.15) { ctx.fillStyle = "rgba(255,255,255,0.25)"; ctx.fillRect( 0, Math.floor(Math.random() * canvas.height), canvas.width, 3 ); } anim = requestAnimationFrame(draw); } if (active) draw(); return () => cancelAnimationFrame(anim); }, [active]); return e("canvas", { ref, width: window.innerWidth, height: window.innerHeight, style: { pointerEvents: "none", position: "fixed", inset: 0, zIndex: 100, opacity: active ? 1 : 0, transition: "opacity 0.3s", }, }); }
 
       // --- 主渲染 return ---
-      return e( "div", { className: "crt-bg" },
-        // --- 新增：條件渲染教學彈窗 ---
-        isTutorialVisible && e(TutorialModal, { onClose: handleCloseTutorial }),
-        
-        e(CRTOverlay),
-        e(VHSNoise, { active: phase === "VHS_INTRO" || phase === "MEMORY" }),
-        e( "div", { className: "main-frame" },
+      const gameContent = e( "div", { className: "main-frame" },
           phase === "VHS_INTRO" && e( "div", { className: "vhs-intro" }, e("span", { className: "pixel-font" }, "VHS 載入中...") ),
           phase === "TITLE" && e( "div", { className: "title-screen" }, e( "h1", { className: "pixel-font", style: { color: "#F9DF5B" } }, "我的時光寶物架" ), e( "p", { style: { color: "#E383B9" } }, e("b", null, "80/90s"), " 懷舊記憶訓練" ), e( "button", { className: "pixel-font", onClick: startGame }, "開始遊戲" ) ),
           phase === "MEMORY" && e( "div", null, e( "div", { className: "pixel-font", style: { color: "#E383B9" } }, "記住貨架上的寶物吧！" ), renderShelf(shelfItems, false), e("div", { className: "timer-bar" }) ),
           phase === "QUESTION" && e( "div", null, e( "div", { className: "pixel-font", style: { color: "#6EDCFF" } }, prompt ), mode === "FIND_DIFF" ? renderShelf(hiddenShelfItems, true) : mode === "ESTIMATE_PRICE" ? e( "div", { style: { marginTop: "2em", textAlign: "center" } }, questionData && e("img", { src: questionData.item.img, alt: questionData.item.name, className: "item-pixel", style: { marginBottom: "1em" }, }), questionData && questionData.choices.map((c, i) => e( "button", { key: i, className: "pixel-font price-btn", onClick: () => handleChoice(i), }, c ) ) ) : renderShelf(shelfItems, true) ),
           phase === "FEEDBACK" && e( "div", null, e( "div", { className: "pixel-font feedback" }, feedback, e("br", null), e( "span", { style: { fontSize: 18, color: "#FFD700" } }, "分數：", score ) ) )
-        )
+      );
+
+      return e( "div", { className: "crt-bg" },
+        isTutorialVisible && e(TutorialModal, { onClose: handleCloseTutorial }),
+        e(CRTOverlay),
+        e(VHSNoise, { active: phase === "VHS_INTRO" || phase === "MEMORY" }),
+        // 遊戲主內容只在教學關閉後顯示
+        !isTutorialVisible && gameContent
       );
     }
 

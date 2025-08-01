@@ -84,12 +84,7 @@
             </div>
         </div>
     </div>
-    
     <div id="root"></div>
-    
-    <audio src="/audio/type.mp3" id="sfx-type"></audio>
-    <audio src="/audio/blip.mp3" id="sfx-blip"></audio>
-
     <script type="text/javascript">
       // ===== 安全的 DOM 創建輔助函式 =====
       function createElement(tag, options = {}, children = []) {
@@ -122,18 +117,41 @@
         }
         return stack[0];
       }
-      function genArcadeQuestion(lvl){
-        let n1,n2,n3,op1,op2,exprs;
-        const t=Date.now();
-        if(lvl<3){ n1=rand(2,9);n2=rand(2,9);op1=pick(["x","+","-"]);exprs=[n1,op1,n2]; }
-        else if(lvl<5){ n1=rand(10,19);n2=rand(2,9);op1=pick(["x","+","-"]);exprs=[n1,op1,n2]; }
-        else if(lvl<8){ n1=rand(10,29);n2=rand(10,29);op1=pick(["x","+","-"]);exprs=[n1,op1,n2]; }
-        else { n1=rand(10,49);n2=rand(10,49);n3=rand(2,19);op1=pick(["x","+"]);op2=pick(["-","+"]); if(Math.random()>0.5){exprs=[n1,op1,n2,op2,n3];} else{exprs=[n1,op2,n2,op1,n3];} }
-        return {exprs,ans:calc(exprs),start:t};
-      }
       
-      // ===== 音效與BGM管理 (簡易版) =====
-      function playS(src) { try { new Audio(src).play(); } catch(e) { console.error("Audio play failed", e); } }
+      // ***** BUG FIX STARTS HERE *****
+      function genArcadeQuestion(lvl){
+        let n1,n2,n3,op1,op2;
+        let exprsForDisplay, exprsForCalc;
+        const t = Date.now();
+        
+        if(lvl < 3){
+          n1=rand(2,9); n2=rand(2,9); op1=pick(["x","+","-"]);
+          exprsForDisplay = [n1, op1, n2];
+          exprsForCalc = [n1, n2, op1]; // Postfix for calculation
+        } else if (lvl < 8) {
+          n1=rand(10,29); n2=rand(2,9); op1=pick(["x","+","-"]);
+          exprsForDisplay = [n1, op1, n2];
+          exprsForCalc = [n1, n2, op1];
+        } else {
+          n1=rand(10,49); n2=rand(10,49); n3=rand(2,19);
+          op1=pick(["x","+"]); op2=pick(["-","+"]);
+          if(Math.random() > 0.5){
+            // (n1 op1 n2) op2 n3
+            exprsForDisplay = [n1, op1, n2, op2, n3];
+            exprsForCalc = [n1, n2, op1, n3, op2]; // Postfix for calculation
+          } else {
+            // n1 op2 (n2 op1 n3) - RPN calc is left-to-right, so we'll stick to that
+            exprsForDisplay = [n1, op2, n2, op1, n3];
+            exprsForCalc = [n1, n2, op2, n3, op1]; 
+          }
+        }
+        // The original `q.exprs` is now split into one for display and one for calculation
+        return {exprs: exprsForDisplay, ans: calc(exprsForCalc), start:t};
+      }
+      // ***** BUG FIX ENDS HERE *****
+      
+      const SFX_URLS = { countdown: "https://cdn.pixabay.com/audio/2022/10/16/audio_12eb6f1e7b.mp3", correct: "https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b6a99.mp3", wrong: "https://cdn.pixabay.com/audio/2022/02/23/audio_115b9b6a1f.mp3", boot: "https://cdn.pixabay.com/audio/2022/07/26/audio_124b0e7f3b.mp3" };
+      function playS(name) { if(SFX_URLS[name]) { try { new Audio(SFX_URLS[name]).play(); } catch(e) { console.error("Audio play failed", e); } } }
 
       // ==== View State ====
       let state = { scene: "title", theme: "green", arcade: null };
@@ -154,7 +172,7 @@
       // ---- 各場景渲染函式 (安全版本) ----
       function renderTitleScreen(container) {
           container.className = 'crt-content titlescreen';
-          const logo = createElement('img', { src: 'assets/logo.png', className: 'titlescreen-logo', alt: '心算駭客' });
+          const logo = createElement('img', { src: 'https://i.imgur.com/YJjXcEo.png', className: 'titlescreen-logo', alt: '心算駭客' });
           const pressStart = createElement('div', { id: 'pressstart', className: 'titlescreen-press', textContent: 'PRESS START' });
           const themeButtons = ['green', 'amber', 'blue'].map(theme => {
               const btn = createElement('button', { id: `theme-${theme}`, textContent: { green: '螢光綠', amber: '琥珀', blue: '深藍' }[theme], className: state.theme === theme ? 'active' : '' });
@@ -186,12 +204,12 @@
             arcade = { q: genArcadeQuestion(1), lvl: 1, input: "", phase: "countdown", stats: { score:0, correct:0, wrong:0, streak:0, maxStreak:0, fastest:9999, longest:0, startTime:Date.now(), leaderboard:[] }, msg: "3", timeUsed: 0, showOverlay: false, };
             setState({arcade});
             let count = 3;
-            playS("/audio/countdown.mp3");
+            playS("countdown");
             const timer = setInterval(() => {
                 count--;
                 if (state.scene !== 'arcade') { clearInterval(timer); return; }
                 if (count === 0) { arcade.phase = "question"; arcade.msg = ""; setState({ arcade }); clearInterval(timer); setTimeout(() => document.getElementById("answer-input")?.focus(), 100); } 
-                else { arcade.msg = count.toString(); setState({ arcade }); playS("/audio/countdown.mp3"); }
+                else { arcade.msg = count.toString(); setState({ arcade }); playS("countdown"); }
             }, 800);
             return;
           }
@@ -256,8 +274,8 @@
         const arcade = state.arcade;
         const now = Date.now(), used = now - arcade.q.start;
         const correct = parseInt(arcade.input) === arcade.q.ans;
-        if(correct) { playS("/audio/correct.mp3"); const streak = arcade.stats.streak + 1; arcade.stats = { ...arcade.stats, score: arcade.stats.score + 10 + Math.max(0, Math.floor(1500 - used) / 50), correct: arcade.stats.correct + 1, streak, maxStreak: Math.max(streak, arcade.stats.maxStreak), fastest: Math.min(used, arcade.stats.fastest), longest: Math.max(used, arcade.stats.longest) }; arcade.msg = "✓ 正確！"; arcade.timeUsed = used; } 
-        else { playS("/audio/wrong.mp3"); arcade.stats = {...arcade.stats, score: Math.max(0, arcade.stats.score - 8), wrong: arcade.stats.wrong + 1, streak: 0}; arcade.msg = "✗ 錯誤！"; arcade.timeUsed = used; }
+        if(correct) { playS("correct"); const streak = arcade.stats.streak + 1; arcade.stats = { ...arcade.stats, score: arcade.stats.score + 10 + Math.max(0, Math.floor(1500 - used) / 50), correct: arcade.stats.correct + 1, streak, maxStreak: Math.max(streak, arcade.stats.maxStreak), fastest: Math.min(used, arcade.stats.fastest), longest: Math.max(used, arcade.stats.longest) }; arcade.msg = "✓ 正確！"; arcade.timeUsed = used; } 
+        else { playS("wrong"); arcade.stats = {...arcade.stats, score: Math.max(0, arcade.stats.score - 8), wrong: arcade.stats.wrong + 1, streak: 0}; arcade.msg = "✗ 錯誤！"; arcade.timeUsed = used; }
         arcade.phase = "result";
         setState({ arcade });
         setTimeout(() => { if(correct) nextQuestion(); else { arcade.showOverlay = true; arcade.phase = "over"; setState({ arcade }); } }, 900);
@@ -294,7 +312,6 @@
           const tutorialKey = 'tutorialShown_mental-math-hacker';
 
           const startGame = () => {
-              // 確保只啟動一次
               window.onload = null; 
               boot();
           };
@@ -305,17 +322,17 @@
                   closeBtn.onclick = function() {
                       if (overlay) overlay.style.display = 'none';
                       sessionStorage.setItem(tutorialKey, 'true');
-                      startGame(); // 關閉教學後啟動遊戲
+                      startGame();
                   };
               }
           } else {
-              startGame(); // 如果已經看過教學，直接啟動遊戲
+              startGame();
           }
       }
 
       function boot() {
         render();
-        playS("msdos_boot.mp3"); // 假設音效路徑
+        playS("boot");
       }
       
       window.onload = initTutorial;

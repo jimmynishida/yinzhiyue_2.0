@@ -82,15 +82,15 @@
       const [selectedLevel, setSelectedLevel] = React.useState(null);
       const [score, setScore] = React.useState(null);
 
-      // BGM 控制
-      React.useEffect(() => { if(screen==="desktop"||screen==="levelSelect") playBGM("citypop"); if(screen==="game" && selectedLevel) playBGM(selectedLevel.bgm); if(screen==="score") stopBGM(); return stopBGM; }, [screen, selectedLevel]);
+      // BGM 控制 (加入 isTutorialVisible 判斷)
+      React.useEffect(() => { if(isTutorialVisible) return; if(screen==="desktop"||screen==="levelSelect") playBGM("citypop"); if(screen==="game" && selectedLevel) playBGM(selectedLevel.bgm); if(screen==="score") stopBGM(); return stopBGM; }, [screen, selectedLevel, isTutorialVisible]);
 
       return e(React.Fragment, {},
         isTutorialVisible && e(TutorialModal, { onClose: handleCloseTutorial }),
-        screen === "desktop" && e(Desktop, { onEnter: ()=>setScreen("levelSelect") }),
-        screen === "levelSelect" && e(LevelSelect, { levels, onSelect: lv => {setSelectedLevel(lv); setScreen("game");} }),
-        screen === "game" && selectedLevel && e(GameLevel, { level: selectedLevel, onFinish: score => { setScore(score); setScreen("score"); }, onBack: ()=>setScreen("levelSelect") }),
-        screen === "score" && score && e(ScoreSummary, { score, onBackToDesktop: ()=>{setScore(null); setSelectedLevel(null); setScreen("desktop")}, onReplay: ()=>{setScore(null); setScreen("game")} })
+        !isTutorialVisible && screen === "desktop" && e(Desktop, { onEnter: ()=>setScreen("levelSelect") }),
+        !isTutorialVisible && screen === "levelSelect" && e(LevelSelect, { levels, onSelect: lv => {setSelectedLevel(lv); setScreen("game");} }),
+        !isTutorialVisible && screen === "game" && selectedLevel && e(GameLevel, { level: selectedLevel, onFinish: score => { setScore(score); setScreen("score"); }, onBack: ()=>setScreen("levelSelect") }),
+        !isTutorialVisible && screen === "score" && score && e(ScoreSummary, { score, onBackToDesktop: ()=>{setScore(null); setSelectedLevel(null); setScreen("desktop")}, onReplay: ()=>{setScore(null); setScreen("game")} })
       );
     }
     // --- 各畫面元件 (與之前相同) ---
@@ -108,5 +108,3 @@
   </script>
 </body>
 </html>
-}
-這兩個檔案是否還有錯誤
