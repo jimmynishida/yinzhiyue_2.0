@@ -32,9 +32,97 @@
     .cube-option:active, .cube-option:focus { background: #0b1; box-shadow: 0 0 20px #0f0b, 0 0 2px #0a0; }
     .game-hud { font-size: 1em; padding: 8px 0 16px 0; display: flex; justify-content: space-between; width: 90%; margin: 0 auto 8px auto; text-shadow: 0 0 3px #0f0b, 0 0 1px #0a0; position: absolute; top: 18px; left: 5%;}
     @media (max-width: 750px) { .crt-frame { width: 99vw; height: 99vw; min-height: 400px; } .crt-inner { font-size: 14px; } }
+  /* --- 教學彈窗樣式 --- */
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 32, 44, 0.85); /* 午夜藍背景 */
+    display: none; /* 預設隱藏 */
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.tutorial-modal {
+    background: #E2E8F0; /* 冬日灰 */
+    color: #1A202C;
+    padding: 20px 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 2px solid #F7FAFC;
+    position: relative;
+    font-family: 'Noto Sans TC', sans-serif; /* 使用更易讀的現代字體 */
+}
+
+.tutorial-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #555;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.tutorial-content h4 {
+    font-family: 'VT323', monospace; /* 標題保留復古字體 */
+    color: #1A202C;
+    font-size: 2em;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.tutorial-image-placeholder {
+    width: 100%;
+    min-height: 150px;
+    background: rgba(26, 32, 44, 0.1);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed #5DADE2;
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.tutorial-content ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+}
+
+.tutorial-content li {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
   </style>
 </head>
 <body>
+  <div id="tutorial-overlay" class="tutorial-overlay">
+    <div class="tutorial-modal">
+        <button id="tutorial-close-btn" class="tutorial-close-btn">我知道了 (略過)</button>
+        <div class="tutorial-content">
+            <h4>玩法說明</h4>
+            <div class="tutorial-image-placeholder">
+                <p style="font-size: 1.2em; color: #E59866;">[ 此處為一張靜態玩法說明圖 ]</p>
+                <ul id="tutorial-text-list">
+                    <li>專心看！找出畫面中唯一一個「紋路不同」的方塊。</li>
+                    <li>用滑鼠點擊它即可得分。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
   <div class="crt-frame">
     <div class="crt-glass">
       <div class="crt-scanlines"></div>
@@ -152,7 +240,41 @@ function submitInitials() { if (!state.initials) return; let hs = getHighScores(
 function toMenu() { audio.stop(); setState({view:"menu", score:0, combo:0, question:null, initials:""}); }
 function getHighScores() { return JSON.parse(localStorage.getItem("cube_hs") || "[]"); }
 function boot() { render(); audio.play(AUDIO.msdosBoot, 0.8); setTimeout(()=>setState({view:"menu"}), 3000); }
-window.onload = boot;
+window.onload = boot; // 或 window.onload = render; 或其他類似的啟動函式
+// --- 整合後的啟動邏輯 ---
+function initTutorial() {
+    const overlay = document.getElementById('tutorial-overlay');
+    const closeBtn = document.getElementById('tutorial-close-btn');
+
+    // vvvvvv 【第一處需要您修改的地方】 vvvvvv
+    const tutorialKey = 'voxel-decode'; 
+    // ^^^^^^ 【第一處需要您修改的地方】 ^^^^^^
+
+    const startGame = () => {
+        // 確保只啟動一次
+        window.onload = null; 
+
+        // vvvvvv 【第二處需要您修改的地方】 vvvvvv
+        boot(); // <--- 呼叫該遊戲原本的啟動函式 (可能是 boot(), render(), renderApp() 等)
+        // ^^^^^^ 【第二處需要您修改的地方】 ^^^^^^
+    };
+
+    if (!sessionStorage.getItem(tutorialKey)) {
+        if (overlay) overlay.style.display = 'flex';
+        if (closeBtn) {
+            closeBtn.onclick = function() {
+                if (overlay) overlay.style.display = 'none';
+                sessionStorage.setItem(tutorialKey, 'true');
+                startGame(); // 關閉教學後啟動遊戲
+            };
+        }
+    } else {
+        startGame(); // 如果已經看過教學，直接啟動遊戲
+    }
+}
+
+// 將頁面載入後的預設行為指向我們的整合函式
+window.onload = initTutorial;
 </script>
 </body>
 </html>

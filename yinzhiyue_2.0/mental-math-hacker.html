@@ -7,56 +7,14 @@
     <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono:400,700&display=swap" rel="stylesheet">
     <style>
       /* --- CSS 樣式與之前相同 --- */
-      html, body, #root {
-        width: 100vw;
-        height: 100vh;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        background: #121622;
-        font-family: 'IBM Plex Mono', 'Consolas', 'monospace';
-      }
-      .crt {
-        width: 100vw;
-        height: 100vh;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        filter: saturate(1.1) contrast(1.12) brightness(1.15);
-        border-radius: 3vw 3vw 3vw 3vw / 5vw 5vw 5vw 5vw;
-        box-shadow: 0 0 80px 0 #000a, 0 0 0 12px #232420 inset;
-      }
+      html, body, #root { width: 100vw; height: 100vh; margin: 0; padding: 0; box-sizing: border-box; background: #121622; font-family: 'IBM Plex Mono', 'Consolas', 'monospace'; }
+      .crt { width: 100vw; height: 100vh; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center; filter: saturate(1.1) contrast(1.12) brightness(1.15); border-radius: 3vw 3vw 3vw 3vw / 5vw 5vw 5vw 5vw; box-shadow: 0 0 80px 0 #000a, 0 0 0 12px #232420 inset; }
       .crt-green .crt-content { color: #74ff7e; text-shadow: 0 0 8px #7fffad, 0 0 16px #47d76e; background: #161c1a; }
       .crt-amber .crt-content { color: #ffe29f; text-shadow: 0 0 8px #ffea8d, 0 0 16px #ffba47; background: #1a1710; }
       .crt-blue .crt-content { color: #67e2ff; text-shadow: 0 0 8px #a7eaff, 0 0 16px #1197cd; background: #10131a; }
-      .crt-content {
-        width: 900px; max-width: 96vw; height: 540px; max-height: 90vh;
-        position: relative; z-index: 2; padding: 38px 48px 38px 48px;
-        font-size: 2rem; display: flex; flex-direction: column;
-        justify-content: center; align-items: center; background: transparent;
-      }
-      .crt-overlay {
-        position: absolute; inset: 0; pointer-events: none; z-index: 3;
-        background:
-          radial-gradient(ellipse at 50% 48%, transparent 60%, #000b 100%),
-          repeating-linear-gradient(135deg, transparent 0 7px, #2223 9px 13px);
-        mix-blend-mode: multiply;
-        border-radius: inherit;
-      }
-      .crt-scanlines {
-        position: absolute; inset: 0; pointer-events: none; z-index: 4;
-        background: repeating-linear-gradient(
-          to bottom,
-          transparent 0px,
-          rgba(0,0,0,0.16) 2px,
-          transparent 4px,
-          transparent 10px
-        );
-        opacity: 0.2;
-        border-radius: inherit;
-      }
+      .crt-content { width: 900px; max-width: 96vw; height: 540px; max-height: 90vh; position: relative; z-index: 2; padding: 38px 48px; font-size: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center; background: transparent; }
+      .crt-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 3; background: radial-gradient(ellipse at 50% 48%, transparent 60%, #000b 100%), repeating-linear-gradient(135deg, transparent 0 7px, #2223 9px 13px); mix-blend-mode: multiply; border-radius: inherit; }
+      .crt-scanlines { position: absolute; inset: 0; pointer-events: none; z-index: 4; background: repeating-linear-gradient( to bottom, transparent 0px, rgba(0,0,0,0.16) 2px, transparent 4px, transparent 10px ); opacity: 0.2; border-radius: inherit; }
       .titlescreen { width: 100%; height: 100%; text-align: center; position: relative; user-select: none; padding-top: 50px;}
       .titlescreen-logo { width: 540px; max-width: 82vw; filter: drop-shadow(0 0 48px #00ffae70); margin-top: 30px;}
       .titlescreen-press { margin-top: 56px; font-size: 2.3rem; letter-spacing: 0.18em; text-shadow: 0 0 16px #0f0, 0 0 32px #3ffb;}
@@ -91,15 +49,8 @@
       .qr-plus svg .op-plus-g { filter: drop-shadow(0 0 9px #fff7);}
       .qr-minus svg .op-minus-g { filter: drop-shadow(0 0 7px #f0f9);}
       .qr-div svg .op-div-g { filter: drop-shadow(0 0 8px #aff7);}
-      .overlay-bg {
-        position: absolute; inset: 0; background: rgba(24,32,45,0.92);
-        display: flex; justify-content: center; align-items: center; z-index: 99;
-      }
-      .overlay-box {
-        background: #161f27dd; border: 2px solid #0ff; border-radius: 15px;
-        box-shadow: 0 0 28px #0ff5, 0 0 8px #fff4 inset;
-        padding: 36px 54px; text-align: center; color: #f7f7ff; min-width: 400px;
-      }
+      .overlay-bg { position: absolute; inset: 0; background: rgba(24,32,45,0.92); display: flex; justify-content: center; align-items: center; z-index: 99; }
+      .overlay-box { background: #161f27dd; border: 2px solid #0ff; border-radius: 15px; box-shadow: 0 0 28px #0ff5, 0 0 8px #fff4 inset; padding: 36px 54px; text-align: center; color: #f7f7ff; min-width: 400px; }
       .overlay-score { font-size: 2.2em; margin: 16px 0 10px 0; letter-spacing: 0.08em;}
       .overlay-details { font-size: 1.1em; margin-bottom: 18px; opacity: 0.92;}
       .overlay-lb-title { font-size: 1.15em; margin: 10px 0 2px 0; color: #0ff; letter-spacing: 0.11em;}
@@ -108,12 +59,37 @@
       .overlay-actions { margin-top: 12px;}
       .overlay-actions button { margin: 0 25px; padding: 9px 26px; background: #1c2c3c; color: #0ff; border: 2px solid #0ff; font: inherit; font-size: 1.10em; border-radius: 8px; cursor: pointer; opacity: 0.88; transition: border 0.18s, box-shadow 0.22s;}
       .overlay-actions button:hover { border: 2px solid #fff; box-shadow: 0 0 10px #0ff4; opacity: 1;}
+      .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: none; align-items: center; justify-content: center; z-index: 10000; }
+      .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 20px 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; }
+      .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; font-family: inherit; }
+      .tutorial-content h4 { font-family: 'VT323', monospace; color: #1A202C; font-size: 2em; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+      .tutorial-image-placeholder { width: 100%; min-height: 150px; background: rgba(26, 32, 44, 0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #5DADE2; padding: 15px; box-sizing: border-box; }
+      .tutorial-content ul { list-style: none; padding: 0; margin-top: 15px; }
+      .tutorial-content li { font-size: 1.1em; margin-bottom: 10px; line-height: 1.5; }
     </style>
   </head>
   <body>
+    <div id="tutorial-overlay" class="tutorial-overlay">
+        <div class="tutorial-modal">
+            <button id="tutorial-close-btn" class="tutorial-close-btn">我知道了 (略過)</button>
+            <div class="tutorial-content">
+                <h4>玩法說明</h4>
+                <div class="tutorial-image-placeholder">
+                    <p style="font-size: 1.2em; color: #E59866;">[ 此處為「心算駭客」玩法說明圖 ]</p>
+                    <ul id="tutorial-text-list">
+                        <li>1. 快速心算出畫面上算式的答案。</li>
+                        <li>2. 使用鍵盤輸入答案後，按下 Enter 鍵確認！</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div id="root"></div>
+    
     <audio src="/audio/type.mp3" id="sfx-type"></audio>
     <audio src="/audio/blip.mp3" id="sfx-blip"></audio>
+
     <script type="text/javascript">
       // ===== 安全的 DOM 創建輔助函式 =====
       function createElement(tag, options = {}, children = []) {
@@ -149,21 +125,10 @@
       function genArcadeQuestion(lvl){
         let n1,n2,n3,op1,op2,exprs;
         const t=Date.now();
-        if(lvl<3){
-          n1=rand(2,9);n2=rand(2,9);op1=pick(["x","+","-"]);exprs=[n1,op1,n2];
-          return {exprs,ans:calc(exprs),start:t};
-        }
-        if(lvl<5){
-          n1=rand(10,19);n2=rand(2,9);op1=pick(["x","+","-"]);exprs=[n1,op1,n2];
-          return {exprs,ans:calc(exprs),start:t};
-        }
-        if(lvl<8){
-          n1=rand(10,29);n2=rand(10,29);op1=pick(["x","+","-"]);exprs=[n1,op1,n2];
-          return {exprs,ans:calc(exprs),start:t};
-        }
-        n1=rand(10,49);n2=rand(10,49);n3=rand(2,19);op1=pick(["x","+"]);op2=pick(["-","+"]);
-        if(Math.random()>0.5){exprs=[n1,op1,n2,op2,n3];}
-        else{exprs=[n1,op2,n2,op1,n3];}
+        if(lvl<3){ n1=rand(2,9);n2=rand(2,9);op1=pick(["x","+","-"]);exprs=[n1,op1,n2]; }
+        else if(lvl<5){ n1=rand(10,19);n2=rand(2,9);op1=pick(["x","+","-"]);exprs=[n1,op1,n2]; }
+        else if(lvl<8){ n1=rand(10,29);n2=rand(10,29);op1=pick(["x","+","-"]);exprs=[n1,op1,n2]; }
+        else { n1=rand(10,49);n2=rand(10,49);n3=rand(2,19);op1=pick(["x","+"]);op2=pick(["-","+"]); if(Math.random()>0.5){exprs=[n1,op1,n2,op2,n3];} else{exprs=[n1,op2,n2,op1,n3];} }
         return {exprs,ans:calc(exprs),start:t};
       }
       
@@ -171,60 +136,34 @@
       function playS(src) { try { new Audio(src).play(); } catch(e) { console.error("Audio play failed", e); } }
 
       // ==== View State ====
-      let state = {
-        scene: "title", // title, mode, arcade
-        theme: "green",
-        arcade: null,
-      };
-      function setState(next) {
-        state = {...state, ...next};
-        render();
-      }
+      let state = { scene: "title", theme: "green", arcade: null };
+      function setState(next) { state = {...state, ...next}; render(); }
 
       // ---- 主渲染函式 ----
       function render() {
         const root = document.getElementById("root");
-        root.innerHTML = ""; // 清空root
-        
+        root.innerHTML = "";
         const crtContent = createElement('div', { id: 'crt-content', className: 'crt-content' });
-        const crt = createElement('div', { className: `crt crt-${state.theme}` }, [
-            createElement('div', { className: 'crt-overlay' }),
-            crtContent,
-            createElement('div', { className: 'crt-scanlines' })
-        ]);
-        
+        const crt = createElement('div', { className: `crt crt-${state.theme}` }, [ createElement('div', { className: 'crt-overlay' }), crtContent, createElement('div', { className: 'crt-scanlines' }) ]);
         root.appendChild(crt);
-
         if(state.scene==="title") renderTitleScreen(crtContent);
         else if(state.scene==="mode") renderModeSelect(crtContent);
         else if(state.scene==="arcade") renderArcadeGame(crtContent);
       }
       
-      // ---- 各場景渲染函式 (已修改為安全版本) ----
+      // ---- 各場景渲染函式 (安全版本) ----
       function renderTitleScreen(container) {
           container.className = 'crt-content titlescreen';
-          
           const logo = createElement('img', { src: 'assets/logo.png', className: 'titlescreen-logo', alt: '心算駭客' });
           const pressStart = createElement('div', { id: 'pressstart', className: 'titlescreen-press', textContent: 'PRESS START' });
-          
           const themeButtons = ['green', 'amber', 'blue'].map(theme => {
-              const btn = createElement('button', {
-                  id: `theme-${theme}`,
-                  textContent: { green: '螢光綠', amber: '琥珀', blue: '深藍' }[theme],
-                  className: state.theme === theme ? 'active' : ''
-              });
+              const btn = createElement('button', { id: `theme-${theme}`, textContent: { green: '螢光綠', amber: '琥珀', blue: '深藍' }[theme], className: state.theme === theme ? 'active' : '' });
               btn.onclick = (e) => { e.stopPropagation(); setState({ theme }); };
               return btn;
           });
-          
-          const themeDiv = createElement('div', { className: 'titlescreen-theme' }, [
-              'THEME: ', ...themeButtons
-          ]);
-          
+          const themeDiv = createElement('div', { className: 'titlescreen-theme' }, [ 'THEME: ', ...themeButtons ]);
           const footer = createElement('div', { className: 'titlescreen-footer', textContent: '© 2025 - MENTAL MATH HACKER: 199X' });
-
           container.append(logo, pressStart, themeDiv, footer);
-          
           let show = true;
           const pressStartInterval = setInterval(()=> {
               const el = document.getElementById("pressstart");
@@ -232,21 +171,13 @@
               else clearInterval(pressStartInterval);
               show = !show;
           }, 500);
-
           container.onclick = () => setState({ scene: "mode" });
           document.body.onkeydown = (e) => { if (e.key === "Enter" && state.scene === "title") setState({ scene: "mode" }); };
       }
 
       function renderModeSelect(container) {
           container.className = 'crt-content modeselect';
-          container.append(
-              createElement('h1', { textContent: '選擇模式' }),
-              createElement('button', { id: 'btn-arcade', textContent: '街機挑戰 (ARCADE MODE)', onclick: () => setState({ scene: "arcade", arcade: null }) }),
-              createElement('button', { id: 'btn-story', textContent: '防火牆突破 (STORY MODE)', onclick: () => alert("故事模式開發中，敬請期待！") }),
-              createElement('div', { style: { marginTop: '70px' } }, [
-                  createElement('button', { id: 'btn-back', textContent: '回到主畫面', onclick: () => setState({ scene: "title" }) })
-              ])
-          );
+          container.append( createElement('h1', { textContent: '選擇模式' }), createElement('button', { textContent: '街機挑戰 (ARCADE MODE)', onclick: () => setState({ scene: "arcade", arcade: null }) }), createElement('button', { textContent: '防火牆突破 (STORY MODE)', onclick: () => alert("故事模式開發中，敬請期待！") }), createElement('div', { style: { marginTop: '70px' } }, [ createElement('button', { textContent: '回到主畫面', onclick: () => setState({ scene: "title" }) }) ]) );
       }
 
       function renderArcadeGame(container) {
@@ -259,44 +190,19 @@
             const timer = setInterval(() => {
                 count--;
                 if (state.scene !== 'arcade') { clearInterval(timer); return; }
-                if (count === 0) {
-                    arcade.phase = "question";
-                    arcade.msg = "";
-                    setState({ arcade });
-                    clearInterval(timer);
-                    setTimeout(() => document.getElementById("answer-input")?.focus(), 100);
-                } else {
-                    arcade.msg = count.toString();
-                    setState({ arcade });
-                    playS("/audio/countdown.mp3");
-                }
+                if (count === 0) { arcade.phase = "question"; arcade.msg = ""; setState({ arcade }); clearInterval(timer); setTimeout(() => document.getElementById("answer-input")?.focus(), 100); } 
+                else { arcade.msg = count.toString(); setState({ arcade }); playS("/audio/countdown.mp3"); }
             }, 800);
             return;
           }
-
           container.className = 'crt-content arcadegame';
-          const header = createElement('div', { className: 'arcadegame-header' }, [
-              createElement('div', { textContent: `分數: ${Math.round(arcade.stats.score)}` }),
-              createElement('div', { textContent: `連擊: ${arcade.stats.streak}` }),
-              createElement('div', { textContent: `等級: ${arcade.lvl}` }),
-              createElement('button', { className: 'arcadegame-quit', textContent: '離開', onclick: () => setState({ scene: "mode" }) })
-          ]);
-          
+          const header = createElement('div', { className: 'arcadegame-header' }, [ createElement('div', { textContent: `分數: ${Math.round(arcade.stats.score)}` }), createElement('div', { textContent: `連擊: ${arcade.stats.streak}` }), createElement('div', { textContent: `等級: ${arcade.lvl}` }), createElement('button', { className: 'arcadegame-quit', textContent: '離開', onclick: () => setState({ scene: "mode" }) }) ]);
           const mainContent = createElement('div', { id: 'arcade-content', style: { width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' } });
           container.append(header, mainContent);
-
-          if(arcade.phase === "countdown") {
-              mainContent.appendChild(createElement('div', { className: 'arcadegame-countdown', textContent: arcade.msg }));
-          } else if (arcade.phase === "question") {
-              renderQuestion(mainContent, arcade);
-          } else if (arcade.phase === "result") {
-              mainContent.append(
-                  createElement('span', { textContent: arcade.msg }),
-                  createElement('span', { style: { marginLeft: '30px' }, textContent: `耗時：${(arcade.timeUsed / 1000).toFixed(2)}秒` })
-              );
-          } else if (arcade.phase === "over" && arcade.showOverlay) {
-              renderOverlay(container, arcade); 
-          }
+          if(arcade.phase === "countdown") { mainContent.appendChild(createElement('div', { className: 'arcadegame-countdown', textContent: arcade.msg })); } 
+          else if (arcade.phase === "question") { renderQuestion(mainContent, arcade); } 
+          else if (arcade.phase === "result") { mainContent.append( createElement('span', { textContent: arcade.msg }), createElement('span', { style: { marginLeft: '30px' }, textContent: `耗時：${(arcade.timeUsed / 1000).toFixed(2)}秒` }) ); } 
+          else if (arcade.phase === "over" && arcade.showOverlay) { renderOverlay(container, arcade); }
       }
 
       function renderQuestion(container, arcade) {
@@ -305,16 +211,7 @@
           const row = createElement('div', { className: 'qr-row' });
           renderer.appendChild(row);
           container.appendChild(renderer);
-
-          const inputEl = createElement('input', {
-              id: 'answer-input',
-              className: `qr-input qr-input-${state.theme}`,
-              maxlength: 6,
-              autocomplete: 'off',
-              spellcheck: 'false',
-              value: arcade.input
-          });
-
+          const inputEl = createElement('input', { id: 'answer-input', className: `qr-input qr-input-${state.theme}`, maxlength: 6, autocomplete: 'off', spellcheck: 'false', value: arcade.input });
           let phase = 0;
           function step() {
               row.innerHTML = ''; 
@@ -323,70 +220,34 @@
                   else row.appendChild(createElement('span', { className: 'qr-blank', textContent: '　' }));
               }
               if (phase > arcade.q.exprs.length) {
-                  row.append(
-                      createElement('span', { className: 'qr-eq', textContent: '=' }),
-                      createElement('span', { className: 'qr-ansinput' }, [
-                          inputEl,
-                          createElement('span', { className: 'qr-cursor', textContent: '▌' })
-                      ])
-                  );
+                  row.append( createElement('span', { className: 'qr-eq', textContent: '=' }), createElement('span', { className: 'qr-ansinput' }, [ inputEl, createElement('span', { className: 'qr-cursor', textContent: '▌' }) ]) );
                   inputEl.focus();
               }
               if (phase <= arcade.q.exprs.length) setTimeout(step, 200 + Math.random() * 50);
               phase++;
           }
           step();
-          
           document.body.onkeydown = (e) => {
               if (state.arcade.phase !== "question") return;
               const currentInput = document.getElementById('answer-input');
               if (!currentInput) return;
-
-              // ***** BUG FIX STARTS HERE *****
               e.preventDefault(); 
-              // ***** BUG FIX ENDS HERE *****
-
-              if (e.key === "Enter") {
-                  checkAnswer();
-              } else if (/^[0-9-]$/.test(e.key)) {
-                  if (state.arcade.input.length < 6) {
-                      state.arcade.input += e.key;
-                      currentInput.value = state.arcade.input;
-                  }
-              } else if (e.key === "Backspace") {
-                  state.arcade.input = state.arcade.input.slice(0, -1);
-                  currentInput.value = state.arcade.input;
-              }
+              if (e.key === "Enter") { checkAnswer(); } 
+              else if (/^[0-9-]$/.test(e.key)) { if (state.arcade.input.length < 6) { state.arcade.input += e.key; currentInput.value = state.arcade.input; } } 
+              else if (e.key === "Backspace") { state.arcade.input = state.arcade.input.slice(0, -1); currentInput.value = state.arcade.input; }
           };
       }
       
       function renderExpr(expr) {
         if(typeof expr === "number") return createElement('span', {className: 'qr-number', textContent: expr});
-        
         const svgNS = "http://www.w3.org/2000/svg";
         const svg = document.createElementNS(svgNS, "svg");
         svg.setAttribute('width', '38');
         svg.setAttribute('height', '38');
         const g = document.createElementNS(svgNS, 'g');
-
-        if(expr === "x") {
-            g.innerHTML = `<rect x="12" y="0" width="14" height="38" rx="5" fill="#0ff"/><rect x="12" y="0" width="14" height="38" rx="5" fill="#0ff" transform="rotate(90 19 19)"/>`;
-            g.className = 'op-mult-g';
-            svg.appendChild(g);
-            return createElement('span', {className:'qr-op qr-mult'}, [svg]);
-        }
-        if(expr === "+") {
-            g.innerHTML = `<rect x="16" y="0" width="6" height="38" rx="3" fill="#fffa"/><rect x="0" y="16" width="38" height="6" rx="3" fill="#fffa"/>`;
-            g.className = 'op-plus-g';
-            svg.appendChild(g);
-            return createElement('span', {className:'qr-op qr-plus'}, [svg]);
-        }
-        if(expr === "-") {
-            g.innerHTML = `<rect x="0" y="16" width="38" height="6" rx="3" fill="#f0f"/>`;
-            g.className = 'op-minus-g';
-            svg.appendChild(g);
-            return createElement('span', {className:'qr-op qr-minus'}, [svg]);
-        }
+        if(expr === "x") { g.innerHTML = `<rect x="12" y="0" width="14" height="38" rx="5" fill="#0ff"/><rect x="12" y="0" width="14" height="38" rx="5" fill="#0ff" transform="rotate(90 19 19)"/>`; g.className = 'op-mult-g'; svg.appendChild(g); return createElement('span', {className:'qr-op qr-mult'}, [svg]); }
+        if(expr === "+") { g.innerHTML = `<rect x="16" y="0" width="6" height="38" rx="3" fill="#fffa"/><rect x="0" y="16" width="38" height="6" rx="3" fill="#fffa"/>`; g.className = 'op-plus-g'; svg.appendChild(g); return createElement('span', {className:'qr-op qr-plus'}, [svg]); }
+        if(expr === "-") { g.innerHTML = `<rect x="0" y="16" width="38" height="6" rx="3" fill="#f0f"/>`; g.className = 'op-minus-g'; svg.appendChild(g); return createElement('span', {className:'qr-op qr-minus'}, [svg]); }
         return createElement('span', {className:'qr-blank', textContent: expr});
       }
 
@@ -395,29 +256,11 @@
         const arcade = state.arcade;
         const now = Date.now(), used = now - arcade.q.start;
         const correct = parseInt(arcade.input) === arcade.q.ans;
-
-        if(correct) {
-            playS("/audio/correct.mp3");
-            const streak = arcade.stats.streak + 1;
-            arcade.stats = {
-                ...arcade.stats, score: arcade.stats.score + 10 + Math.max(0, Math.floor(1500 - used) / 50),
-                correct: arcade.stats.correct + 1, streak, maxStreak: Math.max(streak, arcade.stats.maxStreak),
-                fastest: Math.min(used, arcade.stats.fastest), longest: Math.max(used, arcade.stats.longest)
-            };
-            arcade.msg = "✓ 正確！"; arcade.timeUsed = used;
-        } else {
-            playS("/audio/wrong.mp3");
-            arcade.stats = {...arcade.stats, score: Math.max(0, arcade.stats.score - 8), wrong: arcade.stats.wrong + 1, streak: 0};
-            arcade.msg = "✗ 錯誤！"; arcade.timeUsed = used;
-        }
-        
+        if(correct) { playS("/audio/correct.mp3"); const streak = arcade.stats.streak + 1; arcade.stats = { ...arcade.stats, score: arcade.stats.score + 10 + Math.max(0, Math.floor(1500 - used) / 50), correct: arcade.stats.correct + 1, streak, maxStreak: Math.max(streak, arcade.stats.maxStreak), fastest: Math.min(used, arcade.stats.fastest), longest: Math.max(used, arcade.stats.longest) }; arcade.msg = "✓ 正確！"; arcade.timeUsed = used; } 
+        else { playS("/audio/wrong.mp3"); arcade.stats = {...arcade.stats, score: Math.max(0, arcade.stats.score - 8), wrong: arcade.stats.wrong + 1, streak: 0}; arcade.msg = "✗ 錯誤！"; arcade.timeUsed = used; }
         arcade.phase = "result";
         setState({ arcade });
-
-        setTimeout(() => {
-            if(correct) nextQuestion();
-            else { arcade.showOverlay = true; arcade.phase = "over"; setState({ arcade }); }
-        }, 900);
+        setTimeout(() => { if(correct) nextQuestion(); else { arcade.showOverlay = true; arcade.phase = "over"; setState({ arcade }); } }, 900);
       }
       
       function nextQuestion(){
@@ -438,40 +281,44 @@
           board.push({ name, score: Math.round(arcade.stats.score) });
           board = board.sort((a, b) => b.score - a.score).slice(0, 10);
           localStorage.setItem("crthacker_arcade_lb", JSON.stringify(board));
-
           const tbody = createElement('tbody');
-          board.forEach((row, i) => {
-              tbody.appendChild(createElement('tr', {}, [
-                  createElement('td', { textContent: `${i + 1}.` }),
-                  createElement('td', { textContent: row.name }),
-                  createElement('td', { textContent: row.score })
-              ]));
-          });
-
-          const overlay = createElement('div', { className: 'overlay-bg' }, [
-              createElement('div', { className: 'overlay-box' }, [
-                  createElement('h1', { textContent: 'GAME OVER' }),
-                  createElement('div', { className: 'overlay-score' }, [
-                      '分數: ', createElement('b', {textContent: Math.round(arcade.stats.score)})
-                  ]),
-                  createElement('div', { className: 'overlay-details' }, [
-                      createElement('div', {textContent: `答對: ${arcade.stats.correct} 題`}),
-                      createElement('div', {textContent: `最長連擊: ${arcade.stats.maxStreak}`}),
-                      createElement('div', {textContent: `最快反應: ${(arcade.stats.fastest/1000).toFixed(2)} 秒`}),
-                      createElement('div', {textContent: `最慢反應: ${(arcade.stats.longest/1000).toFixed(2)} 秒`})
-                  ]),
-                  createElement('div', {className: 'overlay-lb-title', textContent: '街機排行榜 TOP 10'}),
-                  createElement('table', {className: 'overlay-lb'}, [tbody]),
-                  createElement('div', { className: 'overlay-actions' }, [
-                      createElement('button', { textContent: '再來一次', onclick: () => setState({ arcade: null }) }),
-                      createElement('button', { textContent: '回主選單', onclick: () => setState({ scene: 'mode', arcade: null }) })
-                  ])
-              ])
-          ]);
+          board.forEach((row, i) => { tbody.appendChild(createElement('tr', {}, [ createElement('td', { textContent: `${i + 1}.` }), createElement('td', { textContent: row.name }), createElement('td', { textContent: row.score }) ])); });
+          const overlay = createElement('div', { className: 'overlay-bg' }, [ createElement('div', { className: 'overlay-box' }, [ createElement('h1', { textContent: 'GAME OVER' }), createElement('div', { className: 'overlay-score' }, [ '分數: ', createElement('b', {textContent: Math.round(arcade.stats.score)}) ]), createElement('div', { className: 'overlay-details' }, [ createElement('div', {textContent: `答對: ${arcade.stats.correct} 題`}), createElement('div', {textContent: `最長連擊: ${arcade.stats.maxStreak}`}), createElement('div', {textContent: `最快反應: ${(arcade.stats.fastest/1000).toFixed(2)} 秒`}), createElement('div', {textContent: `最慢反應: ${(arcade.stats.longest/1000).toFixed(2)} 秒`}) ]), createElement('div', {className: 'overlay-lb-title', textContent: '街機排行榜 TOP 10'}), createElement('table', {className: 'overlay-lb'}, [tbody]), createElement('div', { className: 'overlay-actions' }, [ createElement('button', { textContent: '再來一次', onclick: () => setState({ arcade: null }) }), createElement('button', { textContent: '回主選單', onclick: () => setState({ scene: 'mode', arcade: null }) }) ]) ]) ]);
           container.appendChild(overlay);
       }
       
-      window.onload = render;
+      // --- 整合後的啟動邏輯 ---
+      function initTutorial() {
+          const overlay = document.getElementById('tutorial-overlay');
+          const closeBtn = document.getElementById('tutorial-close-btn');
+          const tutorialKey = 'tutorialShown_mental-math-hacker';
+
+          const startGame = () => {
+              // 確保只啟動一次
+              window.onload = null; 
+              boot();
+          };
+
+          if (!sessionStorage.getItem(tutorialKey)) {
+              if (overlay) overlay.style.display = 'flex';
+              if (closeBtn) {
+                  closeBtn.onclick = function() {
+                      if (overlay) overlay.style.display = 'none';
+                      sessionStorage.setItem(tutorialKey, 'true');
+                      startGame(); // 關閉教學後啟動遊戲
+                  };
+              }
+          } else {
+              startGame(); // 如果已經看過教學，直接啟動遊戲
+          }
+      }
+
+      function boot() {
+        render();
+        playS("msdos_boot.mp3"); // 假設音效路徑
+      }
+      
+      window.onload = initTutorial;
     </script>
   </body>
 </html>

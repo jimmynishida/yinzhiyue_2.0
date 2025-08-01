@@ -5,7 +5,7 @@
   <title>文字特攻隊：九零連線 (Word Commando: 90's Connect)</title>
   <meta name="viewport" content="width=600, initial-scale=1, maximum-scale=1, user-scalable=no">
   <style>
-    /* --- CSS styles are unchanged --- */
+    /* --- 主遊戲樣式 --- */
     @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
     body {
       background: #222 url('https://i.imgur.com/nV7sAzL.png'); margin: 0; min-height: 100vh;
@@ -63,12 +63,39 @@
     .highscore-submit { margin-top: 10px; font-family: 'VT323', monospace; }
     input[type=text] { font-family: 'VT323', monospace; font-size: 1.18em; padding: 2px 6px; text-align: center; letter-spacing: 0.1em; border: 1.5px solid #888; border-radius: 4px; }
     @media (max-width: 600px) { .win95-window { min-width: 96vw; } .win95-content { min-height: 140px; padding: 10px; } }
+    
+    /* --- 教學彈窗樣式 --- */
+    .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: none; align-items: center; justify-content: center; z-index: 10000; }
+    .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 20px 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; }
+    .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; font-family: inherit; }
+    .tutorial-content h4 { font-family: 'VT323', monospace; color: #1A202C; font-size: 2em; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+    .tutorial-image-placeholder { width: 100%; min-height: 150px; background: rgba(26, 32, 44, 0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #5DADE2; padding: 15px; box-sizing: border-box; }
+    .tutorial-content ul { list-style: none; padding: 0; margin-top: 15px; }
+    .tutorial-content li { font-size: 1.1em; margin-bottom: 10px; line-height: 1.5; }
   </style>
 </head>
 <body>
+<div id="tutorial-overlay" class="tutorial-overlay">
+    <div class="tutorial-modal">
+        <button id="tutorial-close-btn" class="tutorial-close-btn">我知道了 (略過)</button>
+        <div class="tutorial-content">
+            <h4>玩法說明</h4>
+            <div class="tutorial-image-placeholder">
+                <p style="font-size: 1.2em; color: #E59866;">[ 此處為「文字特攻隊」玩法說明圖 ]</p>
+                <ul id="tutorial-text-list">
+                    <li>1. 找出與當前主題相關的所有詞彙。</li>
+                    <li>2. 點擊多個相關詞彙將它們選取起來。</li>
+                    <li>3. 點擊「送出連線」按鈕來得分！</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="pixel-bg" id="app"></div>
 <audio id="bgm" loop preload="auto"></audio>
 <audio id="sfx" preload="auto"></audio>
+
 <script>
 // --------- 遊戲資料 (與之前相同) --------
 const THEMES = [ { key: "star-movies", name: "周星馳電影", themeDesc: "星爺爆笑經典", code: "9527", icon: "https://i.imgur.com/6z1r3Km.png", bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune1.mp3", words: ["賭聖", "9527", "無厘頭", "龍祥電影台", "重播"], noise: ["林正英", "珍珠奶茶", "A面B面", "麥當勞", "大豬公", "ICQ", "超級賽亞人"], creative: [["周星馳", "含笑半步癲"], ["龍祥電影台", "重播"]], },{ key: "zombie", name: "香港殭屍片", themeDesc: "靈幻經典，暫時停止呼吸！", code: "1985", icon: "https://i.imgur.com/9VwY3yg.png", bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune2.mp3", words: ["林正英", "暫時停止呼吸", "糯米", "桃木劍", "殭屍道長"], noise: ["賭聖", "珍珠奶茶", "彈珠汽水", "龜派氣功", "大豬公", "ICQ", "Walkman"], creative: [["林正英", "暫時停止呼吸"], ["糯米", "桃木劍", "殭屍道長"]], },{ key: "dragonball", name: "七龍珠", themeDesc: "熱血動畫，天下第一武道會！", code: "7407", icon: "https://i.imgur.com/kf4y0yA.png", bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune3.mp3", words: ["超級賽亞人", "龜派氣功", "天下第一武道會", "那美克星"], noise: ["林正英", "珍珠奶茶", "A面B面", "賭聖", "大豬公", "ICQ", "螢幕保護程式"], creative: [["超級賽亞人", "那美克星"], ["龜派氣功", "天下第一武道會"]], }, ];
@@ -87,7 +114,6 @@ let GAME = { screen: "dialup", theme: null, timeLeft: 60, words: [], selectedIdx
 function resetGameState() { GAME.timeLeft = 60; GAME.words = []; GAME.selectedIdx = []; GAME.score = 0; GAME.longest = 0; GAME.combo = 0; GAME.maxCombo = 0; GAME.powerUp = null; GAME.flashHintIdx = null; }
 
 // --- 徹底重構的渲染邏輯 ---
-
 function createElement(tag, options = {}, children = []) {
     const el = document.createElement(tag);
     Object.keys(options).forEach(key => {
@@ -109,7 +135,6 @@ function buildWindow(titleText, content, titleIconSrc = null) {
         titleChildren.push(createElement('img', { src: titleIconSrc, style: { width: '22px', marginRight: '4px' } }));
     }
     titleChildren.push(createElement('span', { textContent: titleText }));
-
     return createElement('div', { className: 'win95-window' }, [
         createElement('div', { className: 'win95-titlebar' }, [
             createElement('div', { className: 'win95-title' }, titleChildren),
@@ -127,7 +152,6 @@ function getScreenEl(screen) {
     const app = document.getElementById("app");
     app.innerHTML = ""; // Clear the container
     let screenElement;
-
     if (screen === "dialup") screenElement = dialupScreen();
     else if (screen === "level") screenElement = levelScreen();
     else if (screen === "pager") screenElement = pagerScreen();
@@ -136,7 +160,6 @@ function getScreenEl(screen) {
     else if (screen === "result") screenElement = resultScreen();
     else if (screen === "highscore") screenElement = highscoreScreen();
     else screenElement = createElement('div', { textContent: "404 - Screen not found" });
-    
     app.appendChild(screenElement);
 }
 
@@ -236,7 +259,7 @@ function highscoreScreen() {
     okBtn.onclick = () => {
         let name = input.value.toUpperCase(); let arr = GAME.scores[GAME.theme.key] = (GAME.scores[GAME.theme.key] || []);
         arr.push({ name, score: GAME.lastScore }); arr.sort((a, b) => b.score - a.score); arr.splice(10); saveScores(GAME.scores);
-        GAME.screen = 'highscore'; getScreenEl(GAME.screen); // Re-render
+        GAME.screen = 'highscore'; getScreenEl(GAME.screen); 
         const submitDiv = document.getElementById('highscore-submit');
         if (submitDiv) {
             submitDiv.innerHTML = '';
@@ -264,8 +287,42 @@ function renderApp() {
     getScreenEl(GAME.screen);
 }
 
-// --- 啟動 ---
-renderApp();
+// --- 整合後的啟動邏輯 ---
+function initTutorial() {
+    const overlay = document.getElementById('tutorial-overlay');
+    const closeBtn = document.getElementById('tutorial-close-btn');
+    
+    // vvvvvv 【第一處需要您修改的地方】 vvvvvv
+    const tutorialKey = 'word-commando'; 
+    // ^^^^^^ 【第一處需要您修改的地方】 ^^^^^^
+
+    const startGame = () => {
+        // 確保只啟動一次
+        window.onload = null; 
+        
+        // vvvvvv 【第二處需要您修改的地方】 vvvvvv
+        renderApp(); // <--- 呼叫該遊戲原本的啟動函式 (可能是 boot(), render(), renderApp() 等)
+        // ^^^^^^ 【第二處需要您修改的地方】 ^^^^^^
+    };
+
+    if (!sessionStorage.getItem(tutorialKey)) {
+        if (overlay) overlay.style.display = 'flex';
+        if (closeBtn) {
+            closeBtn.onclick = function() {
+                if (overlay) overlay.style.display = 'none';
+                sessionStorage.setItem(tutorialKey, 'true');
+                startGame(); // 關閉教學後啟動遊戲
+            };
+        }
+    } else {
+        startGame(); // 如果已經看過教學，直接啟動遊戲
+    }
+}
+
+// 將頁面載入後的預設行為指向我們的整合函式
+window.onload = initTutorial;
 </script>
 </body>
 </html>
+}
+是否有錯誤

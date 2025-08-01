@@ -5,115 +5,34 @@
   <title>我的時光寶物架 Nostalgic Memory Game</title>
   <meta name="viewport" content="width=540,maximum-scale=1">
   <style>
-@font-face {
-  font-family: 'pixel-font';
-  src: url('https://fonts.gstatic.com/s/pressstart2p/v12/e3t4euO8KNyBfB3R0rGJ.ttf') format('truetype');
-}
-body {
-  margin: 0;
-  background: #222;
-  font-family: Arial, 'pixel-font', monospace;
-  letter-spacing: 1px;
-  overflow: hidden;
-}
-.crt-bg {
-  background: linear-gradient(135deg, #282f3b 60%, #cfc07d 100%);
-  min-height: 100vh;
-  width: 100vw;
-  position: fixed;
-  inset: 0;
-}
-.main-frame {
-  position: relative;
-  width: 480px;
-  margin: 40px auto;
-  padding: 2em 2em 1em 2em;
-  background: rgba(35, 38, 50, 0.92);
-  box-shadow: 0 0 80px #444, 0 0 0 6px #fce26a inset;
-  border-radius: 18px;
-  z-index: 2;
-  min-height: 520px;
-}
-.title-screen {
-  text-align: center;
-  margin-top: 100px;
-}
-.shelf {
-  display: flex;
-  justify-content: center;
-  align-items: end;
-  margin: 2.5em 0 1em 0;
-  gap: 24px;
-  height: 160px;
-}
-.shelf-slot {
-  background: linear-gradient(180deg, #e3c27b 50%, #a9892c 100%);
-  border: 3px solid #e3c27b;
-  width: 96px;
-  height: 96px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  box-shadow: 0 4px 16px #0006;
-  border-radius: 10px 10px 8px 8px;
-  position: relative;
-  transition: filter 0.12s;
-}
-.item-pixel {
-  width: 70px;
-  image-rendering: pixelated;
-  margin-bottom: 10px;
-}
-.timer-bar {
-  height: 8px;
-  background: repeating-linear-gradient(90deg, #ffec9e, #fce26a 12%, #ffc46a 17%, #ffec9e 36%);
-  border-radius: 4px;
-  margin: 1em 0;
-  animation: timer-bar 5s linear;
-}
-@keyframes timer-bar {
-  from { width: 100%; }
-  to { width: 0%; }
-}
-.price-btn {
-  font-size: 1.2em;
-  margin: 1em 1.5em 0 0;
-  background: #ffe5b5;
-  border: 2px solid #f9df5b;
-  color: #1d1821;
-  border-radius: 8px;
-  padding: 0.5em 1.2em;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.price-btn:hover {
-  background: #fffbe7;
-}
-.vhs-intro {
-  display: flex;
-  height: 440px;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5em;
-  color: #eee;
-  text-shadow: 0 0 16px #eaeaea99;
-}
-.feedback {
-  text-align: center;
-  font-size: 2em;
-  color: #ffb96d;
-  margin-top: 90px;
-  text-shadow: 0 0 8px #fff8b6;
-}
-.pixel-font {
-  font-family: 'pixel-font', monospace;
-  letter-spacing: 2px;
-}
+    @font-face { font-family: 'pixel-font'; src: url('https://fonts.gstatic.com/s/pressstart2p/v12/e3t4euO8KNyBfB3R0rGJ.ttf') format('truetype'); }
+    body { margin: 0; background: #222; font-family: Arial, 'pixel-font', monospace; letter-spacing: 1px; overflow: hidden; }
+    .crt-bg { background: linear-gradient(135deg, #282f3b 60%, #cfc07d 100%); min-height: 100vh; width: 100vw; position: fixed; inset: 0; }
+    .main-frame { position: relative; width: 480px; margin: 40px auto; padding: 2em 2em 1em 2em; background: rgba(35, 38, 50, 0.92); box-shadow: 0 0 80px #444, 0 0 0 6px #fce26a inset; border-radius: 18px; z-index: 2; min-height: 520px; }
+    .title-screen { text-align: center; margin-top: 100px; }
+    .shelf { display: flex; justify-content: center; align-items: end; margin: 2.5em 0 1em 0; gap: 24px; height: 160px; }
+    .shelf-slot { background: linear-gradient(180deg, #e3c27b 50%, #a9892c 100%); border: 3px solid #e3c27b; width: 96px; height: 96px; display: flex; align-items: flex-end; justify-content: center; box-shadow: 0 4px 16px #0006; border-radius: 10px 10px 8px 8px; position: relative; transition: filter 0.12s; }
+    .item-pixel { width: 70px; image-rendering: pixelated; margin-bottom: 10px; }
+    .timer-bar { height: 8px; background: repeating-linear-gradient(90deg, #ffec9e, #fce26a 12%, #ffc46a 17%, #ffec9e 36%); border-radius: 4px; margin: 1em 0; animation: timer-bar 5s linear; }
+    @keyframes timer-bar { from { width: 100%; } to { width: 0%; } }
+    .price-btn { font-size: 1.2em; margin: 1em 1.5em 0 0; background: #ffe5b5; border: 2px solid #f9df5b; color: #1d1821; border-radius: 8px; padding: 0.5em 1.2em; cursor: pointer; transition: background 0.15s; }
+    .price-btn:hover { background: #fffbe7; }
+    .vhs-intro { display: flex; height: 440px; align-items: center; justify-content: center; font-size: 1.5em; color: #eee; text-shadow: 0 0 16px #eaeaea99; }
+    .feedback { text-align: center; font-size: 2em; color: #ffb96d; margin-top: 90px; text-shadow: 0 0 8px #fff8b6; }
+    .pixel-font { font-family: 'pixel-font', monospace; letter-spacing: 2px; }
+
+    /* --- 教學彈窗樣式 --- */
+    .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+    .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 20px 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; }
+    .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; font-family: inherit; }
+    .tutorial-content h4 { font-family: 'VT323', monospace; color: #1A202C; font-size: 2em; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+    .tutorial-image-placeholder { width: 100%; min-height: 150px; background: rgba(26, 32, 44, 0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #5DADE2; padding: 15px; box-sizing: border-box; }
+    .tutorial-content ul { list-style: none; padding: 0; margin-top: 15px; }
+    .tutorial-content li { font-size: 1.1em; margin-bottom: 10px; line-height: 1.5; }
   </style>
 </head>
 <body>
   <div id="root"></div>
-  <!-- 音效與BGM（部分以 base64，建議正式專案換成外部檔案） -->
   <audio id="sfx-coin" src="https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b6a99.mp3"></audio>
   <audio id="sfx-wrong" src="https://cdn.pixabay.com/audio/2022/02/23/audio_115b9b6a1f.mp3"></audio>
   <audio id="sfx-vhs" src="https://cdn.pixabay.com/audio/2022/07/26/audio_124b0f0d54.mp3"></audio>
@@ -121,410 +40,106 @@ body {
   <audio id="bgm-chiptune1" src="https://cdn.pixabay.com/audio/2022/10/16/audio_123c0e38b9.mp3" loop></audio>
   <audio id="bgm-chiptune2" src="https://cdn.pixabay.com/audio/2022/10/16/audio_123c0e3a13.mp3" loop></audio>
   <audio id="bgm-citypop" src="https://cdn.pixabay.com/audio/2022/08/20/audio_124b5e2b2b.mp3" loop></audio>
-  <!-- React/JSX script -->
+  
   <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  
   <script>
-  // --- 資料區 ---
-const nostalgicItems = [
-  { name: "Sony Walkman 隨身聽", img: "https://i.imgur.com/YyKJv7C.png", value: 3200 },
-  { name: "Game Boy", img: "https://i.imgur.com/6Qm5n4Q.png", value: 2800 },
-  { name: "B.B. Call 傳呼機", img: "https://i.imgur.com/NZk0BSt.png", value: 1800 },
-  { name: "3.5吋磁碟片", img: "https://i.imgur.com/XR5pQ0l.png", value: 15 },
-  { name: "CD隨身聽 Discman", img: "https://i.imgur.com/4R1cg5J.png", value: 3500 },
-  { name: "Tamagotchi 電子雞", img: "https://i.imgur.com/2kQdLJH.png", value: 700 },
-  { name: "Motorola StarTAC 手機", img: "https://i.imgur.com/YH2dYBi.png", value: 12000 },
-  { name: "魔術方塊", img: "https://i.imgur.com/06JMEtO.png", value: 90 },
-  { name: "溜溜球", img: "https://i.imgur.com/JR3vRir.png", value: 50 },
-  { name: "灌籃高手漫畫", img: "https://i.imgur.com/5F1n3nZ.png", value: 120 },
-  { name: "七龍珠漫畫", img: "https://i.imgur.com/0eJk4gC.png", value: 120 },
-  { name: "VHS錄影帶", img: "https://i.imgur.com/bWf5b3U.png", value: 350 },
-  { name: "彈珠汽水", img: "https://i.imgur.com/0nQkF5x.png", value: 20 },
-  { name: "Pocky巧克力棒", img: "https://i.imgur.com/9Vx5gVS.png", value: 18 },
-  { name: "科學麵", img: "https://i.imgur.com/0C5KpO9.png", value: 10 },
-  { name: "多功能鉛筆盒", img: "https://i.imgur.com/LNV1tXr.png", value: 60 },
-  { name: "香味橡皮擦", img: "https://i.imgur.com/vVq5MZC.png", value: 8 },
-];
+    const e = React.createElement;
 
-function getRandomItems(n) {
-  const arr = nostalgicItems.slice();
-  const items = [];
-  while (items.length < n && arr.length > 0) {
-    const idx = Math.floor(Math.random() * arr.length);
-    items.push(arr.splice(idx, 1)[0]);
-  }
-  return items;
-}
-function getShuffledItems(items) {
-  const arr = items.slice();
-  const idx = Math.floor(Math.random() * arr.length);
-  let newItem;
-  do {
-    newItem = nostalgicItems[Math.floor(Math.random() * nostalgicItems.length)];
-  } while (arr.find((x) => x.name === newItem.name));
-  arr[idx] = newItem;
-  return { changedItems: arr, changedIdx: idx };
-}
+    // --- 資料與遊戲邏輯 (與之前相同) ---
+    const nostalgicItems = [ { name: "Sony Walkman 隨身聽", img: "https://i.imgur.com/YyKJv7C.png", value: 3200 }, { name: "Game Boy", img: "https://i.imgur.com/6Qm5n4Q.png", value: 2800 }, { name: "B.B. Call 傳呼機", img: "https://i.imgur.com/NZk0BSt.png", value: 1800 }, { name: "3.5吋磁碟片", img: "https://i.imgur.com/XR5pQ0l.png", value: 15 }, { name: "CD隨身聽 Discman", img: "https://i.imgur.com/4R1cg5J.png", value: 3500 }, { name: "Tamagotchi 電子雞", img: "https://i.imgur.com/2kQdLJH.png", value: 700 }, { name: "Motorola StarTAC 手機", img: "https://i.imgur.com/YH2dYBi.png", value: 12000 }, { name: "魔術方塊", img: "https://i.imgur.com/06JMEtO.png", value: 90 }, { name: "溜溜球", img: "https://i.imgur.com/JR3vRir.png", value: 50 }, { name: "灌籃高手漫畫", img: "https://i.imgur.com/5F1n3nZ.png", value: 120 }, { name: "七龍珠漫畫", img: "https://i.imgur.com/0eJk4gC.png", value: 120 }, { name: "VHS錄影帶", img: "https://i.imgur.com/bWf5b3U.png", value: 350 }, { name: "彈珠汽水", img: "https://i.imgur.com/0nQkF5x.png", value: 20 }, { name: "Pocky巧克力棒", img: "https://i.imgur.com/9Vx5gVS.png", value: 18 }, { name: "科學麵", img: "https://i.imgur.com/0C5KpO9.png", value: 10 }, { name: "多功能鉛筆盒", img: "https://i.imgur.com/LNV1tXr.png", value: 60 }, { name: "香味橡皮擦", img: "https://i.imgur.com/vVq5MZC.png", value: 8 }, ];
+    function getRandomItems(n) { const arr = nostalgicItems.slice(); const items = []; while (items.length < n && arr.length > 0) { const idx = Math.floor(Math.random() * arr.length); items.push(arr.splice(idx, 1)[0]); } return items; }
+    function getShuffledItems(items) { const arr = items.slice(); const idx = Math.floor(Math.random() * arr.length); let newItem; do { newItem = nostalgicItems[Math.floor(Math.random() * nostalgicItems.length)]; } while (arr.find((x) => x.name === newItem.name)); arr[idx] = newItem; return { changedItems: arr, changedIdx: idx }; }
+    function shuffle(arr) { let a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+    function getRandomGameMode() { const modes = ["FIND_ITEM", "FIND_DIFF", "ESTIMATE_PRICE"]; return modes[Math.floor(Math.random() * modes.length)]; }
+    function getModePrompt(mode, items) { if (mode === "FIND_ITEM") { const idx = Math.floor(Math.random() * items.length); const item = items[idx]; const prompt = [ `欸！我的${item.name}剛放哪了？等下還要用啦！`, `你有看到${item.name}嗎？快點給我找出來！`, `剛才想聽的${item.name}放哪了？快幫我點出來！`, ][Math.floor(Math.random() * 3)]; return { prompt, answer: idx }; } else if (mode === "FIND_DIFF") { const { changedItems, changedIdx } = getShuffledItems(items); const prompt = [ "老媽突擊檢查！我的寶物哪一項被動過手腳？", "咦？剛剛是不是有東西被換掉了？快找出來！", "哪個東西變了？眼力大考驗～", ][Math.floor(Math.random() * 3)]; return { prompt, answer: changedIdx, changedItems }; } else if (mode === "ESTIMATE_PRICE") { const idx = Math.floor(Math.random() * items.length); const item = items[idx]; const correct = item.value; let choices = [ correct, correct + 500, Math.max(correct - 500, 1), correct + 1000, ]; choices = shuffle(choices); const answer = choices.indexOf(correct); const prompt = `猜猜看，這個${item.name}在1990年大概多少錢？`; return { prompt, answer, choices: choices.map((v) => `${v} 元`), item, }; } return { prompt: "Coming soon", answer: 0 }; }
+    const sfx = { coin: () => document.getElementById("sfx-coin"), wrong: () => document.getElementById("sfx-wrong"), vhs: () => document.getElementById("sfx-vhs"), modem: () => document.getElementById("sfx-modem"), };
+    function chiptuneBGM() { const list = ["bgm-chiptune1", "bgm-chiptune2", "bgm-citypop"]; const idx = Math.floor(Math.random() * list.length); return document.getElementById(list[idx]); }
 
-function shuffle(arr) {
-  let a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function getRandomGameMode() {
-  const modes = ["FIND_ITEM", "FIND_DIFF", "ESTIMATE_PRICE"];
-  return modes[Math.floor(Math.random() * modes.length)];
-}
-function getModePrompt(mode, items) {
-  if (mode === "FIND_ITEM") {
-    const idx = Math.floor(Math.random() * items.length);
-    const item = items[idx];
-    const prompt = [
-      `欸！我的${item.name}剛放哪了？等下還要用啦！`,
-      `你有看到${item.name}嗎？快點給我找出來！`,
-      `剛才想聽的${item.name}放哪了？快幫我點出來！`,
-    ][Math.floor(Math.random() * 3)];
-    return { prompt, answer: idx };
-  } else if (mode === "FIND_DIFF") {
-    const { changedItems, changedIdx } = getShuffledItems(items);
-    const prompt = [
-      "老媽突擊檢查！我的寶物哪一項被動過手腳？",
-      "咦？剛剛是不是有東西被換掉了？快找出來！",
-      "哪個東西變了？眼力大考驗～",
-    ][Math.floor(Math.random() * 3)];
-    return { prompt, answer: changedIdx, changedItems };
-  } else if (mode === "ESTIMATE_PRICE") {
-    const idx = Math.floor(Math.random() * items.length);
-    const item = items[idx];
-    const correct = item.value;
-    let choices = [
-      correct,
-      correct + 500,
-      Math.max(correct - 500, 1),
-      correct + 1000,
-    ];
-    choices = shuffle(choices);
-    const answer = choices.indexOf(correct);
-    const prompt = `猜猜看，這個${item.name}在1990年大概多少錢？`;
-    return {
-      prompt,
-      answer,
-      choices: choices.map((v) => `${v} 元`),
-      item,
-    };
-  }
-  return { prompt: "Coming soon", answer: 0 };
-}
-
-// 音效管理
-const sfx = {
-  coin: () => document.getElementById("sfx-coin"),
-  wrong: () => document.getElementById("sfx-wrong"),
-  vhs: () => document.getElementById("sfx-vhs"),
-  modem: () => document.getElementById("sfx-modem"),
-};
-function chiptuneBGM() {
-  const list = ["bgm-chiptune1", "bgm-chiptune2", "bgm-citypop"];
-  const idx = Math.floor(Math.random() * list.length);
-  return document.getElementById(list[idx]);
-}
-
-// --- CRT Overlay ---
-function CRTOverlay() {
-  return React.createElement("div", {
-    style: {
-      pointerEvents: "none",
-      position: "fixed",
-      inset: 0,
-      zIndex: 99,
-      background:
-        "repeating-linear-gradient(0deg, rgba(0,0,0,0.07) 0 2px, transparent 2px 6px)",
-      mixBlendMode: "overlay",
-    },
-  });
-}
-
-// --- VHS Noise Overlay ---
-function VHSNoise({ active }) {
-  const ref = React.useRef();
-  React.useEffect(() => {
-    let anim;
-    function draw() {
-      const canvas = ref.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (let y = 0; y < canvas.height; y += 4) {
-        const alpha = Math.random() * 0.12 + 0.07;
-        ctx.fillStyle = `rgba(240,240,240,${alpha})`;
-        ctx.fillRect(0, y, canvas.width, 2);
-      }
-      // Tracking lines
-      if (Math.random() < 0.15) {
-        ctx.fillStyle = "rgba(255,255,255,0.25)";
-        ctx.fillRect(
-          0,
-          Math.floor(Math.random() * canvas.height),
-          canvas.width,
-          3
-        );
-      }
-      anim = requestAnimationFrame(draw);
-    }
-    if (active) draw();
-    return () => cancelAnimationFrame(anim);
-  }, [active]);
-  return React.createElement("canvas", {
-    ref,
-    width: window.innerWidth,
-    height: window.innerHeight,
-    style: {
-      pointerEvents: "none",
-      position: "fixed",
-      inset: 0,
-      zIndex: 100,
-      opacity: active ? 1 : 0,
-      transition: "opacity 0.3s",
-    },
-  });
-}
-
-// --- 主遊戲 ---
-function App() {
-  const [phase, setPhase] = React.useState("VHS_INTRO");
-  const [shelfItems, setShelfItems] = React.useState([]);
-  const [hiddenShelfItems, setHiddenShelfItems] = React.useState([]);
-  const [answer, setAnswer] = React.useState(null);
-  const [mode, setMode] = React.useState("FIND_ITEM");
-  const [prompt, setPrompt] = React.useState("");
-  const [score, setScore] = React.useState(0);
-  const [feedback, setFeedback] = React.useState("");
-  const [questionData, setQuestionData] = React.useState(null);
-  const [bgm, setBgm] = React.useState(null);
-
-  // 開場 VHS
-  React.useEffect(() => {
-    if (phase === "VHS_INTRO") {
-      sfx.modem().play();
-      setTimeout(() => setPhase("TITLE"), 4200);
-    }
-  }, [phase]);
-
-  // 開場BGM
-  React.useEffect(() => {
-    if (phase === "TITLE" && !bgm) {
-      const bgmAudio = chiptuneBGM();
-      setBgm(bgmAudio);
-      bgmAudio.loop = true;
-      bgmAudio.volume = 0.23;
-      bgmAudio.play();
-    }
-  }, [phase, bgm]);
-
-  // 下一關
-  function startGame() {
-    setScore(0);
-    nextRound();
-  }
-  function nextRound() {
-    const mode = getRandomGameMode();
-    setMode(mode);
-    const numItems = 3 + Math.floor(score / 2);
-    const items = getRandomItems(numItems);
-    setShelfItems(items);
-    setPrompt("");
-    setPhase("MEMORY");
-    setTimeout(() => {
-      sfx.vhs().play();
-      setPhase("QUESTION");
-      const qData = getModePrompt(mode, items);
-      setPrompt(qData.prompt);
-      setAnswer(qData.answer);
-      setQuestionData(qData);
-      if (mode === "FIND_DIFF") {
-        setHiddenShelfItems(qData.changedItems);
-      }
-    }, 5000);
-  }
-
-  // 點物品（找東西/找不同）
-  function handleClickItem(idx) {
-    if (phase !== "QUESTION") return;
-    let correct = false;
-    if (mode === "FIND_ITEM" || mode === "FIND_ITEM_LOCATION") {
-      correct = idx === answer;
-    } else if (mode === "FIND_DIFF") {
-      correct = idx === answer;
-    }
-    if (correct) {
-      setFeedback("帥喔！");
-      sfx.coin().pause(); sfx.coin().currentTime=0; sfx.coin().play();
-      setScore(s => s + 1);
-    } else {
-      setFeedback("遜掉了～");
-      sfx.wrong().pause(); sfx.wrong().currentTime=0; sfx.wrong().play();
-    }
-    setPhase("FEEDBACK");
-    setTimeout(() => nextRound(), 1800);
-  }
-
-  // 估價王
-  function handleChoice(i) {
-    if (phase !== "QUESTION") return;
-    const correct = i === answer;
-    if (correct) {
-      setFeedback("超懂行！");
-      sfx.coin().pause(); sfx.coin().currentTime=0; sfx.coin().play();
-      setScore(s => s + 1);
-    } else {
-      setFeedback("再猜猜看～");
-      sfx.wrong().pause(); sfx.wrong().currentTime=0; sfx.wrong().play();
-    }
-    setPhase("FEEDBACK");
-    setTimeout(() => nextRound(), 1800);
-  }
-
-  // 貨架
-  function renderShelf(items, clickable) {
-    return React.createElement(
-      "div",
-      { className: "shelf" },
-      items.map((item, i) =>
-        React.createElement(
-          "div",
-          {
-            key: i,
-            className: "shelf-slot",
-            style: {
-              cursor: clickable ? "pointer" : "default",
-              filter: item ? "" : "brightness(0.4)",
-            },
-            onClick: () => clickable && handleClickItem(i),
-          },
-          item &&
-            React.createElement("img", {
-              src: item.img,
-              alt: item.name,
-              className: "item-pixel",
-              title: item.name,
-              draggable: false,
-            })
-        )
-      )
-    );
-  }
-
-  return React.createElement(
-    "div",
-    { className: "crt-bg" },
-    React.createElement(CRTOverlay),
-    React.createElement(VHSNoise, { active: phase === "VHS_INTRO" || phase === "MEMORY" }),
-    React.createElement(
-      "div",
-      { className: "main-frame" },
-      phase === "VHS_INTRO" &&
-        React.createElement(
-          "div",
-          { className: "vhs-intro" },
-          React.createElement("span", { className: "pixel-font" }, "VHS 載入中...")
-        ),
-      phase === "TITLE" &&
-        React.createElement(
-          "div",
-          { className: "title-screen" },
-          React.createElement(
-            "h1",
-            { className: "pixel-font", style: { color: "#F9DF5B" } },
-            "我的時光寶物架"
-          ),
-          React.createElement(
-            "p",
-            { style: { color: "#E383B9" } },
-            React.createElement("b", null, "80/90s"),
-            " 懷舊記憶訓練"
-          ),
-          React.createElement(
-            "button",
-            { className: "pixel-font", onClick: startGame },
-            "開始遊戲"
-          )
-        ),
-      phase === "MEMORY" &&
-        React.createElement(
-          "div",
-          null,
-          React.createElement(
-            "div",
-            { className: "pixel-font", style: { color: "#E383B9" } },
-            "記住貨架上的寶物吧！"
-          ),
-          renderShelf(shelfItems, false),
-          React.createElement("div", { className: "timer-bar" })
-        ),
-      phase === "QUESTION" &&
-        React.createElement(
-          "div",
-          null,
-          React.createElement(
-            "div",
-            { className: "pixel-font", style: { color: "#6EDCFF" } },
-            prompt
-          ),
-          mode === "FIND_DIFF"
-            ? renderShelf(hiddenShelfItems, true)
-            : mode === "ESTIMATE_PRICE"
-            ? React.createElement(
-                "div",
-                { style: { marginTop: "2em", textAlign: "center" } },
-                questionData &&
-                  React.createElement("img", {
-                    src: questionData.item.img,
-                    alt: questionData.item.name,
-                    className: "item-pixel",
-                    style: { marginBottom: "1em" },
-                  }),
-                questionData &&
-                  questionData.choices.map((c, i) =>
-                    React.createElement(
-                      "button",
-                      {
-                        key: i,
-                        className: "pixel-font price-btn",
-                        onClick: () => handleChoice(i),
-                      },
-                      c
-                    )
-                  )
-              )
-            : renderShelf(shelfItems, true)
-        ),
-      phase === "FEEDBACK" &&
-        React.createElement(
-          "div",
-          null,
-          React.createElement(
-            "div",
-            { className: "pixel-font feedback" },
-            feedback,
-            React.createElement("br", null),
-            React.createElement(
-              "span",
-              { style: { fontSize: 18, color: "#FFD700" } },
-              "分數：",
-              score
+    // --- 新增：教學彈窗 React 元件 ---
+    function TutorialModal({ onClose }) {
+        const placeholder = e('div', { className: 'tutorial-image-placeholder' }, 
+            e('p', { style: { fontSize: '1.2em', color: '#E59866' } }, '[ 此處為「時光寶物架」玩法說明圖 ]'),
+            e('ul', null, 
+                e('li', null, '1. 記住貨架上出現的所有寶物！'),
+                e('li', null, '2. 在下一關，找出被調包的物品、或回答指定問題！')
             )
-          )
-        )
-    )
-  );
-}
+        );
+        const content = e('div', { className: 'tutorial-content' }, 
+            e('h4', null, '玩法說明'),
+            placeholder
+        );
+        return e('div', { className: 'tutorial-overlay' },
+            e('div', { className: 'tutorial-modal' },
+                e('button', { className: 'tutorial-close-btn', onClick: onClose }, '我知道了 (略過)'),
+                content
+            )
+        );
+    }
 
-// --- 啟動 ---
-ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+    // --- 主遊戲 ---
+    function App() {
+      // --- 新增：教學狀態管理 ---
+      const [isTutorialVisible, setTutorialVisible] = React.useState(false);
+      const tutorialKey = 'tutorialShown_nostalgic_memory';
+
+      React.useEffect(() => {
+        // 組件載入時，只執行一次，檢查是否需要顯示教學
+        if (!sessionStorage.getItem(tutorialKey)) {
+          setTutorialVisible(true);
+        }
+      }, []);
+
+      const handleCloseTutorial = () => {
+        setTutorialVisible(false);
+        sessionStorage.setItem(tutorialKey, 'true');
+      };
+      
+      // --- 原有遊戲狀態 ---
+      const [phase, setPhase] = React.useState("VHS_INTRO");
+      const [shelfItems, setShelfItems] = React.useState([]);
+      const [hiddenShelfItems, setHiddenShelfItems] = React.useState([]);
+      const [answer, setAnswer] = React.useState(null);
+      const [mode, setMode] = React.useState("FIND_ITEM");
+      const [prompt, setPrompt] = React.useState("");
+      const [score, setScore] = React.useState(0);
+      const [feedback, setFeedback] = React.useState("");
+      const [questionData, setQuestionData] = React.useState(null);
+      const [bgm, setBgm] = React.useState(null);
+
+      // --- 原有遊戲邏輯 (useEffect, functions) 不變 ---
+      React.useEffect(() => { if (phase === "VHS_INTRO") { sfx.modem().play(); setTimeout(() => setPhase("TITLE"), 4200); } }, [phase]);
+      React.useEffect(() => { if (phase === "TITLE" && !bgm) { const bgmAudio = chiptuneBGM(); setBgm(bgmAudio); bgmAudio.loop = true; bgmAudio.volume = 0.23; bgmAudio.play(); } }, [phase, bgm]);
+      function startGame() { setScore(0); nextRound(); }
+      function nextRound() { const mode = getRandomGameMode(); setMode(mode); const numItems = 3 + Math.floor(score / 2); const items = getRandomItems(numItems); setShelfItems(items); setPrompt(""); setPhase("MEMORY"); setTimeout(() => { sfx.vhs().play(); setPhase("QUESTION"); const qData = getModePrompt(mode, items); setPrompt(qData.prompt); setAnswer(qData.answer); setQuestionData(qData); if (mode === "FIND_DIFF") { setHiddenShelfItems(qData.changedItems); } }, 5000); }
+      function handleClickItem(idx) { if (phase !== "QUESTION" || isTutorialVisible) return; let correct = false; if (mode === "FIND_ITEM" || mode === "FIND_ITEM_LOCATION") { correct = idx === answer; } else if (mode === "FIND_DIFF") { correct = idx === answer; } if (correct) { setFeedback("帥喔！"); sfx.coin().pause(); sfx.coin().currentTime=0; sfx.coin().play(); setScore(s => s + 1); } else { setFeedback("遜掉了～"); sfx.wrong().pause(); sfx.wrong().currentTime=0; sfx.wrong().play(); } setPhase("FEEDBACK"); setTimeout(() => nextRound(), 1800); }
+      function handleChoice(i) { if (phase !== "QUESTION" || isTutorialVisible) return; const correct = i === answer; if (correct) { setFeedback("超懂行！"); sfx.coin().pause(); sfx.coin().currentTime=0; sfx.coin().play(); setScore(s => s + 1); } else { setFeedback("再猜猜看～"); sfx.wrong().pause(); sfx.wrong().currentTime=0; sfx.wrong().play(); } setPhase("FEEDBACK"); setTimeout(() => nextRound(), 1800); }
+      function renderShelf(items, clickable) { return e( "div", { className: "shelf" }, items.map((item, i) => e( "div", { key: i, className: "shelf-slot", style: { cursor: clickable ? "pointer" : "default", filter: item ? "" : "brightness(0.4)", }, onClick: () => clickable && handleClickItem(i), }, item && e("img", { src: item.img, alt: item.name, className: "item-pixel", title: item.name, draggable: false, }) ) ) ); }
+      
+      // --- CRT & VHS 效果元件 ---
+      function CRTOverlay() { return e("div", { style: { pointerEvents: "none", position: "fixed", inset: 0, zIndex: 99, background: "repeating-linear-gradient(0deg, rgba(0,0,0,0.07) 0 2px, transparent 2px 6px)", mixBlendMode: "overlay", }, }); }
+      function VHSNoise({ active }) { const ref = React.useRef(); React.useEffect(() => { let anim; function draw() { const canvas = ref.current; if (!canvas) return; const ctx = canvas.getContext("2d"); ctx.clearRect(0, 0, canvas.width, canvas.height); for (let y = 0; y < canvas.height; y += 4) { const alpha = Math.random() * 0.12 + 0.07; ctx.fillStyle = `rgba(240,240,240,${alpha})`; ctx.fillRect(0, y, canvas.width, 2); } if (Math.random() < 0.15) { ctx.fillStyle = "rgba(255,255,255,0.25)"; ctx.fillRect( 0, Math.floor(Math.random() * canvas.height), canvas.width, 3 ); } anim = requestAnimationFrame(draw); } if (active) draw(); return () => cancelAnimationFrame(anim); }, [active]); return e("canvas", { ref, width: window.innerWidth, height: window.innerHeight, style: { pointerEvents: "none", position: "fixed", inset: 0, zIndex: 100, opacity: active ? 1 : 0, transition: "opacity 0.3s", }, }); }
+
+      // --- 主渲染 return ---
+      return e( "div", { className: "crt-bg" },
+        // --- 新增：條件渲染教學彈窗 ---
+        isTutorialVisible && e(TutorialModal, { onClose: handleCloseTutorial }),
+        
+        e(CRTOverlay),
+        e(VHSNoise, { active: phase === "VHS_INTRO" || phase === "MEMORY" }),
+        e( "div", { className: "main-frame" },
+          phase === "VHS_INTRO" && e( "div", { className: "vhs-intro" }, e("span", { className: "pixel-font" }, "VHS 載入中...") ),
+          phase === "TITLE" && e( "div", { className: "title-screen" }, e( "h1", { className: "pixel-font", style: { color: "#F9DF5B" } }, "我的時光寶物架" ), e( "p", { style: { color: "#E383B9" } }, e("b", null, "80/90s"), " 懷舊記憶訓練" ), e( "button", { className: "pixel-font", onClick: startGame }, "開始遊戲" ) ),
+          phase === "MEMORY" && e( "div", null, e( "div", { className: "pixel-font", style: { color: "#E383B9" } }, "記住貨架上的寶物吧！" ), renderShelf(shelfItems, false), e("div", { className: "timer-bar" }) ),
+          phase === "QUESTION" && e( "div", null, e( "div", { className: "pixel-font", style: { color: "#6EDCFF" } }, prompt ), mode === "FIND_DIFF" ? renderShelf(hiddenShelfItems, true) : mode === "ESTIMATE_PRICE" ? e( "div", { style: { marginTop: "2em", textAlign: "center" } }, questionData && e("img", { src: questionData.item.img, alt: questionData.item.name, className: "item-pixel", style: { marginBottom: "1em" }, }), questionData && questionData.choices.map((c, i) => e( "button", { key: i, className: "pixel-font price-btn", onClick: () => handleChoice(i), }, c ) ) ) : renderShelf(shelfItems, true) ),
+          phase === "FEEDBACK" && e( "div", null, e( "div", { className: "pixel-font feedback" }, feedback, e("br", null), e( "span", { style: { fontSize: 18, color: "#FFD700" } }, "分數：", score ) ) )
+        )
+      );
+    }
+
+    // --- 啟動 ---
+    ReactDOM.createRoot(document.getElementById("root")).render(e(App));
   </script>
 </body>
 </html>
