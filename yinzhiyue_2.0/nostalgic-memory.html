@@ -12,7 +12,6 @@
     .title-screen { text-align: center; margin-top: 100px; }
     .shelf { display: flex; justify-content: center; align-items: end; margin: 2.5em 0 1em 0; gap: 24px; height: 160px; }
     
-    /* --- 已更新的視覺元件樣式 --- */
     .shelf-slot {
       background-image: url('assets/shelf-bg.jpg'); 
       background-size: cover;
@@ -22,7 +21,7 @@
       height: 120px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3) inset;
       display: flex;
-      align-items: center; /* 讓物品垂直置中 */
+      align-items: center;
       justify-content: center;
       border-radius: 10px 10px 8px 8px;
       position: relative;
@@ -34,7 +33,6 @@
       object-fit: contain;
       filter: drop-shadow(5px 5px 8px rgba(0,0,0,0.4));
     }
-    /* --- 其他原有樣式 --- */
     .timer-bar { height: 8px; background: repeating-linear-gradient(90deg, #ffec9e, #fce26a 12%, #ffc46a 17%, #ffec9e 36%); border-radius: 4px; margin: 1em 0; animation: timer-bar 5s linear; }
     @keyframes timer-bar { from { width: 100%; } to { width: 0%; } }
     .price-btn { font-size: 1.2em; margin: 1em 1.5em 0 0; background: #ffe5b5; border: 2px solid #f9df5b; color: #1d1821; border-radius: 8px; padding: 0.5em 1.2em; cursor: pointer; transition: background 0.15s; }
@@ -43,7 +41,6 @@
     .feedback { text-align: center; font-size: 2em; color: #ffb96d; margin-top: 90px; text-shadow: 0 0 8px #fff8b6; }
     .pixel-font { font-family: 'pixel-font', monospace; letter-spacing: 2px; }
 
-    /* --- 教學彈窗樣式 --- */
     .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; }
     .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 20px 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; }
     .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; font-family: inherit; }
@@ -51,42 +48,17 @@
     .tutorial-image-placeholder { width: 100%; min-height: 150px; background: rgba(26, 32, 44, 0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #5DADE2; padding: 15px; box-sizing: border-box; }
     .tutorial-content ul { list-style: none; padding: 0; margin-top: 15px; }
     .tutorial-content li { font-size: 1.1em; margin-bottom: 10px; line-height: 1.5; }
+ 
+    /* --- 手機版響應式樣式 --- */
+    @media (max-width: 600px) {
+        .main-frame { width: 95vw; margin: 10px auto; padding: 1em; min-height: 80vh; }
+        .shelf { gap: 10px; flex-wrap: wrap; height: auto; }
+        .shelf-slot { width: 28vw; height: 28vw; }
+        .pixel-font { font-size: 1.5em; }
+        .price-btn { font-size: 1.1em; padding: 0.8em 1em; margin: 0.5em; }
+        .feedback { font-size: 1.8em; }
+    }
   </style>
- /* --- 手機版響應式樣式 --- */
-@media (max-width: 600px) {
-    /* 讓主框架接近滿版，減少邊距 */
-    .main-frame {
-        width: 95vw; /* vw = view-width, 視窗寬度的百分比 */
-        margin: 10px auto;
-        padding: 1em;
-        min-height: 80vh; /* vh = view-height */
-    }
-
-    /* 調整貨架，讓物品隨螢幕寬度縮放 */
-    .shelf {
-        gap: 10px; /* 縮小間距 */
-        flex-wrap: wrap; /* 允許換行 */
-        height: auto;
-    }
-    
-    .shelf-slot {
-        width: 28vw;  /* 使用 vw 單位讓它隨螢幕變大 */
-        height: 28vw;
-    }
-
-    /* 加大關鍵字體 */
-    .pixel-font {
-        font-size: 1.5em; /* 將遊戲提示文字加大 */
-    }
-    .price-btn {
-        font-size: 1.1em;
-        padding: 0.8em 1em;
-        margin: 0.5em;
-    }
-    .feedback {
-        font-size: 1.8em;
-    }
-}
 </head>
 <body>
   <div id="root"></div>
@@ -103,30 +75,28 @@
   
   <script>
     const e = React.createElement;
-      // --- 已更新的資料區 (已修正所有錯誤) ---
-const nostalgicItems = [
-  // 建議檔名：小寫英文、數字與橫線(-)
-  { name: "Sony Walkman 隨身聽", img: "assets/sony-walkman.jpg", value: 3200 },
-  { name: "Game Boy", img: "assets/gameboy.jpeg", value: 2800 },
-  { name: "B.B. Call 傳呼機", img: "assets/bb-call.webp", value: 1800 }, // 優化建議：移除檔名空格
-  { name: "3.5吋磁碟片", img: "assets/floppydisk.jpeg", value: 15 },
-  { name: "Tamagotchi 電子雞", img: "assets/tamagotchi.jpeg", value: 700 },
-  { name: "CD隨身聽", img: "assets/cd-player.jpg", value: 3500 },
-  { name: "CPU", img: "assets/cpu.jpeg", value: 3000 },
-  { name: "箭牌口香糖", img: "assets/doublemint.jpeg", value: 7 },
-  { name: "乖乖", img: "assets/guai-guai.jpeg", value: 5 },
-  { name: "黑松汽水", img: "assets/heysong.jpeg", value: 12 },
-  { name: "彈珠", img: "assets/marble.png", value: 1 }, // value 修正為較合理的 1
-  { name: "RAM 記憶體", img: "assets/memory.webp", value: 3000 },
-  { name: "明星花露水", img: "assets/mingsing.jpg", value: 7 },
-  { name: "森永牛奶糖", img: "assets/morinaga-caramel.jpg", value: 5 },
-  { name: "卡式錄音帶", img: "assets/music-tape.jpeg", value: 12 },
-  { name: "王子麵", img: "assets/prince-noodles.png", value: 3 }, // ★★★ Bug修正：補上引號，並移除檔名空格
-  { name: "黑松沙士", img: "assets/sarsaparilla.png", value: 12 },
-  { name: "尪仔標", img: "assets/wang-zai-biao.jpeg", value: 1 },
-  { name: "養樂多", img: "assets/yakult.jpg", value: 2 },
 
-      // 建議為所有物品準備對應的圖片檔
+    // --- 物品資料庫 ---
+    const nostalgicItems = [
+      { name: "Sony Walkman 隨身聽", img: "assets/sony-walkman.jpg", value: 3200 },
+      { name: "Game Boy", img: "assets/gameboy.jpeg", value: 2800 },
+      { name: "B.B. Call 傳呼機", img: "assets/bb-call.webp", value: 1800 },
+      { name: "3.5吋磁碟片", img: "assets/floppydisk.jpeg", value: 15 },
+      { name: "Tamagotchi 電子雞", img: "assets/tamagotchi.jpeg", value: 700 },
+      { name: "CD隨身聽", img: "assets/cd-player.jpg", value: 3500 },
+      { name: "CPU", img: "assets/cpu.jpeg", value: 3000 },
+      { name: "箭牌口香糖", img: "assets/doublemint.jpeg", value: 7 },
+      { name: "乖乖", img: "assets/guai-guai.jpeg", value: 5 },
+      { name: "黑松汽水", img: "assets/heysong.jpeg", value: 12 },
+      { name: "彈珠", img: "assets/marble.png", value: 1 },
+      { name: "RAM 記憶體", img: "assets/memory.webp", value: 3000 },
+      { name: "明星花露水", img: "assets/mingsing.jpg", value: 7 },
+      { name: "森永牛奶糖", img: "assets/morinaga-caramel.jpg", value: 5 },
+      { name: "卡式錄音帶", img: "assets/music-tape.jpeg", value: 12 },
+      { name: "王子麵", img: "assets/prince-noodles.png", value: 3 },
+      { name: "黑松沙士", img: "assets/sarsaparilla.png", value: 12 },
+      { name: "尪仔標", img: "assets/wang-zai-biao.jpeg", value: 1 },
+      { name: "養樂多", img: "assets/yakult.jpg", value: 2 },
     ];
 
     // --- 遊戲邏輯 ---
@@ -134,7 +104,7 @@ const nostalgicItems = [
     function getShuffledItems(items) { const arr = items.slice(); const idx = Math.floor(Math.random() * arr.length); let newItem; do { newItem = nostalgicItems[Math.floor(Math.random() * nostalgicItems.length)]; } while (arr.find((x) => x.name === newItem.name)); arr[idx] = newItem; return { changedItems: arr, changedIdx: idx }; }
     function shuffle(arr) { let a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
     function getRandomGameMode() { const modes = ["FIND_ITEM", "FIND_DIFF", "ESTIMATE_PRICE"]; return modes[Math.floor(Math.random() * modes.length)]; }
-    function getModePrompt(mode, items) { if (mode === "FIND_ITEM") { const idx = Math.floor(Math.random() * items.length); const item = items[idx]; const prompt = [ `欸！我的${item.name}剛放哪了？等下還要用啦！`, `你有看到${item.name}嗎？快點給我找出來！`, `剛才想聽的${item.name}放哪了？快幫我點出來！`, ][Math.floor(Math.random() * 3)]; return { prompt, answer: idx }; } else if (mode === "FIND_DIFF") { const { changedItems, changedIdx } = getShuffledItems(items); const prompt = [ "老媽突擊檢查！我的寶物哪一項被動過手腳？", "咦？剛剛是不是有東西被換掉了？快找出來！", "哪個東西變了？眼力大考驗～", ][Math.floor(Math.random() * 3)]; return { prompt, answer: changedIdx, changedItems }; } else if (mode === "ESTIMATE_PRICE") { const idx = Math.floor(Math.random() * items.length); const item = items[idx]; const correct = item.value; let choices = [ correct, correct + 500, Math.max(correct - 500, 1), correct + 1000, ]; choices = shuffle(choices); const answer = choices.indexOf(correct); const prompt = `猜猜看，這個${item.name}在1990年大概多少錢？`; return { prompt, answer, choices: choices.map((v) => `${v} 元`), item, }; } return { prompt: "Coming soon", answer: 0 }; }
+    function getModePrompt(mode, items) { if (mode === "FIND_ITEM") { const idx = Math.floor(Math.random() * items.length); const item = items[idx]; const prompt = [ `欸！我的${item.name}剛放哪了？`, `你有看到${item.name}嗎？`, ][Math.floor(Math.random() * 2)]; return { prompt, answer: idx }; } else if (mode === "FIND_DIFF") { const { changedItems, changedIdx } = getShuffledItems(items); const prompt = [ "咦？是不是有東西被換掉了？", "哪個東西變了？眼力大考驗～", ][Math.floor(Math.random() * 2)]; return { prompt, answer: changedIdx, changedItems }; } else if (mode === "ESTIMATE_PRICE") { const idx = Math.floor(Math.random() * items.length); const item = items[idx]; const correct = item.value; let choices = [ correct, correct + 500, Math.max(correct - 500, 1), correct + 1000, ]; choices = shuffle(choices); const answer = choices.indexOf(correct); const prompt = `猜猜看，${item.name}在當年大概多少錢？`; return { prompt, answer, choices: choices.map((v) => `${v} 元`), item, }; } return { prompt: "Coming soon", answer: 0 }; }
     const sfx = { coin: () => document.getElementById("sfx-coin"), wrong: () => document.getElementById("sfx-wrong"), vhs: () => document.getElementById("sfx-vhs"), modem: () => document.getElementById("sfx-modem"), };
     function chiptuneBGM() { const list = ["bgm-chiptune1", "bgm-chiptune2", "bgm-citypop"]; const idx = Math.floor(Math.random() * list.length); return document.getElementById(list[idx]); }
 
@@ -147,102 +117,19 @@ const nostalgicItems = [
                 e('li', null, '2. 在下一關，找出被調包的物品、或回答指定問題！')
             )
         );
-        const content = e('div', { className: 'tutorial-content' }, 
-            e('h4', null, '玩法說明'),
-            placeholder
-        );
-        return e('div', { className: 'tutorial-overlay' },
-            e('div', { className: 'tutorial-modal' },
-                e('button', { className: 'tutorial-close-btn', onClick: onClose }, '我知道了 (略過)'),
-                content
-            )
-        );
+        const content = e('div', { className: 'tutorial-content' }, e('h4', null, '玩法說明'), placeholder);
+        return e('div', { className: 'tutorial-overlay' }, e('div', { className: 'tutorial-modal' }, e('button', { className: 'tutorial-close-btn', onClick: onClose }, '我知道了 (略過)'), content));
     }
 
     // --- 主遊戲 ---
     function App() {
-      // --- 教學狀態管理 ---
       const [isTutorialVisible, setTutorialVisible] = React.useState(false);
       const tutorialKey = 'tutorialShown_nostalgic_memory';
-
-      React.useEffect(() => {
-        if (!sessionStorage.getItem(tutorialKey)) {
-          setTutorialVisible(true);
-        }
-      }, []);
-
-      const handleCloseTutorial = () => {
-        setTutorialVisible(false);
-        sessionStorage.setItem(tutorialKey, 'true');
-      };
+      React.useEffect(() => { if (!sessionStorage.getItem(tutorialKey)) { setTutorialVisible(true); } }, []);
+      const handleCloseTutorial = () => { setTutorialVisible(false); sessionStorage.setItem(tutorialKey, 'true'); };
       
-      // --- 遊戲狀態 ---
       const [phase, setPhase] = React.useState("VHS_INTRO");
       const [shelfItems, setShelfItems] = React.useState([]);
       const [hiddenShelfItems, setHiddenShelfItems] = React.useState([]);
       const [answer, setAnswer] = React.useState(null);
-      const [mode, setMode] = React.useState("FIND_ITEM");
-      const [prompt, setPrompt] = React.useState("");
-      const [score, setScore] = React.useState(0);
-      const [feedback, setFeedback] = React.useState("");
-      const [questionData, setQuestionData] = React.useState(null);
-      const [bgm, setBgm] = React.useState(null);
-
-      // --- 遊戲邏輯 ---
-      React.useEffect(() => { 
-          if (isTutorialVisible) return;
-          if (phase === "VHS_INTRO") { 
-              sfx.modem().play(); 
-              setTimeout(() => setPhase("TITLE"), 4200); 
-          } 
-      }, [phase, isTutorialVisible]);
-
-      React.useEffect(() => { 
-          if (isTutorialVisible) return;
-          if (phase === "TITLE" && !bgm) { 
-              const bgmAudio = chiptuneBGM(); 
-              setBgm(bgmAudio); 
-              bgmAudio.loop = true; 
-              bgmAudio.volume = 0.23; 
-              bgmAudio.play(); 
-          } 
-      }, [phase, bgm, isTutorialVisible]);
-
-      function startGame() { setScore(0); nextRound(); }
-      function nextRound() { const mode = getRandomGameMode(); setMode(mode); const numItems = Math.min(3 + Math.floor(score / 2), 5); const items = getRandomItems(numItems); setShelfItems(items); setPrompt(""); setPhase("MEMORY"); setTimeout(() => { sfx.vhs().play(); setPhase("QUESTION"); const qData = getModePrompt(mode, items); setPrompt(qData.prompt); setAnswer(qData.answer); setQuestionData(qData); if (mode === "FIND_DIFF") { setHiddenShelfItems(qData.changedItems); } }, 5000); }
-      function handleClickItem(idx) { if (phase !== "QUESTION" || isTutorialVisible) return; let correct = false; if (mode === "FIND_ITEM" || mode === "FIND_ITEM_LOCATION") { correct = idx === answer; } else if (mode === "FIND_DIFF") { correct = idx === answer; } if (correct) { setFeedback("帥喔！"); sfx.coin().pause(); sfx.coin().currentTime=0; sfx.coin().play(); setScore(s => s + 1); } else { setFeedback("遜掉了～"); sfx.wrong().pause(); sfx.wrong().currentTime=0; sfx.wrong().play(); } setPhase("FEEDBACK"); setTimeout(() => nextRound(), 1800); }
-      function handleChoice(i) { if (phase !== "QUESTION" || isTutorialVisible) return; const correct = i === answer; if (correct) { setFeedback("超懂行！"); sfx.coin().pause(); sfx.coin().currentTime=0; sfx.coin().play(); setScore(s => s + 1); } else { setFeedback("再猜猜看～"); sfx.wrong().pause(); sfx.wrong().currentTime=0; sfx.wrong().play(); } setPhase("FEEDBACK"); setTimeout(() => nextRound(), 1800); }
-      
-      // --- 已更新的渲染函式 ---
-      function renderShelf(items, clickable) { 
-          return e( "div", { className: "shelf" }, 
-              items.map((item, i) => e( "div", { key: i, className: "shelf-slot", style: { cursor: clickable ? "pointer" : "default", filter: item ? "" : "brightness(0.8)", }, onClick: () => clickable && handleClickItem(i), }, 
-                  item && e("img", { src: item.img, alt: item.name, className: "item-realistic", title: item.name, draggable: false, }) 
-              )) 
-          ); 
-      }
-      
-      function CRTOverlay() { return e("div", { style: { pointerEvents: "none", position: "fixed", inset: 0, zIndex: 99, background: "repeating-linear-gradient(0deg, rgba(0,0,0,0.07) 0 2px, transparent 2px 6px)", mixBlendMode: "overlay", }, }); }
-      function VHSNoise({ active }) { const ref = React.useRef(); React.useEffect(() => { let anim; function draw() { const canvas = ref.current; if (!canvas) return; const ctx = canvas.getContext("2d"); ctx.clearRect(0, 0, canvas.width, canvas.height); for (let y = 0; y < canvas.height; y += 4) { const alpha = Math.random() * 0.12 + 0.07; ctx.fillStyle = `rgba(240,240,240,${alpha})`; ctx.fillRect(0, y, canvas.width, 2); } if (Math.random() < 0.15) { ctx.fillStyle = "rgba(255,255,255,0.25)"; ctx.fillRect( 0, Math.floor(Math.random() * canvas.height), canvas.width, 3 ); } anim = requestAnimationFrame(draw); } if (active) draw(); return () => cancelAnimationFrame(anim); }, [active]); return e("canvas", { ref, width: window.innerWidth, height: window.innerHeight, style: { pointerEvents: "none", position: "fixed", inset: 0, zIndex: 100, opacity: active ? 1 : 0, transition: "opacity 0.3s", }, }); }
-
-      const gameContent = e( "div", { className: "main-frame" },
-          phase === "VHS_INTRO" && e( "div", { className: "vhs-intro" }, e("span", { className: "pixel-font" }, "VHS 載入中...") ),
-          phase === "TITLE" && e( "div", { className: "title-screen" }, e( "h1", { className: "pixel-font", style: { color: "#F9DF5B" } }, "我的時光寶物架" ), e( "p", { style: { color: "#E383B9" } }, e("b", null, "80/90s"), " 懷舊記憶訓練" ), e( "button", { className: "pixel-font", onClick: startGame }, "開始遊戲" ) ),
-          phase === "MEMORY" && e( "div", null, e( "div", { className: "pixel-font", style: { color: "#E383B9" } }, "記住貨架上的寶物吧！" ), renderShelf(shelfItems, false), e("div", { className: "timer-bar" }) ),
-          phase === "QUESTION" && e( "div", null, e( "div", { className: "pixel-font", style: { color: "#6EDCFF" } }, prompt ), mode === "FIND_DIFF" ? renderShelf(hiddenShelfItems, true) : mode === "ESTIMATE_PRICE" ? e( "div", { style: { marginTop: "2em", textAlign: "center" } }, questionData && e("img", { src: questionData.item.img, alt: questionData.item.name, className: "item-realistic", style: { marginBottom: "1em" }, }), questionData && questionData.choices.map((c, i) => e( "button", { key: i, className: "pixel-font price-btn", onClick: () => handleChoice(i), }, c ) ) ) : renderShelf(shelfItems, true) ),
-          phase === "FEEDBACK" && e( "div", null, e( "div", { className: "pixel-font feedback" }, feedback, e("br", null), e( "span", { style: { fontSize: 18, color: "#FFD700" } }, "分數：", score ) ) )
-      );
-
-      return e( "div", { className: "crt-bg" },
-        isTutorialVisible && e(TutorialModal, { onClose: handleCloseTutorial }),
-        e(CRTOverlay),
-        e(VHSNoise, { active: phase === "VHS_INTRO" || phase === "MEMORY" }),
-        !isTutorialVisible && gameContent
-      );
-    }
-
-    // --- 啟動 ---
-    ReactDOM.createRoot(document.getElementById("root")).render(e(App));
-  </script>
-</body>
-</html>
+      const [mode, setMode] =
