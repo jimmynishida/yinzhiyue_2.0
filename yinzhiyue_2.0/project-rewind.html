@@ -85,12 +85,16 @@
       // BGM 控制 (加入 isTutorialVisible 判斷)
       React.useEffect(() => { if(isTutorialVisible) return; if(screen==="desktop"||screen==="levelSelect") playBGM("citypop"); if(screen==="game" && selectedLevel) playBGM(selectedLevel.bgm); if(screen==="score") stopBGM(); return stopBGM; }, [screen, selectedLevel, isTutorialVisible]);
 
+      const mainGameContent = e(React.Fragment, {}, 
+        screen === "desktop" && e(Desktop, { onEnter: ()=>setScreen("levelSelect") }),
+        screen === "levelSelect" && e(LevelSelect, { levels, onSelect: lv => {setSelectedLevel(lv); setScreen("game");} }),
+        screen === "game" && selectedLevel && e(GameLevel, { level: selectedLevel, onFinish: score => { setScore(score); setScreen("score"); }, onBack: ()=>setScreen("levelSelect") }),
+        screen === "score" && score && e(ScoreSummary, { score, onBackToDesktop: ()=>{setScore(null); setSelectedLevel(null); setScreen("desktop")}, onReplay: ()=>{setScore(null); setScreen("game")} })
+      );
+
       return e(React.Fragment, {},
         isTutorialVisible && e(TutorialModal, { onClose: handleCloseTutorial }),
-        !isTutorialVisible && screen === "desktop" && e(Desktop, { onEnter: ()=>setScreen("levelSelect") }),
-        !isTutorialVisible && screen === "levelSelect" && e(LevelSelect, { levels, onSelect: lv => {setSelectedLevel(lv); setScreen("game");} }),
-        !isTutorialVisible && screen === "game" && selectedLevel && e(GameLevel, { level: selectedLevel, onFinish: score => { setScore(score); setScreen("score"); }, onBack: ()=>setScreen("levelSelect") }),
-        !isTutorialVisible && screen === "score" && score && e(ScoreSummary, { score, onBackToDesktop: ()=>{setScore(null); setSelectedLevel(null); setScreen("desktop")}, onReplay: ()=>{setScore(null); setScreen("game")} })
+        !isTutorialVisible && mainGameContent
       );
     }
     // --- 各畫面元件 (與之前相同) ---
