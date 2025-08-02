@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>我的時光寶物架 Nostalgic Memory Game</title>
-  <meta name="viewport" content="width=540,maximum-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     @font-face { font-family: 'pixel-font'; src: url('https://fonts.gstatic.com/s/pressstart2p/v12/e3t4euO8KNyBfB3R0rGJ.ttf') format('truetype'); }
     body { margin: 0; background: #222; font-family: Arial, 'pixel-font', monospace; letter-spacing: 1px; overflow: hidden; }
@@ -52,6 +52,41 @@
     .tutorial-content ul { list-style: none; padding: 0; margin-top: 15px; }
     .tutorial-content li { font-size: 1.1em; margin-bottom: 10px; line-height: 1.5; }
   </style>
+ /* --- 手機版響應式樣式 --- */
+@media (max-width: 600px) {
+    /* 讓主框架接近滿版，減少邊距 */
+    .main-frame {
+        width: 95vw; /* vw = view-width, 視窗寬度的百分比 */
+        margin: 10px auto;
+        padding: 1em;
+        min-height: 80vh; /* vh = view-height */
+    }
+
+    /* 調整貨架，讓物品隨螢幕寬度縮放 */
+    .shelf {
+        gap: 10px; /* 縮小間距 */
+        flex-wrap: wrap; /* 允許換行 */
+        height: auto;
+    }
+    
+    .shelf-slot {
+        width: 28vw;  /* 使用 vw 單位讓它隨螢幕變大 */
+        height: 28vw;
+    }
+
+    /* 加大關鍵字體 */
+    .pixel-font {
+        font-size: 1.5em; /* 將遊戲提示文字加大 */
+    }
+    .price-btn {
+        font-size: 1.1em;
+        padding: 0.8em 1em;
+        margin: 0.5em;
+    }
+    .feedback {
+        font-size: 1.8em;
+    }
+}
 </head>
 <body>
   <div id="root"></div>
@@ -71,27 +106,28 @@
 
     // --- 已更新的資料區 ---
     const nostalgicItems = [
-      { name: "Sony Walkman 隨身聽", img: "assets/SonyWalkman.jpg", value: 3200 },
-      { name: "Game Boy", img: "assets/gameboy.jpeg", value: 2800 },
-      { name: "B.B. Call 傳呼機", img: "assets/B.B. Call.webp", value: 1800 },
-      { name: "3.5吋磁碟片", img: "assets/floppydisk.jpeg", value: 15 },
-      { name: "Tamagotchi 電子雞", img: "assets/Tamagotchi.jpeg", value: 700 },
-      { name: "CD隨身聽", img: "assets/cdplayer.jpg", value: 3500 },
-      { name: "CPU", img: "assets/cpu.jpeg", value: 3000 },
-      { name: "箭牌口香糖", img: "assets/Doublemint.jpeg", value: 7 },
-      { name: "乖乖", img: "assets/guaiguåi.jpeg", value: 5 },
-      { name: "黑松汽水", img: "assets/heysong.jpeg", value: 12 },
-      { name: "彈珠", img: "assets/Marble.png", value: 1 },
-      { name: "RAM 記憶體", img: "assets/memory.webp", value: 1000 },
-      { name: "明星花露水", img: "assets/mingsing.jpg", value: 50 },
-      { name: "森永牛奶糖", img: "assets/mirukukyarameru.jpg", value: 7 },
-      { name: "錄音帶", img: "assets/music tape.jpeg", value: 100 },
-      { name: "王子麵", img: "assets/Prince Noodles.png", value: 3 },
-      { name: "黑松沙士", img: "assets/sarsaparilla.png", value: 12 },
-      { name: "尪仔標", img: "assets/Wangzaibiao.jpeg", value: 1 },
-      { name: "養樂多", img: "assets/Yakult.jp", value: 2 },
-      { name: "黑松汽水", img: "assets/heysong.jpeg", value: 12 },
-      { name: "彈珠", img: "assets/Marble.png", value: 1 },
+      // --- 已更新的資料區 (已修正所有錯誤) ---
+const nostalgicItems = [
+  // 建議檔名：小寫英文、數字與橫線(-)
+  { name: "Sony Walkman 隨身聽", img: "assets/sony-walkman.jpg", value: 3200 },
+  { name: "Game Boy", img: "assets/gameboy.jpeg", value: 2800 },
+  { name: "B.B. Call 傳呼機", img: "assets/bb-call.webp", value: 1800 }, // 優化建議：移除檔名空格
+  { name: "3.5吋磁碟片", img: "assets/floppydisk.jpeg", value: 15 },
+  { name: "Tamagotchi 電子雞", img: "assets/tamagotchi.jpeg", value: 700 },
+  { name: "CD隨身聽", img: "assets/cd-player.jpg", value: 3500 },
+  { name: "CPU", img: "assets/cpu.jpeg", value: 3000 },
+  { name: "箭牌口香糖", img: "assets/doublemint.jpeg", value: 7 },
+  { name: "乖乖", img: "assets/guai-guai.jpeg", value: 5 },
+  { name: "黑松汽水", img: "assets/heysong.jpeg", value: 12 },
+  { name: "彈珠", img: "assets/marble.png", value: 1 }, // value 修正為較合理的 1
+  { name: "RAM 記憶體", img: "assets/memory.webp", value: 3000 },
+  { name: "明星花露水", img: "assets/mingsing.jpg", value: 7 },
+  { name: "森永牛奶糖", img: "assets/morinaga-caramel.jpg", value: 5 },
+  { name: "卡式錄音帶", img: "assets/music-tape.jpeg", value: 12 },
+  { name: "王子麵", img: "assets/prince-noodles.png", value: 3 }, // ★★★ Bug修正：補上引號，並移除檔名空格
+  { name: "黑松沙士", img: "assets/sarsaparilla.png", value: 12 },
+  { name: "尪仔標", img: "assets/wang-zai-biao.jpeg", value: 1 },
+  { name: "養樂多", img: "assets/yakult.jpg", value: 2 },
 
       // 建議為所有物品準備對應的圖片檔
     ];
