@@ -2,39 +2,42 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>我的時光寶物架 Nostalgic Memory Game</title>
+  <title>我的時光寶物架 - 拼圖模式</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     @font-face { font-family: 'pixel-font'; src: url('https://fonts.gstatic.com/s/pressstart2p/v12/e3t4euO8KNyBfB3R0rGJ.ttf') format('truetype'); }
     body { margin: 0; background: #222; font-family: Arial, 'pixel-font', monospace; letter-spacing: 1px; overflow-x: hidden; }
-    .crt-bg { background-image: url('assets/your-background.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 100vh; width: 100vw; position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
-    .main-frame { position: relative; width: 480px; margin: 40px auto; padding: 2em; background: rgba(35, 38, 50, 0.92); box-shadow: 0 0 80px #444, 0 0 0 6px #fce26a inset; border-radius: 18px; z-index: 2; min-height: 520px; box-sizing: border-box; }
-    .game-hud { display: flex; justify-content: space-between; align-items: center; color: #fff; font-size: 1.1em; padding: 0 10px 10px; }
-    .pause-btn { background: none; border: 2px solid #ffc; color: #ffc; border-radius: 5px; font-family: inherit; font-size: 1em; cursor: pointer; }
-    .title-screen, .game-over-screen { text-align: center; margin-top: 100px; }
-    .shelf { display: flex; justify-content: center; align-items: center; margin: 2.5em 0 1em 0; gap: 24px; min-height: 140px; }
-    .shelf-slot { background-image: url('assets/shelf-bg.jpg'); background-size: cover; background-position: center; border: 3px solid #6b4f2c; width: 120px; height: 120px; box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3) inset; display: flex; align-items: center; justify-content: center; border-radius: 10px; position: relative; transition: filter 0.12s; }
-    .item-realistic { max-width: 90%; max-height: 80%; object-fit: contain; filter: drop-shadow(5px 5px 8px rgba(0,0,0,0.4)); }
-    .timer-bar-container { height: 8px; background: #444; border-radius: 4px; margin: 1em 0; }
-    .timer-bar { height: 100%; background: repeating-linear-gradient(90deg, #ffec9e, #fce26a 12%, #ffc46a 17%, #ffec9e 36%); border-radius: 4px; transition: width 0.2s linear; }
-    .price-btn { font-size: 1.2em; margin: 1em 1.5em 0 0; background: #ffe5b5; border: 2px solid #f9df5b; color: #1d1821; border-radius: 8px; padding: 0.5em 1.2em; cursor: pointer; }
-    .feedback { text-align: center; font-size: 2em; color: #ffb96d; margin-top: 90px; text-shadow: 0 0 8px #fff8b6; }
-    .pixel-font { font-family: 'pixel-font', monospace; letter-spacing: 2px; }
-    .pause-overlay, .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-    .pause-menu, .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; text-align: center; }
-    .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; font-family: inherit; }
-    .pause-menu h2, .tutorial-content h4 { font-family: 'VT323', monospace; color: #1A202C; font-size: 2em; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+    .crt-bg { background-image: url('https://i.imgur.com/JxAiJ8B.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 100vh; width: 100vw; position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .main-frame { position: relative; width: 540px; margin: 20px auto; padding: 1.5em; background: rgba(35, 38, 50, 0.95); box-shadow: 0 0 80px #444, 0 0 0 6px #fce26a inset; border-radius: 18px; z-index: 2; box-sizing: border-box; }
+    .title-screen, .game-over-screen { text-align: center; padding: 40px 0; }
     
+    /* --- 九宮格拼圖樣式 --- */
+    .puzzle-container { margin-bottom: 20px; }
+    .puzzle-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 240px; height: 240px; margin: 10px auto; border: 3px solid #fce26a; }
+    .puzzle-piece { width: 100%; height: 100%; background-size: 300% 300%; filter: brightness(0.3) blur(2px); transition: filter 0.5s ease-in-out; }
+    .puzzle-piece.unlocked { filter: brightness(1) blur(0); }
+
+    .shelf { display: flex; justify-content: center; align-items: center; margin: 1.5em 0; gap: 15px; min-height: 120px; }
+    .shelf-slot { background-image: url('assets/shelf-bg.jpg'); background-size: cover; background-position: center; border: 3px solid #6b4f2c; width: 100px; height: 100px; box-shadow: 0 4px 15px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3) inset; display: flex; align-items: center; justify-content: center; border-radius: 10px; position: relative; }
+    .item-realistic { max-width: 85%; max-height: 75%; object-fit: contain; filter: drop-shadow(4px 4px 6px rgba(0,0,0,0.4)); }
+    .timer-bar-container { height: 6px; background: #444; border-radius: 3px; margin: 1em 0; }
+    .timer-bar { height: 100%; background: linear-gradient(90deg, #ffec9e, #fce26a); border-radius: 3px; transition: width 0.2s linear; }
+    .price-btn { font-size: 1em; margin: 0.5em; background: #ffe5b5; border: 2px solid #f9df5b; color: #1d1821; border-radius: 8px; padding: 0.5em 1em; cursor: pointer; }
+    .feedback { text-align: center; font-size: 1.8em; color: #ffb96d; min-height: 50px; display:flex; align-items:center; justify-content:center; }
+    .pixel-font { font-family: 'pixel-font', monospace; letter-spacing: 2px; }
+    
+    .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+    .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 20px 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; }
+    .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; font-family: inherit; }
+    .tutorial-content h4 { font-family: 'VT323', monospace; color: #1A202C; font-size: 2em; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+    .tutorial-image-placeholder { width: 100%; min-height: 150px; background: rgba(26, 32, 44, 0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #5DADE2; padding: 15px; box-sizing: border-box; }
+    .tutorial-content ul { list-style: none; padding: 0; margin-top: 15px; }
+    .tutorial-content li { font-size: 1.1em; margin-bottom: 10px; line-height: 1.5; }
+
     @media (max-width: 600px) {
         body { overflow: auto; }
-        .main-frame { width: 95vw; height: auto; min-height: 85vh; margin: auto; padding: 1.5em 1em; display: flex; flex-direction: column; }
-        .title-screen, .game-over-screen { margin-top: 20px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
-        h1 { font-size: clamp(1.8em, 7vw, 2.2em); }
-        .shelf { gap: 10px; flex-wrap: wrap; height: auto; }
-        .shelf-slot { width: 28vw; height: 28vw; }
-        .pixel-font { font-size: clamp(1.2em, 4vw, 1.8em); }
-        .price-btn { font-size: 1.1em; padding: 0.8em 1em; margin: 0.5em; }
-        .feedback { font-size: clamp(1.5em, 5vw, 2em); margin-top: 20px; }
+        .main-frame { width: 95vw; height: auto; min-height: 90vh; margin: auto; padding: 1em; display: flex; flex-direction: column; }
+        h1 { font-size: clamp(1.5em, 6vw, 2em); }
     }
   </style>
 </head>
@@ -43,8 +46,7 @@
   <audio id="sfx-coin" src="audio/sfx-coin.mp3"></audio>
   <audio id="sfx-wrong" src="audio/sfx-wrong.mp3"></audio>
   <audio id="sfx-vhs" src="audio/sfx-vhs.mp3"></audio>
-  <audio id="sfx-modem" src="audio/sfx-modem.mp3"></audio>
-  <audio id="bgm-chiptune1" src="audio/bgm-chiptune1.mp3" loop></audio>
+  <audio id="bgm-main" src="audio/bgm-chiptune1.mp3" loop></audio>
   
   <script crossorigin src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
@@ -53,70 +55,59 @@
     const e = React.createElement;
     const nostalgicItems = [ { name: "Game Boy", img: "assets/gameboy.jpeg", value: 2800 }, { name: "B.B. Call 傳呼機", img: "assets/bb-call.webp", value: 1800 }, { name: "3.5吋磁碟片", img: "assets/floppydisk.jpeg", value: 15 }, { name: "Tamagotchi 電子雞", img: "assets/tamagotchi.jpeg", value: 700 }, { name: "王子麵", img: "assets/prince-noodles.png", value: 3 }, { name: "養樂多", img: "assets/yakult.jpg", value: 2 }, ];
     
-    // --- 新增：關卡設定 ---
+    // --- 九宮格拼圖設定 ---
+    const puzzleData = {
+        id: 'puz01',
+        name: '多久沒去過西門町了？',
+        image: 'assets/simandin.png' // 請替換成您選擇的精美大圖
+    };
+
+    // --- 9個小關卡的設定 ---
     const levelConfig = [
       { level: 1, items: 3, memoryTime: 6000, mode: "FIND_DIFF" }, 
       { level: 2, items: 3, memoryTime: 5000, mode: "FIND_DIFF" },
-      { level: 3, items: 4, memoryTime: 5000, mode: "ESTIMATE_PRICE" },
-      { level: 4, items: 4, memoryTime: 4000, mode: "FIND_DIFF" },
-      { level: 5, items: 5, memoryTime: 4000, mode: "ESTIMATE_PRICE" },
+      { level: 3, items: 3, memoryTime: 5000, mode: "ESTIMATE_PRICE" },
+      { level: 4, items: 4, memoryTime: 5000, mode: "FIND_DIFF" },
+      { level: 5, items: 4, memoryTime: 4000, mode: "ESTIMATE_PRICE" },
+      { level: 6, items: 4, memoryTime: 4000, mode: "FIND_DIFF" },
+      { level: 7, items: 5, memoryTime: 4000, mode: "FIND_DIFF" },
+      { level: 8, items: 5, memoryTime: 3500, mode: "ESTIMATE_PRICE" },
+      { level: 9, items: 5, memoryTime: 3500, mode: "FIND_DIFF" },
     ];
     
-    // --- 遊戲邏輯 ---
+    // --- 遊戲邏輯 (與之前類似，但為關卡制調整) ---
     function getRandomItems(n) { const arr = nostalgicItems.slice(); const items = []; while (items.length < n && arr.length > 0) { const idx = Math.floor(Math.random() * arr.length); items.push(arr.splice(idx, 1)[0]); } return items; }
     function getShuffledItems(items) { const arr = items.slice(); const idx = Math.floor(Math.random() * arr.length); let newItem; do { newItem = nostalgicItems[Math.floor(Math.random() * nostalgicItems.length)]; } while (arr.find((x) => x.name === newItem.name)); arr[idx] = newItem; return { changedItems: arr, changedIdx: idx }; }
-    function shuffle(arr) { let a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-    function getModePrompt(mode, items) { if (mode === "FIND_DIFF") { const { changedItems, changedIdx } = getShuffledItems(items); const prompt = "咦？是不是有東西被換掉了？"; return { prompt, answer: changedIdx, changedItems }; } else if (mode === "ESTIMATE_PRICE") { const idx = Math.floor(Math.random() * items.length); const item = items[idx]; const correct = item.value; let choices = [ correct, correct + 500, Math.max(correct - 500, 1), correct + 1000, ]; choices = shuffle(choices); const answer = choices.indexOf(correct); const prompt = `猜猜看，${item.name}在當年大概多少錢？`; return { prompt, answer, choices: choices.map((v) => `${v} 元`), item, }; } }
-    const sfxElements = { coin: () => document.getElementById("sfx-coin"), wrong: () => document.getElementById("sfx-wrong"), vhs: () => document.getElementById("sfx-vhs"), modem: () => document.getElementById("sfx-modem"), };
+    function getModePrompt(mode, items) { if (mode === "FIND_DIFF") { const { changedItems, changedIdx } = getShuffledItems(items); const prompt = "咦？是不是有東西被換掉了？"; return { prompt, answer: changedIdx, changedItems }; } else if (mode === "ESTIMATE_PRICE") { const idx = Math.floor(Math.random() * items.length); const item = items[idx]; const correct = item.value; let choices = [ item.value, item.value + 500, Math.max(item.value - 500, 1), item.value + 1000 ].sort(() => Math.random() - 0.5); const answer = choices.indexOf(correct); const prompt = `猜猜看，${item.name}在當年大概多少錢？`; return { prompt, answer, choices: choices.map((v) => `${v} 元`), item, itemIndex: idx }; } }
+    const sfxElements = { coin: () => document.getElementById("sfx-coin"), wrong: () => document.getElementById("sfx-wrong"), vhs: () => document.getElementById("sfx-vhs"), };
     function playSfx(name) { const el = sfxElements[name](); if (el) { el.currentTime = 0; el.play().catch(()=>{}); } }
-    function getBGM() { return document.getElementById("bgm-chiptune1"); }
-
-    function TutorialModal({ onClose }) { const content = e('div', { className: 'tutorial-content' }, e('h4', null, '玩法說明'), e('div', { className: 'tutorial-image-placeholder' }, e('p', { style: { fontSize: '1.2em', color: '#E59866' } }, '[ 玩法說明圖 ]'), e('ul', null, e('li', null, '1. 記住貨架上出現的所有寶物！'), e('li', null, '2. 找出被調包的物品，或猜出物品的當年價格！')))); return e('div', { className: 'tutorial-overlay' }, e('div', { className: 'tutorial-modal' }, e('button', { className: 'tutorial-close-btn', onClick: onClose }, '我知道了 (略過)'), content)); }
     
     function App() {
-      const [isTutorialVisible, setTutorialVisible] = React.useState(false);
-      const [isAudioUnlocked, setAudioUnlocked] = React.useState(false);
-      const [isPaused, setPaused] = React.useState(false);
-      const [gameStatus, setGameStatus] = React.useState("TITLE"); // TITLE, PLAYING, LEVEL_CLEAR, GAME_OVER_WIN, GAME_OVER_LOSE
+      const [gameStatus, setGameStatus] = React.useState("TITLE"); // TITLE, PLAYING, FEEDBACK, PUZZLE_COMPLETE
       const [currentLevel, setCurrentLevel] = React.useState(1);
-      const [lives, setLives] = React.useState(3);
+      const [unlockedPieces, setUnlockedPieces] = React.useState(Array(9).fill(false));
+      const [feedback, setFeedback] = React.useState("");
+      
+      // -- 以下為遊戲中每一局的狀態 --
+      const [phase, setPhase] = React.useState('IDLE'); // IDLE, MEMORY, QUESTION
       const [shelfItems, setShelfItems] = React.useState([]);
       const [hiddenShelfItems, setHiddenShelfItems] = React.useState([]);
       const [answer, setAnswer] = React.useState(null);
       const [mode, setMode] = React.useState("FIND_DIFF");
       const [prompt, setPrompt] = React.useState("");
       const [questionData, setQuestionData] = React.useState(null);
-      const [feedback, setFeedback] = React.useState("");
-      const [memoryTime, setMemoryTime] = React.useState(6000);
-
-      const tutorialKey = 'tutorialShown_nostalgic_memory_v2';
-      React.useEffect(() => { if (!sessionStorage.getItem(tutorialKey)) setTutorialVisible(true); }, []);
-      const handleCloseTutorial = () => { setTutorialVisible(false); sessionStorage.setItem(tutorialKey, 'true'); unlockAudio(); };
-      const unlockAudio = () => { if (isAudioUnlocked) return; Object.values(sfxElements).forEach(getEl => { const el = getEl(); if (el) { el.play().catch(() => {}); el.pause(); } }); const bgmEl = getBGM(); if (bgmEl) { bgmEl.play().catch(() => {}); bgmEl.pause(); } setAudioUnlocked(true); };
-
-      const bgm = React.useMemo(() => getBGM(), []);
-      React.useEffect(() => {
-          if (isAudioUnlocked && !isPaused && (gameStatus === 'PLAYING' || gameStatus === 'LEVEL_CLEAR')) {
-              if (bgm && bgm.paused) bgm.play().catch(()=>{});
-          } else {
-              if (bgm) bgm.pause();
-          }
-      }, [isAudioUnlocked, isPaused, gameStatus, bgm]);
-
-      function startLevel(levelNum) {
-        if (isPaused) return;
+      
+      const startLevel = (levelNum) => {
         const config = levelConfig[levelNum - 1];
-        if (!config) { setGameStatus("GAME_OVER_WIN"); return; }
+        if (!config) { setGameStatus("PUZZLE_COMPLETE"); return; }
         
-        setFeedback("");
-        setGameStatus("PLAYING");
+        setPhase("MEMORY");
         setMode(config.mode);
-        setMemoryTime(config.memoryTime);
         const items = getRandomItems(config.items);
         setShelfItems(items);
         
-        setTimeout(() => {
-          if (isPaused) return;
+        const timer = setTimeout(() => {
+          setPhase('QUESTION');
           playSfx('vhs');
           const qData = getModePrompt(config.mode, items);
           setPrompt(qData.prompt);
@@ -124,92 +115,105 @@
           setQuestionData(qData);
           if (config.mode === "FIND_DIFF") setHiddenShelfItems(qData.changedItems);
         }, config.memoryTime);
-      }
+        return () => clearTimeout(timer);
+      };
       
-      function handleAnswer(isCorrect) {
+      const handleAnswer = (isCorrect) => {
+        if (phase !== 'QUESTION') return;
+
+        setPhase('IDLE');
         if (isCorrect) {
           playSfx('coin');
-          setFeedback(`關卡 ${currentLevel} 完成！`);
-          setGameStatus('LEVEL_CLEAR');
+          setFeedback(`拼圖碎片 ${currentLevel} 解鎖！`);
+          const newUnlocked = [...unlockedPieces];
+          newUnlocked[currentLevel - 1] = true;
+          setUnlockedPieces(newUnlocked);
+          
           setTimeout(() => {
+            setFeedback("");
             setCurrentLevel(prev => prev + 1);
-          }, 1500);
+          }, 800); // 縮短延遲
         } else {
           playSfx('wrong');
-          const newLives = lives - 1;
-          setLives(newLives);
-          if (newLives > 0) {
-            setFeedback("答錯了！再試一次！");
-            setTimeout(() => startLevel(currentLevel), 1500);
-          } else {
-            setFeedback("生命值耗盡！");
-            setGameStatus("GAME_OVER_LOSE");
-          }
+          setFeedback("答錯了！再專心一點！");
+          setTimeout(() => {
+            setFeedback("");
+            startLevel(currentLevel); // 重玩本關
+          }, 800);
         }
-      }
+      };
 
       React.useEffect(() => {
-        if(gameStatus === 'LEVEL_CLEAR' && currentLevel > levelConfig.length) {
-          setGameStatus('GAME_OVER_WIN');
-        } else if (gameStatus === 'LEVEL_CLEAR') {
-          startLevel(currentLevel);
+        if (currentLevel > levelConfig.length) {
+            setGameStatus("PUZZLE_COMPLETE");
+        } else if (gameStatus === 'PLAYING') {
+            startLevel(currentLevel);
         }
       }, [currentLevel, gameStatus]);
-      
-      function renderShelf(items, clickable) { return e("div", { className: "shelf" }, items.map((item, i) => e("div", { key: i, className: "shelf-slot", style: { cursor: clickable ? "pointer" : "default" }, onClick: () => clickable && handleAnswer(i === answer) }, item && e("img", { src: item.img, alt: item.name, className: "item-realistic" })))); }
-      
-      const renderGameContent = () => {
-        if(feedback) return e("div", { className: "feedback pixel-font" }, feedback);
 
-        const config = levelConfig[currentLevel - 1] || {};
-        const isMemoryPhase = !prompt;
-
-        return e(React.Fragment, null,
-          e("div", { className: "game-hud" }, 
-            e("span", null, `關卡: ${currentLevel}/${levelConfig.length}`),
-            e("span", null, `生命值: ${'♥'.repeat(lives)}`),
-            e("button", { className: 'pause-btn', onClick: () => setPaused(true) }, '|| 暫停')
-          ),
-          e("div", { className: "pixel-font", style: { color: isMemoryPhase ? "#E383B9" : "#6EDCFF" } }, isMemoryPhase ? "記住貨架上的寶物吧！" : prompt),
-          isMemoryPhase ? renderShelf(shelfItems, false) : (mode === "FIND_DIFF" ? renderShelf(hiddenShelfItems, true) : renderShelf(shelfItems.map((item, i) => (i === questionData.itemIndex) ? item : null), false)),
-          isMemoryPhase && e("div", { className: "timer-bar-container" }, e("div", { className: "timer-bar", style: { animationDuration: `${memoryTime}ms` } })),
-          !isMemoryPhase && mode === "ESTIMATE_PRICE" && e("div", { style: { textAlign: 'center' } }, questionData.choices.map((c, i) => e("button", { key: i, className: "pixel-font price-btn", onClick: () => handleAnswer(i === answer) }, c)))
+      const resetGame = () => {
+        setCurrentLevel(1);
+        setUnlockedPieces(Array(9).fill(false));
+        setFeedback('');
+        setGameStatus('PLAYING');
+      };
+      
+      const renderPuzzle = () => {
+        const pieces = [];
+        for (let i = 0; i < 9; i++) {
+            const piece = e('div', {
+                key: i,
+                className: `puzzle-piece ${unlockedPieces[i] ? 'unlocked' : ''}`,
+                style: {
+                    backgroundImage: `url(${puzzleData.image})`,
+                    backgroundPosition: `${(i % 3) * 50}% ${(Math.floor(i / 3)) * 50}%`
+                }
+            });
+            pieces.push(piece);
+        }
+        return e('div', {className: 'puzzle-container'}, 
+            e('p', {style: {color: '#fff', fontSize: '1.1em'}}, puzzleData.name),
+            e('div', {className: 'puzzle-grid'}, pieces)
         );
       };
       
-      const resetGame = () => {
-        setCurrentLevel(1);
-        setLives(3);
-        setFeedback('');
-        setPaused(false);
-        setGameStatus('PLAYING');
-        startLevel(1);
+      const renderGameScreen = () => {
+        if (phase === 'IDLE') return e('div', {className: 'feedback pixel-font'}, feedback);
+
+        const isMemoryPhase = phase === 'MEMORY';
+        return e(React.Fragment, null,
+          e("div", { className: "pixel-font", style: { color: isMemoryPhase ? "#E383B9" : "#6EDCFF", minHeight: '40px' } }, isMemoryPhase ? "記住貨架上的寶物吧！" : prompt),
+          isMemoryPhase ? e("div", { className: "shelf" }, shelfItems.map((item, i) => e("div", { key: i, className: "shelf-slot" }, item && e("img", { src: item.img, alt: item.name, className: "item-realistic" })))) : 
+                          (mode === "FIND_DIFF" ? e("div", { className: "shelf" }, hiddenShelfItems.map((item, i) => e("div", { key: i, className: "shelf-slot", style:{cursor:'pointer'}, onClick: () => handleAnswer(i === answer) }, item && e("img", { src: item.img, alt: item.name, className: "item-realistic" })))) : 
+                          e("div", {style: {textAlign: 'center'}}, questionData.choices.map((c, i) => e("button", { key: i, className: "pixel-font price-btn", onClick: () => handleAnswer(i === answer) }, c))))
+        );
       };
 
-      const renderScreen = () => {
+      const renderContent = () => {
         switch (gameStatus) {
           case 'TITLE':
             return e("div", { className: "title-screen" }, 
               e("h1", { className: "pixel-font", style: { color: "#F9DF5B" } }, "我的時光寶物架"), 
-              e("p", { style: { color: "#E383B9" } }, "80/90s 懷舊記憶訓練"), 
+              e("p", { style: { color: "#E383B9" } }, "九宮格拼圖挑戰"), 
               e("button", { className: "pixel-font", onClick: resetGame }, "開始遊戲")
             );
           case 'PLAYING':
-          case 'LEVEL_CLEAR':
-            return renderGameContent();
-          case 'GAME_OVER_WIN':
-            return e("div", { className: 'game-over-screen' }, e("h2", {style:{color:"#F9DF5B"}}, "恭喜！"), e("p", {style:{color:"#fff"}}, "您已完成所有挑戰！"), e("button", { className: "pixel-font", onClick: resetGame }, "再玩一次"));
-          case 'GAME_OVER_LOSE':
-            return e("div", { className: 'game-over-screen' }, e("h2", {style:{color:"#ff6b6b"}}, "遊戲結束"), e("p", {style:{color:"#fff"}}, "別氣餒，再試一次吧！"), e("button", { className: "pixel-font", onClick: resetGame }, "重新開始"));
+            return e('div', null, renderPuzzle(), renderGameScreen());
+          case 'PUZZLE_COMPLETE':
+            return e("div", { className: 'game-over-screen' }, 
+              e("h2", {style:{color:"#F9DF5B"}}, "恭喜通關！"),
+              renderPuzzle(),
+              e("p", {style:{color:"#fff"}}, `您成功拼湊了「${puzzleData.name}」的完整記憶！`), 
+              e("button", { className: "pixel-font", onClick: ()=>alert('海報已生成並儲存！') }, "生成分享海報"),
+              e("button", { className: "pixel-font", onClick: () => setGameStatus('TITLE') }, "返回主選單")
+            );
           default:
-            return e("div", { className: "feedback" }, "載入中...");
+            return e("div", null, "載入中...");
         }
       }
 
-      return e("div", { className: "crt-bg", onClick: unlockAudio },
-        isTutorialVisible && e(TutorialModal, { onClose: handleCloseTutorial }),
-        isPaused && e("div", { className: "pause-overlay" }, e("div", { className: "pause-menu" }, e("h2", null, "遊戲已暫停"), e("button", { className: "price-btn", onClick: () => setPaused(false) }, "繼續遊戲"), e("button", { className: "price-btn", onClick: () => {setPaused(false); setGameStatus('TITLE');} }, "返回主選單"))),
-        !isTutorialVisible && e("div", { className: "main-frame" }, renderScreen())
+      return e("div", { className: "crt-bg" },
+        e("div", { className: "main-frame" }, renderContent())
       );
     }
     ReactDOM.createRoot(document.getElementById("root")).render(e(App));
