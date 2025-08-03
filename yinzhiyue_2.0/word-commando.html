@@ -7,168 +7,176 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
     body {
-      background: #222 url('assets/win95-bg.png'); margin: 0; min-height: 100vh;
+      background: #222 url('https://i.imgur.com/nV7sAzL.png'); margin: 0; min-height: 100vh;
       font-family: 'VT323', 'monospace', 'DFKai-SB', 'MingLiU', sans-serif; letter-spacing: 0.03em;
     }
-    .pixel-bg { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; padding: 10px 0; }
-    .win95-window { border: 3px solid #000; background: #c3c7cb; box-shadow: 4px 4px 0 #888; width: 480px; max-width: 95vw; position: relative; z-index: 1; }
+    .pixel-bg { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .win95-window { border: 3px solid #000; background: #c3c7cb; box-shadow: 4px 4px 0 #888; width: 480px; max-width: 95vw; position: relative; margin: 20px auto; z-index: 1; }
     .win95-titlebar { background: #215dc6; color: #fff; display: flex; align-items: center; padding: 2px 8px; font-family: 'VT323', monospace; font-size: 1.2rem; user-select: none; }
     .win95-title { flex: 1; letter-spacing: 0.05em; display: flex; align-items: center; gap: 4px; }
     .win95-content { padding: 20px; font-family: 'VT323', monospace; background: #f7f7f7; min-height: 300px; position: relative; z-index: 1; }
     .win95-btn { border: 2px outset #fff; background: #ededed; padding: 2px 14px; font-family: 'VT323', monospace; font-size: 1.1rem; margin: 2px; box-shadow: 2px 2px #aaa; cursor: pointer; }
-    .start-btn { font-size: 1.4rem; margin-top: 32px; background: #215dc6; color: #fff; }
+    .win95-btn:active { border-style: inset; }
+    .start-btn { font-size: 1.4rem; margin-top: 32px; background: #215dc6; color: #fff; border: 2px outset #fff; }
     .dialup-screen, .level-select-screen, .level-result-screen { display: flex; flex-direction: column; align-items: center; text-align: center; }
-    .dialup-animation { width: 72px; height: 72px; background: url('assets/dialup.gif') center/contain no-repeat; margin: 20px 0; }
-    .dialup-text { margin-bottom: 12px; font-size: 1.2rem; color: #215dc6; text-shadow: 0 1px #fff, 1px 0 #000, 2px 2px #7c7d7e; }
+    .dialup-animation { width: 72px; height: 72px; background: url('https://i.imgur.com/4uYlQst.gif') center/contain no-repeat; margin: 20px 0; }
+    .dialup-text { margin-bottom: 12px; font-family: 'VT323', monospace; font-size: 1.2rem; color: #215dc6; text-shadow: 0 1px #fff, 1px 0 #000, 2px 2px #7c7d7e; }
     .folders-row { display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; }
-    .folder-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; margin: 16px 0; width: 84px; }
+    .folder-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; margin: 16px 0; width: 84px; transition: filter 0.2s; }
     .folder-icon img { width: 60px; filter: drop-shadow(2px 2px #888); }
     .folder-icon.locked { filter: grayscale(1) brightness(0.7); cursor: not-allowed; }
-    .folder-label { margin-top: 2px; font-size: 1.08rem; color: #333; }
+    .folder-label { font-family: 'VT323', monospace; margin-top: 2px; font-size: 1.08rem; color: #333; }
     .game-play { display: flex; flex-direction: column; align-items: center; }
-    .game-hud { display: flex; width: 100%; justify-content: space-between; font-size: 1.1rem; margin-bottom: 8px; align-items: center; }
+    .game-hud { display: flex; width: 100%; justify-content: space-between; font-family: 'VT323', monospace; font-size: 1.1rem; margin-bottom: 8px; align-items: center; }
     .timer { color: #215dc6; font-weight: bold; font-size: 1.18rem; }
-    .word-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 18px 0; width: 100%; }
-    .word-btn { font-family: 'DFKai-SB', 'MingLiU', 'VT323', monospace; font-size: 1.12rem; padding: 7px 5px; border: 2px solid #7c7d7e; border-radius: 4px; background: #fafafa; box-shadow: 2px 2px #bbb; cursor: pointer; transition: background 0.1s, color 0.1s; }
-    .word-btn.selected { background: #215dc6; color: #fff; }
-    .game-actions { margin-top: 10px; display: flex; gap: 14px; justify-content: center;}
+    .word-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; justify-content: center; margin: 18px 0; width: 100%; }
+    .word-btn { font-family: 'DFKai-SB', 'MingLiU', 'VT323', monospace; font-size: 1.12rem; padding: 7px 5px; border: 2px solid #7c7d7e; border-radius: 4px; background: #fafafa; box-shadow: 2px 2px #bbb; cursor: pointer; transition: background 0.16s, color 0.16s; outline: none; }
+    .word-btn.selected { background: #215dc6; color: #fff; border: 2px solid #444; }
+    .game-actions { margin-top: 10px; display: flex; gap: 14px; }
     .pause-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; }
     .level-result-title { font-size: 2rem; color: #215dc6; text-shadow: 0 1px #fff, 1px 0 #000, 2px 2px #7c7d7e; margin: 20px 0; }
-    
-    /* ★★★ 已新增的響應式樣式 ★★★ */
     @media (max-width: 600px) {
-        .win95-content { padding: 15px; min-height: auto; }
-        .word-board { gap: 5px; margin: 10px 0; }
-        .word-btn { font-size: clamp(1em, 3.8vw, 1.2em); padding: 5px 3px; }
-        .win95-btn { font-size: 1em; padding: 4px 10px; }
-        .game-hud { font-size: 1em; flex-wrap: wrap; }
-        h1, h2, .level-result-title { font-size: 1.5em; }
+        .win95-window { width: 95vw; }
+        .win95-content { padding: 15px; }
+        .word-board { gap: 5px; }
+        .word-btn { font-size: clamp(0.9em, 3.5vw, 1.1em); padding: 5px 3px; }
+        h1, .level-result-title { font-size: 1.5em; }
     }
-    
     .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: none; align-items: center; justify-content: center; z-index: 10000; }
     .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 20px 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; }
-    .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; }
+    .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; font-family: inherit; }
     .tutorial-content h4 { font-family: 'VT323', monospace; color: #1A202C; font-size: 2em; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+    .tutorial-image-placeholder { width: 100%; min-height: 150px; background: rgba(26, 32, 44, 0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #5DADE2; padding: 15px; box-sizing: border-box; }
+    .tutorial-content ul { list-style: none; padding: 0; margin-top: 15px; }
+    .tutorial-content li { font-size: 1.1em; margin-bottom: 10px; line-height: 1.5; }
   </style>
 </head>
 <body>
 <div id="tutorial-overlay" class="tutorial-overlay">
+    <div class="tutorial-modal">
+        <button id="tutorial-close-btn" class="tutorial-close-btn">我知道了 (略過)</button>
+        <div class="tutorial-content">
+            </div>
     </div>
-<div class="pixel-bg" id="app">
-    <div id="game-content"></div>
 </div>
-<audio id="bgm" loop preload="auto"></audio>
+<div class="pixel-bg" id="app">
+    <div id="game-content"></div> </div>
+<audio id="bgm" loop preload="auto" src="audio/bgm-main.mp3"></audio>
 <audio id="sfx" preload="auto"></audio>
 <script>
-    // JavaScript 程式碼與上次修正版相同，此處為節省篇幅省略
-    const THEMES = [ { level: 1, key: "star-movies", name: "周星馳電影", icon: "assets/folder-icon-movie.png", bgm: "audio/bgm-chiptune1.mp3", words: ["賭聖", "9527", "無厘頭", "重播"], noise: ["林正英", "珍珠奶茶", "A面B面", "麥當勞", "大豬公", "ICQ", "超級賽亞人"], }, { level: 2, key: "zombie", name: "香港殭屍片", icon: "assets/folder-icon-zombie.png", bgm: "audio/bgm-chiptune2.mp3", words: ["林正英", "暫時停止呼吸", "糯米", "桃木劍"], noise: ["賭聖", "珍珠奶茶", "彈珠汽水", "龜派氣功", "大豬公", "ICQ", "Walkman"], }, { level: 3, key: "dragonball", name: "七龍珠", icon: "assets/folder-icon-dbz.png", bgm: "audio/bgm-chiptune3.mp3", words: ["超級賽亞人", "龜派氣功", "天下第一武道會", "那美克星"], noise: ["林正英", "珍珠奶茶", "A面B面", "賭聖", "大豬公", "ICQ"], }, ];
-    const SFX = { dialup: "audio/sfx-dialup.mp3", select: "audio/sfx-select.mp3", success: "audio/sfx-success.mp3", error: "audio/sfx-error.mp3" };
-    let GAME = { screen: "dialup", maxUnlockedLevel: 1, currentLevel: 1, lives: 3, isPaused: false, timeLeft: 60, words: [], selectedIdx: [], foundWords: [] };
-    let timerId = null;
+const THEMES = [ { level: 1, key: "star-movies", name: "周星馳電影", icon: "assets/folder-icon-movie.png", bgm: "audio/bgm-chiptune1.mp3", words: ["賭聖", "9527", "無厘頭", "重播"], noise: ["林正英", "珍珠奶茶", "A面B面", "麥當勞", "大豬公", "ICQ", "超級賽亞人"], }, { level: 2, key: "zombie", name: "香港殭屍片", icon: "assets/folder-icon-zombie.png", bgm: "audio/bgm-chiptune2.mp3", words: ["林正英", "暫時停止呼吸", "糯米", "桃木劍"], noise: ["賭聖", "珍珠奶茶", "彈珠汽水", "龜派氣功", "大豬公", "ICQ", "Walkman"], }, { level: 3, key: "dragonball", name: "七龍珠", icon: "assets/folder-icon-dbz.png", bgm: "audio/bgm-chiptune3.mp3", words: ["超級賽亞人", "龜派氣功", "天下第一武道會", "那美克星"], noise: ["林正英", "珍珠奶茶", "A面B面", "賭聖", "大豬公", "ICQ"], }, ];
+const SFX = { dialup: "audio/sfx-dialup.mp3", select: "audio/sfx-select.mp3", success: "audio/sfx-success.mp3", error: "audio/sfx-error.mp3", combo: "audio/sfx-combo.mp3", };
+let GAME = { screen: "dialup", maxUnlockedLevel: 1, currentLevel: 1, lives: 3, isPaused: false, timeLeft: 60, words: [], selectedIdx: [], foundWords: [], };
+let timerId = null;
 
-    function shuffle(arr) { let a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a }
-    function sample(arr,n=1){const s=shuffle(arr);return n===1?s[0]:s.slice(0,n)}
-    function playSFX(src){try{const sfx=document.getElementById("sfx");sfx.src=src;sfx.play()}catch(e){}}
-    function setBGM(src){try{const bgm=document.getElementById("bgm");if(!src){bgm.pause();return}bgm.src=src;bgm.play()}catch(e){}}
-    function resetGameState(){GAME.timeLeft=60;GAME.words=[];GAME.selectedIdx=[];GAME.foundWords=[];GAME.lives=3;GAME.isPaused=false}
+function shuffle(arr) { let a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a }
+function sample(arr,n=1){const s=shuffle(arr);return n===1?s[0]:s.slice(0,n)}
+function playSFX(src){try{const sfx=document.getElementById("sfx");sfx.src=src;sfx.play()}catch(e){}}
+function setBGM(src){try{const bgm=document.getElementById("bgm");if(!src){bgm.pause();return}bgm.src=src;bgm.play()}catch(e){}}
+function resetGameState(){GAME.timeLeft=60;GAME.words=[];GAME.selectedIdx=[];GAME.foundWords=[];GAME.lives=3;GAME.isPaused=false}
 
-    function createElement(tag,o={},c=[]){const el=document.createElement(tag);Object.keys(o).forEach(k=>{if(k==='className')el.className=o[k];else if(k==='textContent')el.textContent=o[k];else if(k==='onclick')el.onclick=o[k];else if(k==='style')Object.assign(el.style,o[k]);else el.setAttribute(k,o[k])});c.forEach(ch=>{if(ch)el.appendChild(typeof ch==='string'?document.createTextNode(ch):ch)});return el}
-    function buildWindow(t,c,i=null){const T=[];if(i){T.push(createElement('img',{src:i,style:{width:'22px',marginRight:'4px'}}))}T.push(createElement('span',{textContent:t}));return createElement('div',{className:'win95-window'},[createElement('div',{className:'win95-titlebar'},[createElement('div',{className:'win95-title'},T)]),createElement('div',{className:'win95-content'},[c])])}
+function createElement(tag,o={},c=[]){const el=document.createElement(tag);Object.keys(o).forEach(k=>{if(k==='className')el.className=o[k];else if(k==='textContent')el.textContent=o[k];else if(k==='onclick')el.onclick=o[k];else if(k==='style')Object.assign(el.style,o[k]);else el.setAttribute(k,o[k])});c.forEach(ch=>{if(ch)el.appendChild(typeof ch==='string'?document.createTextNode(ch):ch)});return el}
+function buildWindow(t,c,i=null){const T=[];if(i){T.push(createElement('img',{src:i,style:{width:'22px',marginRight:'4px'}}))}T.push(createElement('span',{textContent:t}));return createElement('div',{className:'win95-window'},[createElement('div',{className:'win95-titlebar'},[createElement('div',{className:'win95-title'},T)]),createElement('div',{className:'win95-content'},[c])])}
 
-    function render() {
-        const contentContainer = document.getElementById("game-content");
-        contentContainer.innerHTML = "";
-        let screenElement;
-        switch(GAME.screen) {
-            case "dialup": screenElement = dialupScreen(); break;
-            case "levelSelect": screenElement = levelSelectScreen(); break;
-            case "playing": screenElement = gameScreen(); break;
-            case "levelClear": screenElement = levelResultScreen(true); break;
-            case "gameOver": screenElement = levelResultScreen(false); break;
-            default: screenElement = createElement('div', {textContent: 'Error'});
-        }
-        contentContainer.appendChild(screenElement);
-    }
-
-    function dialupScreen(){const s=createElement('div',{id:'dialup-status',className:'dialup-status',textContent:'撥接音效中...'});const b=createElement('button',{className:'win95-btn start-btn',textContent:'START',style:{display:'none'}});b.onclick=()=>render("levelSelect");const c=createElement('div',{className:'dialup-screen'},[createElement('div',{className:'dialup-animation'}),createElement('div',{className:'dialup-text',textContent:'正在連線到 90 年代...'}),s,b]);setTimeout(()=>playSFX(SFX.dialup),150);setTimeout(()=>{s.textContent="連線成功！";b.style.display=""},3800);return buildWindow('載入中...',c)}
-    function levelSelectScreen(){const r=createElement('div',{className:'folders-row'});THEMES.forEach(t=>{const l=t.level>GAME.maxUnlockedLevel;const f=createElement('div',{className:`folder-icon ${l?'locked':''}`,title:l?'鎖定中':t.name},[createElement('img',{src:t.icon,alt:t.name}),createElement('div',{className:'folder-label',textContent:`關卡 ${t.level}`})]);if(!l){f.onclick=()=>{GAME.currentLevel=t.level;resetGameState();setBGM(t.bgm);GAME.words=shuffle([...t.words,...sample(t.noise,16-t.words.length)]);render("playing");startTimer()}}r.appendChild(f)});return buildWindow('關卡選擇',createElement('div',{className:'level-select-screen'},[createElement('h1',{textContent:'選擇挑戰關卡'}),r]))}
-
-    function handleBoardClick(event) {
-        if (GAME.isPaused) return;
-        const target = event.target.closest('.word-btn');
-        if (!target || target.disabled) return;
-        const index = parseInt(target.dataset.index, 10);
-        const indexInSelection = GAME.selectedIdx.indexOf(index);
-        if (indexInSelection > -1) {
-            GAME.selectedIdx.splice(indexInSelection, 1);
-            target.classList.remove('selected');
-        } else {
-            GAME.selectedIdx.push(index);
-            target.classList.add('selected');
-            playSFX(SFX.select);
-        }
-    }
-
-    function gameScreen() {
-        const theme = THEMES.find(t => t.level === GAME.currentLevel);
-        const board = createElement('div', { className: 'word-board' });
-        board.addEventListener('click', handleBoardClick);
-
-        GAME.words.forEach((word, i) => {
-            const isFound = GAME.foundWords.includes(word);
-            const btnOptions = { className: 'word-btn', textContent: word, disabled: isFound, 'data-index': i };
-            const btn = createElement('button', btnOptions);
-            if (GAME.selectedIdx.includes(i)) btn.classList.add("selected");
-            if (isFound) btn.style.opacity = 0.5;
-            board.appendChild(btn);
-        });
-
-        const hud = createElement('div', { className: 'game-hud' }, [ createElement('span', { className: 'timer' }, [ `🕒 `, createElement('span', { id: 'timer', textContent: GAME.timeLeft }), 's' ]), createElement('span', { textContent: `生命值: ${'♥'.repeat(GAME.lives)}` }), createElement('button', { className: 'win95-btn', textContent: '|| 暫停', onclick: togglePause }) ]);
-        const submitBtn = createElement('button', { className: 'win95-btn', textContent: '送出連線' });
-        submitBtn.onclick = () => {
-            if (GAME.selectedIdx.length === 0) return;
-            let line = GAME.selectedIdx.map(i => GAME.words[i]);
-            let allCorrect = line.every(w => theme.words.includes(w));
-            if (allCorrect) {
-                playSFX(SFX.success);
-                GAME.foundWords.push(...line);
-                if (GAME.foundWords.length >= theme.words.length) {
-                    GAME.screen = "levelClear";
-                    GAME.maxUnlockedLevel = Math.max(GAME.maxUnlockedLevel, GAME.currentLevel + 1);
-                    clearInterval(timerId);
-                }
-            } else {
-                playSFX(SFX.error);
-                GAME.lives--;
-                if (GAME.lives <= 0) {
-                    GAME.screen = "gameOver";
-                    clearInterval(timerId);
-                }
-            }
-            GAME.selectedIdx = [];
-            render(GAME.screen);
-        };
-        const cancelBtn = createElement('button', { className: 'win95-btn', textContent: '取消', onclick: () => { GAME.selectedIdx = []; render("playing"); } });
-        const content = createElement('div', { className: 'game-play' }, [ hud, createElement('h2', {textContent: theme.name, style:{margin:'10px 0'}}), board, createElement('div', { className: 'game-actions' }, [submitBtn, cancelBtn]) ]);
-        if (GAME.isPaused) {
-            const pauseMenu = createElement('div', {className: 'win95-window', style: {position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 10}}, [
-                createElement('div', {className: 'win95-content', style: {textAlign: 'center'}}, [
-                    createElement('h2', {textContent: '遊戲已暫停'}),
-                    createElement('button', {className: 'win95-btn', textContent: '繼續遊戲', onclick: togglePause})
-                ])
-            ]);
-            const pauseOverlay = createElement('div', {className: 'pause-overlay', style:{display:'flex'}}, [pauseMenu]);
-            content.appendChild(pauseOverlay);
-        }
-        return buildWindow(`關卡 ${theme.level}`, content, theme.icon);
-    }
+function render() {
+    // ★★★ Bug修正：只清除專用容器，而不是清除自己 ★★★
+    const contentContainer = document.getElementById("game-content");
+    contentContainer.innerHTML = "";
     
-    function levelResultScreen(isWin){const t=isWin?'關卡完成！':'挑戰失敗！';const m=isWin?'太棒了！你解鎖了下一關！':'別氣餒，再試一次吧！';const b=createElement('button',{className:'win95-btn start-btn'});if(isWin){if(GAME.currentLevel<THEMES.length){b.textContent='前往下一關';b.onclick=()=>{GAME.currentLevel++;GAME.screen='levelSelect';render(GAME.screen)}}else{b.textContent='恭喜全部通關！';b.onclick=()=>{GAME.screen='levelSelect';render(GAME.screen)}}}else{b.textContent='重新挑戰本關';b.onclick=()=>{GAME.screen='levelSelect';render(GAME.screen)}}const c=createElement('div',{className:'level-result-screen'},[createElement('div',{className:'level-result-title',textContent:t}),createElement('p',{textContent:m}),b]);return buildWindow('結算',c)}
-    function startTimer(){if(timerId)clearInterval(timerId);timerId=setInterval(()=>{if(GAME.isPaused||GAME.screen!=="playing")return;GAME.timeLeft--;const t=document.getElementById('timer');if(t)t.textContent=GAME.timeLeft;if(GAME.timeLeft<=0){clearInterval(timerId);GAME.screen="gameOver";render(GAME.screen)}},1000)}
-    function togglePause(){GAME.isPaused=!GAME.isPaused;render(GAME.screen)}
+    let screenElement;
+    switch(GAME.screen) {
+        case "dialup": screenElement = dialupScreen(); break;
+        case "levelSelect": screenElement = levelSelectScreen(); break;
+        case "playing": screenElement = gameScreen(); break;
+        case "levelClear": screenElement = levelResultScreen(true); break;
+        case "gameOver": screenElement = levelResultScreen(false); break;
+        default: screenElement = createElement('div', {textContent: 'Error'});
+    }
+    contentContainer.appendChild(screenElement);
+}
 
-    function initTutorial(){const o=document.getElementById('tutorial-overlay');const c=document.getElementById('tutorial-close-btn');const k='tutorialShown_word_commando';const s=()=>{window.onload=null;render(GAME.screen)};if(!sessionStorage.getItem(k)){if(o)o.style.display='flex';if(c){c.onclick=function(){if(o)o.style.display='none';sessionStorage.setItem(k,'true');s()}}}else{s()}}
-    window.onload=initTutorial;
+function dialupScreen(){const s=createElement('div',{id:'dialup-status',className:'dialup-status',textContent:'撥接音效中...'});const b=createElement('button',{className:'win95-btn start-btn',textContent:'START',style:{display:'none'}});b.onclick=()=>render("levelSelect");const c=createElement('div',{className:'dialup-screen'},[createElement('div',{className:'dialup-animation'}),createElement('div',{className:'dialup-text',textContent:'正在連線到 90 年代...'}),s,b]);setTimeout(()=>playSFX(SFX.dialup),150);setTimeout(()=>{s.textContent="連線成功！";b.style.display=""},3800);return buildWindow('載入中...',c)}
+function levelSelectScreen(){const r=createElement('div',{className:'folders-row'});THEMES.forEach(t=>{const l=t.level>GAME.maxUnlockedLevel;const f=createElement('div',{className:`folder-icon ${l?'locked':''}`,title:l?'鎖定中':t.name},[createElement('img',{src:t.icon,alt:t.name}),createElement('div',{className:'folder-label',textContent:`關卡 ${t.level}`})]);if(!l){f.onclick=()=>{GAME.currentLevel=t.level;resetGameState();setBGM(t.bgm);GAME.words=shuffle([...t.words,...sample(t.noise,16-t.words.length)]);render("playing");startTimer()}}r.appendChild(f)});return buildWindow('關卡選擇',createElement('div',{className:'level-select-screen'},[createElement('h1',{textContent:'選擇挑戰關卡'}),r]))}
+
+// --- ★★★ 徹底重構的遊戲畫面與事件處理 ★★★ ---
+function handleBoardClick(event) {
+    if (GAME.isPaused) return;
+    const target = event.target.closest('.word-btn');
+    if (!target || target.disabled) return;
+    
+    const index = parseInt(target.dataset.index, 10);
+    const indexInSelection = GAME.selectedIdx.indexOf(index);
+
+    if (indexInSelection > -1) {
+        GAME.selectedIdx.splice(indexInSelection, 1);
+        target.classList.remove('selected');
+    } else {
+        GAME.selectedIdx.push(index);
+        target.classList.add('selected');
+        playSFX(SFX.select);
+    }
+}
+
+function gameScreen() {
+    const theme = THEMES.find(t => t.level === GAME.currentLevel);
+    const board = createElement('div', { className: 'word-board' });
+    board.addEventListener('click', handleBoardClick); // Use addEventListener for robustness
+
+    GAME.words.forEach((word, i) => {
+        const isFound = GAME.foundWords.includes(word);
+        const btnOptions = { className: 'word-btn', textContent: word, disabled: isFound, 'data-index': i };
+        const btn = createElement('button', btnOptions);
+        if (GAME.selectedIdx.includes(i)) btn.classList.add("selected");
+        if (isFound) btn.style.opacity = 0.5;
+        board.appendChild(btn);
+    });
+
+    const hud = createElement('div', { className: 'game-hud' }, [ createElement('span', { className: 'timer' }, [ `🕒 `, createElement('span', { id: 'timer', textContent: GAME.timeLeft }), 's' ]), createElement('span', { textContent: `生命值: ${'♥'.repeat(GAME.lives)}` }), createElement('button', { className: 'win95-btn', textContent: '|| 暫停', onclick: togglePause }) ]);
+    const submitBtn = createElement('button', { className: 'win95-btn', textContent: '送出連線' });
+    submitBtn.onclick = () => {
+        if (GAME.selectedIdx.length === 0) return;
+        let line = GAME.selectedIdx.map(i => GAME.words[i]);
+        let allCorrect = line.every(w => theme.words.includes(w));
+        if (allCorrect) {
+            playSFX(SFX.success);
+            GAME.foundWords.push(...line);
+            if (GAME.foundWords.length >= theme.words.length) {
+                GAME.screen = "levelClear";
+                GAME.maxUnlockedLevel = Math.max(GAME.maxUnlockedLevel, GAME.currentLevel + 1);
+                clearInterval(timerId);
+            }
+        } else {
+            playSFX(SFX.error);
+            GAME.lives--;
+            if (GAME.lives <= 0) {
+                GAME.screen = "gameOver";
+                clearInterval(timerId);
+            }
+        }
+        GAME.selectedIdx = [];
+        render(GAME.screen);
+    };
+    const cancelBtn = createElement('button', { className: 'win95-btn', textContent: '取消', onclick: () => { GAME.selectedIdx = []; render("playing"); } });
+    const content = createElement('div', { className: 'game-play' }, [ hud, createElement('h2', {textContent: theme.name, style:{margin:'10px 0'}}), board, createElement('div', { className: 'game-actions' }, [submitBtn, cancelBtn]) ]);
+    if (GAME.isPaused) {
+        const pauseMenu = createElement('div', {className: 'win95-window', style: {position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 10}}, [
+            createElement('div', {className: 'win95-content', style: {textAlign: 'center'}}, [
+                createElement('h2', {textContent: '遊戲已暫停'}),
+                createElement('button', {className: 'win95-btn', textContent: '繼續遊戲', onclick: togglePause})
+            ])
+        ]);
+        const pauseOverlay = createElement('div', {className: 'pause-overlay', style:{display:'flex'}}, [pauseMenu]);
+        content.appendChild(pauseOverlay);
+    }
+    return buildWindow(`關卡 ${theme.level}`, content, theme.icon);
+}
+
+function levelResultScreen(isWin){const t=isWin?'關卡完成！':'挑戰失敗！';const m=isWin?'太棒了！你解鎖了下一關！':'別氣餒，再試一次吧！';const b=createElement('button',{className:'win95-btn start-btn'});if(isWin){if(GAME.currentLevel<THEMES.length){b.textContent='前往下一關';b.onclick=()=>{GAME.currentLevel++;GAME.screen='levelSelect';render(GAME.screen)}}else{b.textContent='恭喜全部通關！';b.onclick=()=>{GAME.screen='levelSelect';render(GAME.screen)}}}else{b.textContent='重新挑戰本關';b.onclick=()=>{GAME.screen='levelSelect';render(GAME.screen)}}const c=createElement('div',{className:'level-result-screen'},[createElement('div',{className:'level-result-title',textContent:t}),createElement('p',{textContent:m}),b]);return buildWindow('結算',c)}
+function startTimer(){if(timerId)clearInterval(timerId);timerId=setInterval(()=>{if(GAME.isPaused||GAME.screen!=="playing")return;GAME.timeLeft--;const t=document.getElementById('timer');if(t)t.textContent=GAME.timeLeft;if(GAME.timeLeft<=0){clearInterval(timerId);GAME.screen="gameOver";render(GAME.screen)}},1000)}
+function togglePause(){GAME.isPaused=!GAME.isPaused;render(GAME.screen)}
+
+function initTutorial(){const o=document.getElementById('tutorial-overlay');const c=document.getElementById('tutorial-close-btn');const k='tutorialShown_word_commando';const s=()=>{window.onload=null;render(GAME.screen)};if(!sessionStorage.getItem(k)){if(o)o.style.display='flex';if(c){c.onclick=function(){if(o)o.style.display='none';sessionStorage.setItem(k,'true');s()}}}else{s()}}
+window.onload=initTutorial;
 </script>
 </body>
 </html>
