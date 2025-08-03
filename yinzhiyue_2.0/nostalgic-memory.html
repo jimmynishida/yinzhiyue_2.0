@@ -42,8 +42,27 @@
   
   <script>
     const e = React.createElement;
-    const nostalgicItems = [ { name: "Game Boy", img: "assets/gameboy.jpeg", value: 2800 }, { name: "B.B. Call 傳呼機", img: "assets/bb-call.webp", value: 1800 }, { name: "3.5吋磁碟片", img: "assets/floppydisk.jpeg", value: 15 }, { name: "Tamagotchi 電子雞", img: "assets/tamagotchi.jpeg", value: 700 }, { name: "王子麵", img: "assets/prince-noodles.png", value: 3 }, { name: "養樂多", img: "assets/yakult.jpg", value: 2 }, ];
-    const puzzleData = { id: 'puz01', name: '泡沫紅茶店的午後', image: 'https://i.imgur.com/gK2Y2eR.png' };
+    const nostalgicItems = [   { name: "CD隨身聽", img: "assets/cdplayer. png ", value: 3500 },
+  { name: "Walkman隨身聽", img: "assets/sony-walkman.png", value: 3200 },
+      { name: "CPU", img: "assets/cpu.jpeg", value: 3000 },
+      { name: "箭牌口香糖", img: "assets/Doublemint.jpeg", value: 7 },
+      { name: "乖乖", img: "assets/guaiguåi.png ", value: 5 },
+      { name: "黑松汽水", img: "assets/heysong.jpeg", value: 12 },
+      { name: "彈珠", img: "assets/marble.png", value: 3500 },
+      { name: "RAM 記憶體", img: "assets/memory.webp", value: 3000 },
+      { name: "明星花露水", img: "assets/mingsing.png", value: 70 },
+      { name: "森永牛奶糖", img: "assets/mirukukyarameru.png ", value: 5 },
+      { name: "卡式錄音帶", img: "assets/music tape.png ", value: 12 },
+      { name: "王子麵", img: "assets/Prince Noodles.png, value: 3 },
+      { name: "黑松沙士", img: "assets/sarsaparilla.png", value: 12 },
+      { name: "尪仔標", img: "assets/Wangzaibiao.jpeg", value: 1 },
+      { name: "養樂多", img: "assets/Yakult.png", value: 2 },
+{ name: "Game Boy", img: "assets/gameboy.png ", value: 2800 }, 
+{ name: "B.B. Call 呼叫機", img: "assets/bb-call.webp", value: 1800 },
+ { name: "3.5吋磁碟片", img: "assets/floppydisk.jpeg", value: 15 }, 
+{ name: "Tamagotchi 電子雞", img: "assets/tamagotchi.png", value: 700 }, 
+ ];
+    const puzzleData = { id: 'puz01', name: '西門町', image: 'assets/simandin.png' };
     const levelConfig = [ { level: 1, items: 3, memoryTime: 6000, mode: "FIND_DIFF" }, { level: 2, items: 3, memoryTime: 5000, mode: "FIND_DIFF" }, { level: 3, items: 3, memoryTime: 5000, mode: "ESTIMATE_PRICE" }, { level: 4, items: 4, memoryTime: 5000, mode: "FIND_DIFF" }, { level: 5, items: 4, memoryTime: 4000, mode: "ESTIMATE_PRICE" }, { level: 6, items: 4, memoryTime: 4000, mode: "FIND_DIFF" }, { level: 7, items: 5, memoryTime: 4000, mode: "FIND_DIFF" }, { level: 8, items: 5, memoryTime: 3500, mode: "ESTIMATE_PRICE" }, { level: 9, items: 5, memoryTime: 3500, mode: "FIND_DIFF" }, ];
     function getRandomItems(n) { const arr = nostalgicItems.slice(); const items = []; while (items.length < n && arr.length > 0) { const idx = Math.floor(Math.random() * arr.length); items.push(arr.splice(idx, 1)[0]); } return items; }
     function getShuffledItems(items) { const arr = items.slice(); const idx = Math.floor(Math.random() * arr.length); let newItem; do { newItem = nostalgicItems[Math.floor(Math.random() * nostalgicItems.length)]; } while (arr.find((x) => x.name === newItem.name)); arr[idx] = newItem; return { changedItems: arr, changedIdx: idx }; }
