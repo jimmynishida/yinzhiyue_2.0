@@ -5,7 +5,6 @@
   <title>文字特攻隊：九零連線 (Word Commando: 90's Connect)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* CSS 樣式與之前版本相同 */
     @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
     body {
       background: #222 url('https://i.imgur.com/nV7sAzL.png'); margin: 0; min-height: 100vh;
@@ -130,24 +129,26 @@ function levelSelectScreen() {
 
 function handleBoardClick(event) {
     if (GAME.isPaused) return;
-    const target = event.target;
-    if (!target.classList.contains('word-btn') || target.disabled) return;
+    const target = event.target.closest('.word-btn');
+    if (!target || target.disabled) return;
+    
     const index = parseInt(target.dataset.index, 10);
     const indexInSelection = GAME.selectedIdx.indexOf(index);
+
     if (indexInSelection > -1) {
         GAME.selectedIdx.splice(indexInSelection, 1);
-        target.classList.remove('selected');
     } else {
         GAME.selectedIdx.push(index);
-        target.classList.add('selected');
         playSFX(SFX.select);
     }
+    render(); // After changing state, we MUST re-render to show the changes.
 }
 
 function gameScreen() {
     const theme = THEMES.find(t => t.level === GAME.currentLevel);
     const board = createElement('div', { className: 'word-board' });
-    board.onclick = handleBoardClick;
+    board.onclick = handleBoardClick; // Apply single event listener to parent
+
     GAME.words.forEach((word, i) => {
         const isFound = GAME.foundWords.includes(word);
         const btnOptions = { className: 'word-btn', textContent: word, disabled: isFound, 'data-index': i };
@@ -156,6 +157,7 @@ function gameScreen() {
         if (isFound) btn.style.opacity = 0.5;
         board.appendChild(btn);
     });
+
     const hud = createElement('div', { className: 'game-hud' }, [ createElement('span', { className: 'timer' }, [ `🕒 `, createElement('span', { id: 'timer', textContent: GAME.timeLeft }), 's' ]), createElement('span', { textContent: `生命值: ${'♥'.repeat(GAME.lives)}` }), createElement('button', { className: 'win95-btn', textContent: '|| 暫停', onclick: togglePause }) ]);
     const submitBtn = createElement('button', { className: 'win95-btn', textContent: '送出連線' });
     submitBtn.onclick = () => {
@@ -179,7 +181,7 @@ function gameScreen() {
             }
         }
         GAME.selectedIdx = [];
-        render(); //Submit and cancel are major state changes that NEED a full re-render
+        render();
     };
     const cancelBtn = createElement('button', { className: 'win95-btn', textContent: '取消', onclick: () => { GAME.selectedIdx = []; render(); } });
     const content = createElement('div', { className: 'game-play' }, [ hud, createElement('h2', {textContent: theme.name, style:{margin:'10px 0'}}), board, createElement('div', { className: 'game-actions' }, [submitBtn, cancelBtn]) ]);
@@ -199,24 +201,20 @@ function gameScreen() {
 function levelResultScreen(isWin) {
     const title = isWin ? '關卡完成！' : '挑戰失敗！';
     const message = isWin ? '太棒了！你解鎖了下一關！' : '別氣餒，再試一次吧！';
-    const nextBtn = createElement('button', { className: 'win95-btn start-btn', textContent: '返回關卡選擇' });
-     if(isWin && GAME.currentLevel < THEMES.length) {
-        nextBtn.textContent = '前往下一關';
-     } else if (isWin && GAME.currentLevel >= THEMES.length) {
-        nextBtn.textContent = '恭喜全部通關！';
-     } else {
-        nextBtn.textContent = '重新挑戰本關';
-     }
-
-    nextBtn.onclick = () => {
-        if (!isWin) {
-            // Stay on current level for retry
-        } else if (isWin && GAME.currentLevel < THEMES.length) {
-            GAME.currentLevel++;
+    const nextBtn = createElement('button', { className: 'win95-btn start-btn' });
+    
+    if (isWin) {
+        if (GAME.currentLevel < THEMES.length) {
+            nextBtn.textContent = '前往下一關';
+            nextBtn.onclick = () => { GAME.currentLevel++; GAME.screen = 'levelSelect'; render(); };
+        } else {
+            nextBtn.textContent = '恭喜全部通關！';
+            nextBtn.onclick = () => { GAME.screen = 'levelSelect'; render(); };
         }
-        GAME.screen = 'levelSelect';
-        render();
-    };
+    } else {
+        nextBtn.textContent = '重新挑戰本關';
+        nextBtn.onclick = () => { GAME.screen = 'levelSelect'; render(); };
+    }
    
     const content = createElement('div', { className: 'level-result-screen' }, [ createElement('div', { className: 'level-result-title', textContent: title }), createElement('p', { textContent: message }), nextBtn ]);
     return buildWindow('結算', content);
