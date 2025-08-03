@@ -86,6 +86,11 @@ function resetGameState() { GAME.timeLeft = 60; GAME.words = []; GAME.selectedId
 function createElement(tag, options = {}, children = []) { const el = document.createElement(tag); Object.keys(options).forEach(key => { if (key === 'className') el.className = options[key]; else if (key === 'textContent') el.textContent = options[key]; else if (key === 'onclick') el.onclick = options[key]; else if (key === 'style') Object.assign(el.style, options[key]); else el.setAttribute(key, options[key]); }); children.forEach(child => { if (child) el.appendChild(typeof child === 'string' ? document.createTextNode(child) : child); }); return el; }
 function buildWindow(titleText, content, titleIconSrc = null) { const titleChildren = []; if (titleIconSrc) { titleChildren.push(createElement('img', { src: titleIconSrc, style: { width: '22px', marginRight: '4px' } })); } titleChildren.push(createElement('span', { textContent: titleText })); return createElement('div', { className: 'win95-window' }, [ createElement('div', { className: 'win95-titlebar' }, [ createElement('div', { className: 'win95-title' }, titleChildren) ]), createElement('div', { className: 'win95-content' }, [content]) ]); }
 
+// ***** BUG FIX: Centralized, deferred rendering function *****
+function updateAndRender() {
+    setTimeout(render, 0);
+}
+
 function render() {
     const app = document.getElementById("app");
     app.innerHTML = "";
@@ -104,7 +109,7 @@ function render() {
 function dialupScreen() {
     const statusDiv = createElement('div', { id: 'dialup-status', className: 'dialup-status', textContent: '撥接音效中...' });
     const startBtn = createElement('button', { className: 'win95-btn start-btn', textContent: 'START', style: { display: 'none' } });
-    startBtn.onclick = () => { GAME.screen = "levelSelect"; setBGM(null); render(); }; // FIXED
+    startBtn.onclick = () => { GAME.screen = "levelSelect"; setBGM(null); updateAndRender(); };
     const content = createElement('div', { className: 'dialup-screen' }, [ createElement('div', { className: 'dialup-animation' }), createElement('div', { className: 'dialup-text', textContent: '正在連線到 90 年代...' }), statusDiv, startBtn ]);
     setTimeout(() => playSFX(SFX.dialup), 150);
     setTimeout(() => { statusDiv.textContent = "連線成功！"; startBtn.style.display = ""; }, 3800);
@@ -117,7 +122,7 @@ function levelSelectScreen() {
         const isLocked = theme.level > GAME.maxUnlockedLevel;
         const folder = createElement('div', { className: `folder-icon ${isLocked ? 'locked' : ''}`, title: isLocked ? '鎖定中' : theme.name }, [ createElement('img', { src: theme.icon, alt: theme.name }), createElement('div', { className: 'folder-label', textContent: `關卡 ${theme.level}` }) ]);
         if (!isLocked) {
-            folder.onclick = () => { GAME.currentLevel = theme.level; resetGameState(); setBGM(theme.bgm); let pool = shuffle([...theme.words, ...sample(theme.noise, 16 - theme.words.length)]); GAME.words = pool; GAME.screen = "playing"; render(); startTimer(); }; // FIXED
+            folder.onclick = () => { GAME.currentLevel = theme.level; resetGameState(); setBGM(theme.bgm); let pool = shuffle([...theme.words, ...sample(theme.noise, 16 - theme.words.length)]); GAME.words = pool; GAME.screen = "playing"; updateAndRender(); startTimer(); };
         }
         foldersRow.appendChild(folder);
     });
@@ -132,7 +137,17 @@ function gameScreen() {
         const btn = createElement('button', { className: 'word-btn', textContent: word, disabled: isFound });
         if (GAME.selectedIdx.includes(i)) btn.classList.add("selected");
         if (isFound) btn.style.opacity = 0.5;
-        btn.onclick = () => { if (!GAME.selectedIdx.includes(i)) { GAME.selectedIdx.push(i); playSFX(SFX.select); render(); } }; // FIXED
+        btn.onclick = () => {
+            if (isFound || GAME.isPaused) return;
+            const indexInSelection = GAME.selectedIdx.indexOf(i);
+            if (indexInSelection > -1) {
+                GAME.selectedIdx.splice(indexInSelection, 1);
+            } else {
+                GAME.selectedIdx.push(i);
+                playSFX(SFX.select);
+            }
+            updateAndRender(); // Re-render to show selection change
+        };
         board.appendChild(btn);
     });
     const hud = createElement('div', { className: 'game-hud' }, [ createElement('span', { className: 'timer' }, [ `🕒 `, createElement('span', { id: 'timer', textContent: GAME.timeLeft }), 's' ]), createElement('span', { textContent: `生命值: ${'♥'.repeat(GAME.lives)}` }), createElement('button', { className: 'win95-btn', textContent: '|| 暫停', onclick: togglePause }) ]);
@@ -148,7 +163,6 @@ function gameScreen() {
                 GAME.screen = "levelClear";
                 GAME.maxUnlockedLevel = Math.max(GAME.maxUnlockedLevel, GAME.currentLevel + 1);
                 clearInterval(timerId);
-                render();
             }
         } else {
             playSFX(SFX.error);
@@ -156,13 +170,12 @@ function gameScreen() {
             if (GAME.lives <= 0) {
                 GAME.screen = "gameOver";
                 clearInterval(timerId);
-                render();
             }
         }
         GAME.selectedIdx = [];
-        render(); // FIXED
+        updateAndRender();
     };
-    const cancelBtn = createElement('button', { className: 'win95-btn', textContent: '取消', onclick: () => { GAME.selectedIdx = []; render(); } }); // FIXED
+    const cancelBtn = createElement('button', { className: 'win95-btn', textContent: '取消', onclick: () => { GAME.selectedIdx = []; updateAndRender(); } });
     const content = createElement('div', { className: 'game-play' }, [ hud, createElement('h2', {textContent: theme.name, style:{margin:'10px 0'}}), board, createElement('div', { className: 'game-actions' }, [submitBtn, cancelBtn]) ]);
     if(GAME.isPaused){
         const pauseMenu = createElement('div', {className: 'win95-window', style: {position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 10}}, [
@@ -180,18 +193,16 @@ function gameScreen() {
 function levelResultScreen(isWin) {
     const title = isWin ? '關卡完成！' : '挑戰失敗！';
     const message = isWin ? '太棒了！你解鎖了下一關！' : '別氣餒，再試一次吧！';
-    const nextBtn = createElement('button', { className: 'win95-btn start-btn', textContent: isWin ? '前往下一關' : '重新挑戰' });
+    const nextBtn = createElement('button', { className: 'win95-btn start-btn', textContent: isWin && THEMES.length > GAME.currentLevel ? '前往下一關' : '重新挑戰' });
     nextBtn.onclick = () => {
-        if(isWin && GAME.currentLevel < THEMES.length) { GAME.currentLevel++; }
+        if(isWin && THEMES.length > GAME.currentLevel) { /* Logic now handled by level select screen */ }
         GAME.screen = 'levelSelect';
-        render(); // FIXED
+        updateAndRender();
     };
-    const content = createElement('div', { className: 'level-result-screen' }, [
-        createElement('div', { className: 'level-result-title', textContent: title }),
-        createElement('p', { textContent: message }),
-        nextBtn,
-        createElement('button', { className: 'win95-btn', textContent: '返回主選單', onclick: () => { GAME.screen = 'levelSelect'; render(); } }) // FIXED
-    ]);
+    if (isWin && GAME.currentLevel >= THEMES.length) {
+        nextBtn.textContent = "挑戰所有關卡";
+    }
+    const content = createElement('div', { className: 'level-result-screen' }, [ createElement('div', { className: 'level-result-title', textContent: title }), createElement('p', { textContent: message }), nextBtn, createElement('button', { className: 'win95-btn', textContent: '返回主選單', onclick: () => { GAME.screen = 'levelSelect'; updateAndRender(); } }) ]);
     return buildWindow('結算', content);
 }
 
@@ -205,14 +216,14 @@ function startTimer() {
     if (GAME.timeLeft <= 0) {
       clearInterval(timerId);
       GAME.screen = "gameOver";
-      render();
+      updateAndRender();
     }
   }, 1000);
 }
 
 function togglePause() {
     GAME.isPaused = !GAME.isPaused;
-    render();
+    updateAndRender();
 }
 
 function initTutorial() {
@@ -221,7 +232,7 @@ function initTutorial() {
     const tutorialKey = 'tutorialShown_word_commando';
     const startGame = () => {
         window.onload = null;
-        render(); // Use the main render function
+        render();
     };
     if (!sessionStorage.getItem(tutorialKey)) {
         if (overlay) overlay.style.display = 'flex';
