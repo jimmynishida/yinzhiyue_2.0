@@ -8,7 +8,7 @@
     /* CSS 樣式與之前版本相同 */
     @font-face { font-family: 'pixel-font'; src: url('https://fonts.gstatic.com/s/pressstart2p/v12/e3t4euO8KNyBfB3R0rGJ.ttf') format('truetype'); }
     body { margin: 0; background: #222; font-family: Arial, 'pixel-font', monospace; letter-spacing: 1px; overflow-x: hidden; }
-    .crt-bg { background-image: url('https://i.imgur.com/JxAiJ8B.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 100vh; width: 100vw; position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .crt-bg { background-image: url('assets/your-background.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 100vh; width: 100vw; position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
     .main-frame { position: relative; width: 540px; margin: 20px auto; padding: 1.5em; background: rgba(35, 38, 50, 0.95); box-shadow: 0 0 80px #444, 0 0 0 6px #fce26a inset; border-radius: 18px; z-index: 2; box-sizing: border-box; }
     .title-screen, .game-over-screen { text-align: center; padding: 40px 0; }
     .puzzle-container { margin-bottom: 20px; }
@@ -42,7 +42,7 @@
   
   <script>
     const e = React.createElement;
-    const nostalgicItems = [   { name: "CD隨身聽", img: "assets/cdplayer. png ", value: 3500 },
+    const nostalgicItems = [  { name: "CD隨身聽", img: "assets/cdplayer. png ", value: 3500 },
   { name: "Walkman隨身聽", img: "assets/sony-walkman.png", value: 3200 },
       { name: "CPU", img: "assets/cpu.jpeg", value: 3000 },
       { name: "箭牌口香糖", img: "assets/Doublemint.jpeg", value: 7 },
@@ -60,9 +60,14 @@
 { name: "Game Boy", img: "assets/gameboy.png ", value: 2800 }, 
 { name: "B.B. Call 呼叫機", img: "assets/bb-call.webp", value: 1800 },
  { name: "3.5吋磁碟片", img: "assets/floppydisk.jpeg", value: 15 }, 
-{ name: "Tamagotchi 電子雞", img: "assets/tamagotchi.png", value: 700 }, 
- ];
-    const puzzleData = { id: 'puz01', name: '西門町', image: 'assets/simandin.png' };
+{ name: "Tamagotchi 電子雞", img: "assets/tamagotchi.png", value: 700 },  ];
+    
+    // --- 已修正的拼圖設定 ---
+    const puzzleData = { 
+        id: 'puz01', 
+        name: '西門町', image: 'assets/simandin.png' // <-- 修改為本地路徑
+    };
+
     const levelConfig = [ { level: 1, items: 3, memoryTime: 6000, mode: "FIND_DIFF" }, { level: 2, items: 3, memoryTime: 5000, mode: "FIND_DIFF" }, { level: 3, items: 3, memoryTime: 5000, mode: "ESTIMATE_PRICE" }, { level: 4, items: 4, memoryTime: 5000, mode: "FIND_DIFF" }, { level: 5, items: 4, memoryTime: 4000, mode: "ESTIMATE_PRICE" }, { level: 6, items: 4, memoryTime: 4000, mode: "FIND_DIFF" }, { level: 7, items: 5, memoryTime: 4000, mode: "FIND_DIFF" }, { level: 8, items: 5, memoryTime: 3500, mode: "ESTIMATE_PRICE" }, { level: 9, items: 5, memoryTime: 3500, mode: "FIND_DIFF" }, ];
     function getRandomItems(n) { const arr = nostalgicItems.slice(); const items = []; while (items.length < n && arr.length > 0) { const idx = Math.floor(Math.random() * arr.length); items.push(arr.splice(idx, 1)[0]); } return items; }
     function getShuffledItems(items) { const arr = items.slice(); const idx = Math.floor(Math.random() * arr.length); let newItem; do { newItem = nostalgicItems[Math.floor(Math.random() * nostalgicItems.length)]; } while (arr.find((x) => x.name === newItem.name)); arr[idx] = newItem; return { changedItems: arr, changedIdx: idx }; }
@@ -70,7 +75,6 @@
     const sfxElements = { coin: () => document.getElementById("sfx-coin"), wrong: () => document.getElementById("sfx-wrong"), vhs: () => document.getElementById("sfx-vhs"), };
     function playSfx(name) { const el = sfxElements[name](); if (el) { el.currentTime = 0; el.play().catch(()=>{}); } }
     
-    // --- 已新增：海報生成函式 ---
     function generatePoster(puzzle) {
         const canvas = document.createElement('canvas');
         canvas.width = 600;
@@ -94,7 +98,7 @@
             link.href = canvas.toDataURL('image/png');
             link.click();
         };
-        img.onerror = () => { alert('海報圖片載入失敗，請稍後再試。'); };
+        img.onerror = () => { alert('海報圖片載入失敗，請確認 assets 資料夾中有名為 puzzle-image-01.png 的檔案。'); };
     }
 
     function TutorialModal({ onClose }) { const content = e('div', { className: 'tutorial-content' }, e('h4', null, '玩法說明'), e('div', { className: 'tutorial-image-placeholder' }, e('p', { style: { fontSize: '1.2em', color: '#E59866' } }, '[ 玩法說明圖 ]'), e('ul', null, e('li', null, '1. 記住貨架上出現的所有寶物！'), e('li', null, '2. 找出被調包的物品，或猜出物品的當年價格！')))); return e('div', { className: 'tutorial-overlay' }, e('div', { className: 'tutorial-modal' }, e('button', { className: 'tutorial-close-btn', onClick: onClose }, '我知道了 (略過)'), content)); }
@@ -149,7 +153,6 @@
 
       const resetGame = () => { setCurrentLevel(1); setUnlockedPieces(Array(9).fill(false)); setFeedback(''); setGameStatus('PLAYING'); };
       
-      // --- 已修正：返回主選單函式 ---
       const returnToTitle = () => {
           setCurrentLevel(1);
           setUnlockedPieces(Array(9).fill(false));
