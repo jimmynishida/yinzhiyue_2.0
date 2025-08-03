@@ -3,22 +3,26 @@
 <head>
   <meta charset="UTF-8" />
   <title>時光機偵錯檔案 Project Rewind: Glitch Archives</title>
-  <meta name="viewport" content="width=900, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css?family=VT323&display=swap" rel="stylesheet">
   <style>
     html, body { margin:0; padding:0; height:100%; background:#222; }
-    body { font-family:'VT323',monospace; }
+    body { font-family:'VT323',monospace; overflow-x: hidden; }
     #root { min-height: 100vh; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    /* --- 教學彈窗樣式 --- */
-    .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-    .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 20px 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; }
+    .game-wrapper { width: 100vw; min-height: 100vh; background:"#181c2a"; color:"#fff"; font-family:inherit; display:flex; flex-direction:column; align-items:center; box-sizing: border-box; padding: 1em; }
+    .split-container { display: flex; margin: 1em 0; align-items: flex-start; justify-content: center; flex-wrap: wrap; gap: 2em; }
+    .split-img-container { width: clamp(300px, 45vw, 400px); aspect-ratio: 4 / 3; border:3px solid #fff2; border-radius:10px; overflow:hidden; box-shadow: 0 0 18px #fff3; background:"#111"; position:relative; cursor: crosshair; }
+    .split-img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .pause-overlay, .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+    .pause-menu, .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; text-align: center; }
     .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; font-family: inherit; }
-    .tutorial-content h4 { font-family: 'VT323', monospace; color: #1A202C; font-size: 2em; margin-top: 10px; margin-bottom: 20px; text-align: center; }
-    .tutorial-image-placeholder { width: 100%; min-height: 150px; background: rgba(26, 32, 44, 0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #5DADE2; padding: 15px; box-sizing: border-box; }
-    .tutorial-content ul { list-style: none; padding: 0; margin-top: 15px; }
-    .tutorial-content li { font-size: 1.1em; margin-bottom: 10px; line-height: 1.5; }
+    .pause-menu h2, .tutorial-content h4 { font-family: 'VT323', monospace; color: #1A202C; font-size: 2em; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+    .action-btn { font-size: 1em; margin: 0.5em; background: #ffe5b5; border: 2px solid #f9df5b; color: #1d1821; border-radius: 8px; padding: 0.5em 1em; cursor: pointer; }
+    
+    .diff-circle { position:absolute; border-radius:50%; box-sizing:border-box; pointer-events:none; transform:translate(-50%, -50%); }
+    .diff-circle-found { border: 2px solid #0f0; background: rgba(90,255,90,0.13); }
   </style>
 </head>
 <body>
@@ -29,60 +33,25 @@
   
   <script>
     const e = React.createElement;
-
-    // --- 資料與遊戲邏輯 (與之前相同) ---
     const assets = { crtBg: "https://i.imgur.com/JxAiJ8B.jpg", win95Logo: "https://i.imgur.com/wE2n8Rr.png", folder: "https://i.imgur.com/4Z8e3Qh.png", midnight_left: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdHA5aGZ2Mjc1NGJoaHhla2J2bDhjZWVvN2Y4dnQwc30zN2kzZ3Y0eCZjdD1n/7OQCv9mh7lFQ/giphy.gif", midnight_right: "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExaTN3dGV3a3JpMHNkaDNkMjFqZm5uY2FjNmI2d29xZGM2cDdkczB1byZjdD1n/26tPoyDhjiJ2g7rEs/giphy.gif", cgi_left: "https://i.imgur.com/BgZQyQ4.gif", cgi_right: "https://i.imgur.com/4M3VhLL.gif", citypop: "https://cdn.pixabay.com/audio/2022/10/16/audio_12d6e7f8e2.mp3", synth: "https://cdn.pixabay.com/audio/2022/10/16/audio_12e0f3e2e2.mp3", vaporwave: "https://cdn.pixabay.com/audio/2022/03/15/audio_116b0c4402.mp3", foundFx: "https://cdn.pixabay.com/audio/2022/03/15/audio_116b0c4402.mp3", comboFx: "https://cdn.pixabay.com/audio/2022/11/16/audio_125b0e7bbd.mp3", timeUpFx: "https://cdn.pixabay.com/audio/2022/03/15/audio_116b0be1b3.mp3", };
-    const levels = [ { id: "arcade-1", folderName: "80's Arcade", year: "1988", name: "午夜賽車", description: "奔馳於像素夜色的濱海公路，尋找時光錯誤！", bgm: "synth", theme: "pixel", imgLeft: assets.midnight_left, imgRight: assets.midnight_right, diffSpots: [ { x: 0.32, y: 0.68, size: 0.07, desc: "車尾燈閃爍頻率" }, { x: 0.82, y: 0.25, size: 0.07, desc: "大樓窗戶亮燈" }, { x: 0.55, y: 0.85, size: 0.08, desc: "棕櫚樹搖擺幅度" } ], timeLimit: 70, }, { id: "cgi-1", folderName: "95 Vaporwave", year: "1995", name: "虛擬幾何空間", description: "初代CGI世界，尋找漂浮物體的異常。", bgm: "vaporwave", theme: "cgi", imgLeft: assets.cgi_left, imgRight: assets.cgi_right, diffSpots: [ { x: 0.44, y: 0.53, size: 0.08, desc: "球體旋轉方向" }, { x: 0.13, y: 0.82, size: 0.07, desc: "地板貼圖" }, { x: 0.75, y: 0.63, size: 0.07, desc: "金屬反光" } ], timeLimit: 80, }, ];
+    const levels = [ { id: "arcade-1", folderName: "80's Arcade", year: "1988", name: "午夜賽車", description: "奔馳於像素夜色的濱海公路，尋找時光錯誤！", bgm: "synth", theme: "pixel", imgLeft: assets.midnight_left, imgRight: assets.midnight_right, diffSpots: [ { x: 32, y: 68, size: 7 }, { x: 82, y: 25, size: 7 }, { x: 55, y: 85, size: 8 } ], timeLimit: 70, }, { id: "cgi-1", folderName: "95 Vaporwave", year: "1995", name: "虛擬幾何空間", description: "初代CGI世界，尋找漂浮物體的異常。", bgm: "vaporwave", theme: "cgi", imgLeft: assets.cgi_left, imgRight: assets.cgi_right, diffSpots: [ { x: 44, y: 53, size: 8 }, { x: 13, y: 82, size: 7 }, { x: 75, y: 63, size: 7 } ], timeLimit: 80, }, ];
     function playBGM(type) { if(window._bgm) { try { window._bgm.stop(); } catch{} } let src = assets.citypop; if(type === "synth") src = assets.synth; else if(type === "vaporwave") src = assets.vaporwave; window._bgm = new Howl({ src: [src], loop: true, volume: 0.18 }); window._bgm.play(); }
     function stopBGM() { if(window._bgm) try{window._bgm.stop();}catch{} }
     function getGrade(found,total,combo,leftTime){ if(found===total && leftTime>20 && combo>=3) return "S級"; if(found===total && combo>=2) return "A級"; if(found>=total-1) return "B級"; return "C級"; }
-    const praiseWords = ["Cool!","Perfect!","Combo!","Nice!"];
     const BtnStyle = { fontFamily:'inherit',background:"#1d1",color:"#fff",fontSize:"1.5em", borderRadius:8,border:"none",padding:"0.3em 2em",margin:"1em 1.2em 0 1.2em",cursor:"pointer",boxShadow:"0 0 8px #0f07" };
 
-    // --- 新增：教學彈窗 React 元件 ---
-    function TutorialModal({ onClose }) {
-        const placeholder = e('div', { className: 'tutorial-image-placeholder' }, 
-            e('p', { style: { fontSize: '1.2em', color: '#E59866' } }, '[ 此處為「時光機偵錯」玩法說明圖 ]'),
-            e('ul', null, 
-                e('li', null, '1. 仔細觀察左右兩個看似相同的動圖。'),
-                e('li', null, '2. 找出右邊畫面中，與左邊「不同」的地方並點擊它！')
-            )
-        );
-        const content = e('div', { className: 'tutorial-content' }, 
-            e('h4', null, '玩法說明'),
-            placeholder
-        );
-        return e('div', { className: 'tutorial-overlay' },
-            e('div', { className: 'tutorial-modal' },
-                e('button', { className: 'tutorial-close-btn', onClick: onClose }, '我知道了 (略過)'),
-                content
-            )
-        );
-    }
+    function TutorialModal({ onClose }) { const content = e('div', { className: 'tutorial-content' }, e('h4', null, '玩法說明'), e('div', { className: 'tutorial-image-placeholder' }, e('p', { style: { fontSize: '1.2em', color: '#E59866' } }, '[ 此處為「時光機偵錯」玩法說明圖 ]'), e('ul', null, e('li', null, '1. 仔細觀察左右兩個看似相同的動圖。'), e('li', null, '2. 找出右邊畫面中，與左邊「不同」的地方並點擊它！')))); return e('div', { className: 'tutorial-overlay' }, e('div', { className: 'tutorial-modal' }, e('button', { className: 'tutorial-close-btn', onClick: onClose }, '我知道了 (略過)'), content)); }
     
-    // --- 主程式 ---
     function App() {
-      // --- 新增：教學狀態管理 ---
       const [isTutorialVisible, setTutorialVisible] = React.useState(false);
       const tutorialKey = 'tutorialShown_project_rewind';
-
-      React.useEffect(() => {
-        if (!sessionStorage.getItem(tutorialKey)) {
-          setTutorialVisible(true);
-        }
-      }, []);
-
-      const handleCloseTutorial = () => {
-        setTutorialVisible(false);
-        sessionStorage.setItem(tutorialKey, 'true');
-      };
+      React.useEffect(() => { if (!sessionStorage.getItem(tutorialKey)) setTutorialVisible(true); }, []);
+      const handleCloseTutorial = () => { setTutorialVisible(false); sessionStorage.setItem(tutorialKey, 'true'); };
       
-      // --- 原有遊戲狀態 ---
       const [screen, setScreen] = React.useState("desktop");
       const [selectedLevel, setSelectedLevel] = React.useState(null);
       const [score, setScore] = React.useState(null);
 
-      // BGM 控制 (加入 isTutorialVisible 判斷)
       React.useEffect(() => { if(isTutorialVisible) return; if(screen==="desktop"||screen==="levelSelect") playBGM("citypop"); if(screen==="game" && selectedLevel) playBGM(selectedLevel.bgm); if(screen==="score") stopBGM(); return stopBGM; }, [screen, selectedLevel, isTutorialVisible]);
 
       const mainGameContent = e(React.Fragment, {}, 
@@ -97,17 +66,30 @@
         !isTutorialVisible && mainGameContent
       );
     }
-    // --- 各畫面元件 (與之前相同) ---
-    function Desktop({onEnter}) { return e('div', {style:{ width:"100vw",height:"100vh",background:`url(${assets.crtBg}) center/cover no-repeat,#222`, display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center" }}, e('img',{src:assets.win95Logo,style:{width:100,marginBottom:24}}), e('div',{style:{color:"#0f0",fontSize:"2em",marginBottom:"2em",textShadow:"0 0 4px #0f0,0 0 8px #0f0"}}, "Project Rewind:\nGlitch Archives" ), e('button',{onClick:onEnter,style:{background:"#f0f0f0",border:"2px solid #888",fontSize:"1.5em",padding:"0.5em 3em",borderRadius:12,marginTop:"2em",fontFamily:"inherit",cursor:"pointer",boxShadow:"0 0 12px #fff7"}}, "進入桌面" ) ); }
-    function LevelSelect({levels,onSelect}) { return e('div', {style:{ width:"100vw",height:"100vh",background:"#e0e0e0",fontFamily:"inherit" }}, e('h2',{style:{fontSize:"2em",margin:"2em 0 1em 1em",color:"#333"}},"選擇關卡（點擊檔案夾進入）"), e('div',{style:{display:"flex",flexWrap:"wrap",marginLeft:"2em"}}, levels.map(lv => e('div',{ key:lv.id, onClick:()=>onSelect(lv), style:{ width:150,height:120,margin:"1em 2em 1em 0",background:"#fbf4d6", border:"2px solid #d8c16a",borderRadius:10,display:"flex",flexDirection:"column", alignItems:"center",justifyContent:"center",fontSize:"1.2em",cursor:"pointer",boxShadow:"0 0 12px #bbb7",transition:"transform 0.1s" }, onMouseOver: e=>e.currentTarget.style.transform="scale(1.08)", onMouseOut: e=>e.currentTarget.style.transform="" }, e('img',{src:assets.folder,style:{width:64,marginBottom:8},alt:""}), e('span',null,lv.folderName), e('span',{style:{fontSize:"0.9em",color:"#999"}},lv.year) ) ) ) ); }
-    function GameLevel({level,onFinish,onBack}) { const [found, setFound] = React.useState(Array(level.diffSpots.length).fill(false)); const [combo, setCombo] = React.useState(0); const [comboShow, setComboShow] = React.useState(false); const [comboWord, setComboWord] = React.useState(""); const [timeLeft, setTimeLeft] = React.useState(level.timeLimit); const [usingEagleEye, setUsingEagleEye] = React.useState(false); const [toolCooldown, setToolCooldown] = React.useState(false); const [paused, setPaused] = React.useState(false); React.useEffect(()=>{ if(paused) return; if(timeLeft<=0){ onFinish({ level,found:found.filter(Boolean).length,total:found.length,combo,timeLeft:0,grade:getGrade(found.filter(Boolean).length,found.length,combo,0) }); new Howl({src:[assets.timeUpFx],volume:0.4}).play(); return; } const t=setTimeout(()=>setTimeLeft(t=>t-1),1000); return ()=>clearTimeout(t); },[timeLeft,paused,found,combo,onFinish,level]); React.useEffect(()=>{ if(comboShow){ const t=setTimeout(()=>setComboShow(false),1100); return ()=>clearTimeout(t); } },[comboShow]); React.useEffect(()=>{ if(found.every(Boolean)){ setTimeout(()=>onFinish({ level,found:found.length,total:found.length,combo,timeLeft,grade:getGrade(found.length,found.length,combo,timeLeft) }),700); } },[found,onFinish,combo,timeLeft,level]); function handleImgClick(e,side){ if(paused) return; const rect = e.target.getBoundingClientRect(); const x = (e.clientX - rect.left)/rect.width; const y = (e.clientY - rect.top)/rect.height; let hit=false, idx=-1; level.diffSpots.forEach((d,i)=>{ if(found[i]) return; const dx=Math.abs(d.x-x),dy=Math.abs(d.y-y); const dist=Math.sqrt(dx*dx+dy*dy); if(dist < d.size*1.1){ hit=true; idx=i; } }); if(hit && idx>=0){ new Howl({src:[assets.foundFx],volume:0.45}).play(); setFound(fs=>{const n=[...fs];n[idx]=true;return n;}); setCombo(c=>c+1); setComboShow(true); setComboWord(praiseWords[Math.floor(Math.random()*praiseWords.length)]); new Howl({src:[assets.comboFx],volume:0.33}).play(); } else { setCombo(0); setComboShow(true); setComboWord("Miss!"); } } function useEagleEye(){ if(toolCooldown||usingEagleEye) return; setUsingEagleEye(true); setToolCooldown(true); setTimeout(()=>setUsingEagleEye(false),2200); setTimeout(()=>setToolCooldown(false),7000); } function useTimePause(){ if(paused||toolCooldown) return; setPaused(true); setToolCooldown(true); setTimeout(()=>setPaused(false),5200); setTimeout(()=>setToolCooldown(false),10000); } function useHint(){ if(toolCooldown) return; setToolCooldown(true); const i=found.findIndex(v=>!v); if(i>=0) alert(`提示：有一處錯誤在「${level.diffSpots[i].desc}」附近（第${i+1}個差異）`); setTimeout(()=>setToolCooldown(false),7000); } return e('div',{style:{ background:"#181c2a",minHeight:"100vh",color:"#fff",fontFamily:"inherit",display:"flex",flexDirection:"column",alignItems:"center" }}, e('h2',{style:{marginTop:"1em",fontSize:"2em",color:"#ff9",textShadow:"0 0 9px #0ff8"}},`${level.year} - ${level.folderName} - ${level.name}`), e('div',{style:{margin:"1.1em auto",maxWidth:650,fontSize:"1.3em",color:"#aac"}},level.description), e(TimerBar, {percent:(timeLeft/level.timeLimit)*100}), e('div',{style:{margin:"1em auto 0 0",display:"flex",gap:"2em"}}, e(ToolBtn,{onClick:useEagleEye,disabled:toolCooldown},"🦅 鷹眼放大鏡"), e(ToolBtn,{onClick:useTimePause,disabled:toolCooldown},"⏱ 時光暫停"), e(ToolBtn,{onClick:useHint,disabled:toolCooldown},"🛰️ 錯誤提示"), e(ToolBtn,{onClick:onBack},"↩ 回關卡選單") ), e('div',{style:{display:"flex",margin:"2em 0 1em 0",alignItems:"flex-start",justifyContent:"center"}}, e(SplitImg,{onClick:e=>handleImgClick(e,"left")}, e('img',{src:level.imgLeft,alt:"",draggable:false,style:{width:"100%",height:"100%",objectFit:"cover"}}), level.diffSpots.map((d,i)=> (found[i]||usingEagleEye)?e(DiffCircle,{key:i,x:d.x,y:d.y,size:d.size,found:found[i]}):null ) ), e(SplitImg,{onClick:e=>handleImgClick(e,"right")}, e('img',{src:level.imgRight,alt:"",draggable:false,style:{width:"100%",height:"100%",objectFit:"cover"}}), level.diffSpots.map((d,i)=> (found[i]||usingEagleEye)?e(DiffCircle,{key:i,x:d.x,y:d.y,size:d.size,found:found[i]}):null ) ) ), e('div',{style:{ position:"absolute",left:"46vw",top:"25vh",fontSize:"2.2em",color:"#0fc",textShadow:"0 0 12px #fff,0 0 24px #0ff8", opacity:comboShow?1:0,transition:"opacity 0.3s",pointerEvents:"none" }}, comboWord, combo>1 ?` COMBO x${combo}!`:"" ) ); }
-    function ScoreSummary({score,onBackToDesktop,onReplay}) { return e('div',{style:{ width:"100vw",minHeight:"100vh",background:"linear-gradient(150deg,#2e2d60 0%,#114 100%)", color:"#fff",fontFamily:"inherit",display:"flex",flexDirection:"column",alignItems:"center" }}, e('div',{style:{ marginTop:"9vh",background:"#fff2",borderRadius:16,padding:"2.5em 3.5em",boxShadow:"0 0 19px #fff6",textAlign:"center" }}, e('div',{style:{fontSize:"2.5em",color:"#ff0",marginBottom:"0.3em"}}, score.grade==="S級"?"🌟":score.grade==="A級"?"🎖":score.grade==="B級"?"✅":"🔎", score.grade,"修復師" ), e('div',null,`已修正 ${score.found} / ${score.total} 個錯誤`), e('div',null,`最高連擊數：${score.combo}`), e('div',null,`剩餘時間：${score.timeLeft} 秒`), e('div',{style:{marginTop:16,color:"#8ef"}}, score.grade==="S級" && "完美無瑕！你是傳說級修復專家！" || score.grade==="A級" && "接近完美！再接再厲！" || score.grade==="B級" && "不錯喔！多練習可以更好！" || "加油，下次會更棒！" ), e('button',{onClick:onReplay,style:BtnStyle},"重玩本關"), e('button',{onClick:onBackToDesktop,style:BtnStyle},"返回桌面") ) ); }
-    function TimerBar({percent}) { return e('div',{style:{ width:"60vw",maxWidth:600,height:18,background:"#444",borderRadius:8,margin:"1em auto",overflow:"hidden",position:"relative" }}, e('div',{style:{ width:`${percent}%`,height:"100%", background:"linear-gradient(90deg,#6ff 0%,#f0f 100%)",transition:"width 0.4s" }}) ); }
-    function ToolBtn(props){ return e('button',Object.assign({style:{ fontFamily:"inherit",fontSize:"1.1em",padding:"0.2em 1.2em",borderRadius:8,border:"2px solid #ff9", background:"#222",color:"#ff9",cursor:"pointer",marginRight:"1em" }},props)); }
-    function SplitImg(props){ return e('div',Object.assign({style:{ width:330,height:220,margin:"0 20px",border:"3px solid #fff2",borderRadius:10,overflow:"hidden",boxShadow:"0 0 18px #fff3",background:"#111",position:"relative" }},props)); }
-    function DiffCircle({x,y,size,found}) { return e('div',{style:{ position:"absolute",left:x*330-330*0.5*0.04,top:y*220-220*0.5*0.04, width:size*330*2,height:size*220*2,borderRadius:"50%", background:found?"rgba(90,255,90,0.13)":"rgba(255,255,90,0.10)", border:found?"2px solid #0f0":"2px dashed #ff9",pointerEvents:"none", transition:"background 0.2s,border 0.2s" }}); }
     
-    // --- 啟動 ---
+    function Desktop({onEnter}) { return e('div', {style:{ width:"100vw",height:"100vh",background:`url(${assets.crtBg}) center/cover no-repeat,#222`, display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center" }}, e('img',{src:assets.win95Logo,style:{width:100,marginBottom:24}}), e('div',{style:{color:"#0f0",fontSize:"2em",marginBottom:"2em",textShadow:"0 0 4px #0f0,0 0 8px #0f0", whiteSpace: 'pre-wrap', textAlign:'center'}}, "Project Rewind:\nGlitch Archives" ), e('button',{onClick:onEnter,style:{background:"#f0f0f0",border:"2px solid #888",fontSize:"1.5em",padding:"0.5em 3em",borderRadius:12,marginTop:"2em",fontFamily:"inherit",cursor:"pointer",boxShadow:"0 0 12px #fff7"}}, "進入桌面" ) ); }
+    function LevelSelect({levels,onSelect}) { return e('div', {style:{ width:"100vw",height:"100vh",background:"#e0e0e0",fontFamily:"inherit" }}, e('h2',{style:{fontSize:"2em",margin:"2em 0 1em 1em",color:"#333"}},"選擇關卡"), e('div',{style:{display:"flex",flexWrap:"wrap",marginLeft:"2em"}}, levels.map(lv => e('div',{ key:lv.id, onClick:()=>onSelect(lv), style:{ width:150,height:120,margin:"1em 2em 1em 0",background:"#fbf4d6", border:"2px solid #d8c16a",borderRadius:10,display:"flex",flexDirection:"column", alignItems:"center",justifyContent:"center",fontSize:"1.2em",cursor:"pointer",boxShadow:"0 0 12px #bbb7",transition:"transform 0.1s" }, onMouseOver: e=>e.currentTarget.style.transform="scale(1.08)", onMouseOut: e=>e.currentTarget.style.transform="" }, e('img',{src:assets.folder,style:{width:64,marginBottom:8},alt:""}), e('span',null,lv.folderName), e('span',{style:{fontSize:"0.9em",color:"#999"}},lv.year) ) ) ) ); }
+    function GameLevel({level,onFinish,onBack}) { const [found, setFound] = React.useState(Array(level.diffSpots.length).fill(false)); const [combo, setCombo] = React.useState(0); const [timeLeft, setTimeLeft] = React.useState(level.timeLimit); const [isPaused, setPaused] = React.useState(false); React.useEffect(()=>{ if(isPaused) return; if(timeLeft<=0){ onFinish({ level,found:found.filter(Boolean).length,total:found.length,combo,timeLeft:0,grade:getGrade(found.filter(Boolean).length,found.length,combo,0) }); new Howl({src:[assets.timeUpFx],volume:0.4}).play(); return; } const timerId=setTimeout(()=>setTimeLeft(t=>t-1),1000); return ()=>clearTimeout(timerId); },[timeLeft,isPaused, onFinish, level, found, combo]); React.useEffect(()=>{ if(found.every(Boolean)){ setTimeout(()=>onFinish({ level,found:found.length,total:found.length,combo,timeLeft,grade:getGrade(found.length,found.length,combo,timeLeft) }),700); } },[found, onFinish, level, combo, timeLeft]); function handleImgClick(e){ if(isPaused) return; const rect = e.target.getBoundingClientRect(); const x = (e.clientX - rect.left)/rect.width * 100; const y = (e.clientY - rect.top)/rect.height * 100; let hit=false, idx=-1; level.diffSpots.forEach((d,i)=>{ if(found[i]) return; const dist=Math.sqrt(Math.pow(d.x-x, 2) + Math.pow(d.y-y, 2)); if(dist < d.size){ hit=true; idx=i; } }); if(hit && idx>=0){ new Howl({src:[assets.foundFx],volume:0.45}).play(); setFound(fs=>{const n=[...fs];n[idx]=true;return n;}); setCombo(c=>c+1); } else { setCombo(0); } }
+      return e('div',{className:"game-wrapper"}, 
+        e('h2',{style:{fontSize:"clamp(1.5em, 5vw, 2em)",color:"#ff9",textShadow:"0 0 9px #0ff8", textAlign:'center'}},`${level.year} - ${level.name}`), 
+        e(TimerBar, {percent:(timeLeft/level.timeLimit)*100}), 
+        e('div',{style:{margin:"1em auto 0 auto",display:"flex",gap:"1em", flexWrap:'wrap', justifyContent:'center'}}, 
+            e(ToolBtn,{onClick:()=>setPaused(true)},"|| 暫停"),
+            e(ToolBtn,{onClick:onBack},"↩ 回選單") 
+        ), 
+        e('div',{className:'split-container'}, 
+            e(SplitImg,{imgSrc:level.imgLeft}), 
+            e(SplitImg,{imgSrc:level.imgRight, onClick:handleImgClick, spots:level.diffSpots, found})
+        ),
+        isPaused && e("div", { className: "pause-overlay" }, e("div", { className: "pause-menu" }, e("h2", null, "遊戲已暫停"), e("button", { className: "action-btn", onClick: () => setPaused(false) }, "繼續遊戲"), e("button", { className: "action-btn", onClick: onBack }, "返回選單")))
+      ); 
+    }
+    function ScoreSummary({score,onBackToDesktop,onReplay}) { return e('div',{style:{ width:"100vw",minHeight:"100vh",background:"linear-gradient(150deg,#2e2d60 0%,#114 100%)", color:"#fff",fontFamily:"inherit",display:"flex",flexDirection:"column",alignItems:"center", justifyContent:'center' }}, e('div',{style:{ background:"#fff2",borderRadius:16,padding:"2.5em 3.5em",boxShadow:"0 0 19px #fff6",textAlign:"center" }}, e('div',{style:{fontSize:"2.5em",color:"#ff0",marginBottom:"0.3em"}}, score.grade==="S級"?"🌟":score.grade==="A級"?"🎖":score.grade==="B級"?"✅":"🔎", score.grade,"修復師" ), e('div',null,`已修正 ${score.found} / ${score.total} 個錯誤`), e('div',null,`最高連擊數：${score.combo}`), e('div',null,`剩餘時間：${score.timeLeft} 秒`), e('div',{style:{marginTop:16,color:"#8ef"}}, score.grade==="S級" && "完美無瑕！" || score.grade==="A級" && "接近完美！" || score.grade==="B級" && "不錯喔！" || "加油！" ), e('button',{onClick:onReplay,style:BtnStyle},"重玩本關"), e('button',{onClick:onBackToDesktop,style:BtnStyle},"返回桌面") ) ); }
+    function TimerBar({percent}) { return e('div',{style:{ width:"clamp(300px, 80vw, 600px)",height:18,background:"#444",borderRadius:8,margin:"1em auto",overflow:"hidden" }}, e('div',{style:{ width:`${percent}%`,height:"100%", background:"linear-gradient(90deg,#6ff 0%,#f0f 100%)",transition:"width 0.4s" }}) ); }
+    function ToolBtn(props){ return e('button',Object.assign({style:{ fontFamily:"inherit",fontSize:"1.1em",padding:"0.2em 1.2em",borderRadius:8,border:"2px solid #ff9", background:"#222",color:"#ff9",cursor:"pointer"}},props)); }
+    function SplitImg({imgSrc, onClick, spots, found}) { const children = [e('img',{src:imgSrc,alt:"",draggable:false,className:'split-img'})]; if(spots) { spots.forEach((d,i) => { if(found[i]) children.push(e(DiffCircle,{key:i,x:d.x,y:d.y,size:d.size})); }); } return e('div',{onClick, className:'split-img-container'}, children); }
+    function DiffCircle({x,y,size}) { return e('div',{className:'diff-circle diff-circle-found', style:{ position:"absolute",left:`${x}%`,top:`${y}%`, width:`${size}%`,height:`${size*1.33}%`, transform: 'translate(-50%, -50%)' }}); }
+    
     ReactDOM.createRoot(document.getElementById('root')).render(e(App));
   </script>
 </body>
