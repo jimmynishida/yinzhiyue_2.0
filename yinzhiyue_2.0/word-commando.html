@@ -42,31 +42,54 @@
         .word-btn { font-size: clamp(0.9em, 3.5vw, 1.1em); padding: 5px 3px; }
         h1, .level-result-title { font-size: 1.5em; }
     }
+    .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: none; align-items: center; justify-content: center; z-index: 10000; }
+    .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 20px 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; }
+    .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; font-family: inherit; }
+    .tutorial-content h4 { font-family: 'VT323', monospace; color: #1A202C; font-size: 2em; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+    .tutorial-image-placeholder { width: 100%; min-height: 150px; background: rgba(26, 32, 44, 0.1); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed #5DADE2; padding: 15px; box-sizing: border-box; }
+    .tutorial-content ul { list-style: none; padding: 0; margin-top: 15px; }
+    .tutorial-content li { font-size: 1.1em; margin-bottom: 10px; line-height: 1.5; }
   </style>
 </head>
 <body>
+<div id="tutorial-overlay" class="tutorial-overlay">
+    <div class="tutorial-modal">
+        <button id="tutorial-close-btn" class="tutorial-close-btn">我知道了 (略過)</button>
+        <div class="tutorial-content">
+            <h4>玩法說明</h4>
+            <div class="tutorial-image-placeholder">
+                <p style="font-size: 1.2em; color: #E59866;">[ 此處為「文字特攻隊」玩法說明圖 ]</p>
+                <ul id="tutorial-text-list">
+                    <li>1. 找出與當前主題相關的所有詞彙。</li>
+                    <li>2. 點擊多個相關詞彙將它們選取起來。</li>
+                    <li>3. 點擊「送出連線」按鈕來得分！</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="pixel-bg" id="app"></div>
-<audio id="bgm" loop preload="auto"></audio>
+<audio id="bgm" loop preload="auto" src="audio/bgm-main.mp3"></audio>
 <audio id="sfx" preload="auto"></audio>
 <script>
-// --------- 遊戲資料 --------
-const THEMES = [ { level: 1, key: "star-movies", name: "周星馳電影", icon: "https://i.imgur.com/6z1r3Km.png", bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune1.mp3", words: ["賭聖", "9527", "無厘頭", "重播"], noise: ["林正英", "珍珠奶茶", "A面B面", "麥當勞", "大豬公", "ICQ", "超級賽亞人"], }, { level: 2, key: "zombie", name: "香港殭屍片", icon: "https://i.imgur.com/9VwY3yg.png", bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune2.mp3", words: ["林正英", "暫時停止呼吸", "糯米", "桃木劍"], noise: ["賭聖", "珍珠奶茶", "彈珠汽水", "龜派氣功", "大豬公", "ICQ", "Walkman"], }, { level: 3, key: "dragonball", name: "七龍珠", icon: "https://i.imgur.com/kf4y0yA.png", bgm: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/chiptune3.mp3", words: ["超級賽亞人", "龜派氣功", "天下第一武道會", "那美克星"], noise: ["林正英", "珍珠奶茶", "A面B面", "賭聖", "大豬公", "ICQ"], }, ];
-const SFX = { dialup: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/dialup.wav", select: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/select.wav", success: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/success.wav", error: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/error.wav", combo: "https://cdn.jsdelivr.net/gh/jimmynishida/soundbank@main/combo.wav", };
-
-// --- 遊戲狀態管理 ---
+const THEMES = [ { level: 1, key: "star-movies", name: "周星馳電影", icon: "https://i.imgur.com/6z1r3Km.png", bgm: "audio/bgm-chiptune1.mp3", words: ["賭聖", "9527", "無厘頭", "重播"], noise: ["林正英", "珍珠奶茶", "A面B面", "麥當勞", "大豬公", "ICQ", "超級賽亞人"], }, { level: 2, key: "zombie", name: "香港殭屍片", icon: "https://i.imgur.com/9VwY3yg.png", bgm: "audio/bgm-chiptune2.mp3", words: ["林正英", "暫時停止呼吸", "糯米", "桃木劍"], noise: ["賭聖", "珍珠奶茶", "彈珠汽水", "龜派氣功", "大豬公", "ICQ", "Walkman"], }, { level: 3, key: "dragonball", name: "七龍珠", icon: "https://i.imgur.com/kf4y0yA.png", bgm: "audio/bgm-chiptune3.mp3", words: ["超級賽亞人", "龜派氣功", "天下第一武道會", "那美克星"], noise: ["林正英", "珍珠奶茶", "A面B面", "賭聖", "大豬公", "ICQ"], }, ];
+const SFX = { dialup: "audio/sfx-dialup.mp3", select: "audio/sfx-select.mp3", success: "audio/sfx-success.mp3", error: "audio/sfx-error.mp3", combo: "audio/sfx-combo.mp3", };
 let GAME = { screen: "dialup", maxUnlockedLevel: 1, currentLevel: 1, lives: 3, isPaused: false, timeLeft: 60, words: [], selectedIdx: [], foundWords: [], };
 let timerId = null;
+
+function shuffle(arr) { let a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function sample(arr, n = 1) { const s = shuffle(arr); return n === 1 ? s[0] : s.slice(0, n); }
+function playSFX(src) { try { const sfx = document.getElementById("sfx"); sfx.src = src; sfx.play(); } catch(e){} }
+function setBGM(src) { try { const bgm = document.getElementById("bgm"); if (!src) { bgm.pause(); return; } bgm.src = src; bgm.play(); } catch(e){} }
 function resetGameState() { GAME.timeLeft = 60; GAME.words = []; GAME.selectedIdx = []; GAME.foundWords = []; GAME.lives = 3; GAME.isPaused = false; }
 
-// --- 渲染邏輯 (已全面改為安全版本) ---
 function createElement(tag, options = {}, children = []) { const el = document.createElement(tag); Object.keys(options).forEach(key => { if (key === 'className') el.className = options[key]; else if (key === 'textContent') el.textContent = options[key]; else if (key === 'onclick') el.onclick = options[key]; else if (key === 'style') Object.assign(el.style, options[key]); else el.setAttribute(key, options[key]); }); children.forEach(child => { if (child) el.appendChild(typeof child === 'string' ? document.createTextNode(child) : child); }); return el; }
-function buildWindow(titleText, content, titleIconSrc = null) { const titleChildren = []; if (titleIconSrc) { titleChildren.push(createElement('img', { src: titleIconSrc, style: { width: '22px', marginRight: '4px' } })); } titleChildren.push(createElement('span', { textContent: titleText })); return createElement('div', { className: 'win95-window' }, [ createElement('div', { className: 'win95-titlebar' }, [ createElement('div', { className: 'win95-title' }, titleChildren), ]), createElement('div', { className: 'win95-content' }, [content]) ]); }
+function buildWindow(titleText, content, titleIconSrc = null) { const titleChildren = []; if (titleIconSrc) { titleChildren.push(createElement('img', { src: titleIconSrc, style: { width: '22px', marginRight: '4px' } })); } titleChildren.push(createElement('span', { textContent: titleText })); return createElement('div', { className: 'win95-window' }, [ createElement('div', { className: 'win95-titlebar' }, [ createElement('div', { className: 'win95-title' }, titleChildren) ]), createElement('div', { className: 'win95-content' }, [content]) ]); }
 
 function render() {
     const app = document.getElementById("app");
     app.innerHTML = "";
     let screenElement;
-
     switch(GAME.screen) {
         case "dialup": screenElement = dialupScreen(); break;
         case "levelSelect": screenElement = levelSelectScreen(); break;
@@ -81,7 +104,7 @@ function render() {
 function dialupScreen() {
     const statusDiv = createElement('div', { id: 'dialup-status', className: 'dialup-status', textContent: '撥接音效中...' });
     const startBtn = createElement('button', { className: 'win95-btn start-btn', textContent: 'START', style: { display: 'none' } });
-    startBtn.onclick = () => { GAME.screen = "levelSelect"; setBGM(null); render(); };
+    startBtn.onclick = () => { GAME.screen = "levelSelect"; setBGM(null); render(); }; // FIXED
     const content = createElement('div', { className: 'dialup-screen' }, [ createElement('div', { className: 'dialup-animation' }), createElement('div', { className: 'dialup-text', textContent: '正在連線到 90 年代...' }), statusDiv, startBtn ]);
     setTimeout(() => playSFX(SFX.dialup), 150);
     setTimeout(() => { statusDiv.textContent = "連線成功！"; startBtn.style.display = ""; }, 3800);
@@ -94,7 +117,7 @@ function levelSelectScreen() {
         const isLocked = theme.level > GAME.maxUnlockedLevel;
         const folder = createElement('div', { className: `folder-icon ${isLocked ? 'locked' : ''}`, title: isLocked ? '鎖定中' : theme.name }, [ createElement('img', { src: theme.icon, alt: theme.name }), createElement('div', { className: 'folder-label', textContent: `關卡 ${theme.level}` }) ]);
         if (!isLocked) {
-            folder.onclick = () => { GAME.currentLevel = theme.level; resetGameState(); setBGM(theme.bgm); let pool = shuffle([...theme.words, ...sample(theme.noise, 16 - theme.words.length)]); GAME.words = pool; GAME.screen = "playing"; render(); startTimer(); };
+            folder.onclick = () => { GAME.currentLevel = theme.level; resetGameState(); setBGM(theme.bgm); let pool = shuffle([...theme.words, ...sample(theme.noise, 16 - theme.words.length)]); GAME.words = pool; GAME.screen = "playing"; render(); startTimer(); }; // FIXED
         }
         foldersRow.appendChild(folder);
     });
@@ -109,22 +132,15 @@ function gameScreen() {
         const btn = createElement('button', { className: 'word-btn', textContent: word, disabled: isFound });
         if (GAME.selectedIdx.includes(i)) btn.classList.add("selected");
         if (isFound) btn.style.opacity = 0.5;
-        btn.onclick = () => { if (!GAME.selectedIdx.includes(i)) { GAME.selectedIdx.push(i); playSFX(SFX.select); render(); } };
+        btn.onclick = () => { if (!GAME.selectedIdx.includes(i)) { GAME.selectedIdx.push(i); playSFX(SFX.select); render(); } }; // FIXED
         board.appendChild(btn);
     });
-    
-    const hud = createElement('div', { className: 'game-hud' }, [
-        createElement('span', { className: 'timer' }, [ `🕒 `, createElement('span', { id: 'timer', textContent: GAME.timeLeft }), 's' ]),
-        createElement('span', { textContent: `生命值: ${'♥'.repeat(GAME.lives)}` }),
-        createElement('button', { className: 'win95-btn', textContent: '|| 暫停', onclick: togglePause })
-    ]);
-    
+    const hud = createElement('div', { className: 'game-hud' }, [ createElement('span', { className: 'timer' }, [ `🕒 `, createElement('span', { id: 'timer', textContent: GAME.timeLeft }), 's' ]), createElement('span', { textContent: `生命值: ${'♥'.repeat(GAME.lives)}` }), createElement('button', { className: 'win95-btn', textContent: '|| 暫停', onclick: togglePause }) ]);
     const submitBtn = createElement('button', { className: 'win95-btn', textContent: '送出連線' });
     submitBtn.onclick = () => {
         if (GAME.selectedIdx.length === 0) return;
         let line = GAME.selectedIdx.map(i => GAME.words[i]);
         let allCorrect = line.every(w => theme.words.includes(w));
-        
         if (allCorrect) {
             playSFX(SFX.success);
             GAME.foundWords.push(...line);
@@ -132,7 +148,7 @@ function gameScreen() {
                 GAME.screen = "levelClear";
                 GAME.maxUnlockedLevel = Math.max(GAME.maxUnlockedLevel, GAME.currentLevel + 1);
                 clearInterval(timerId);
-                setTimeout(render, 500);
+                render();
             }
         } else {
             playSFX(SFX.error);
@@ -140,15 +156,14 @@ function gameScreen() {
             if (GAME.lives <= 0) {
                 GAME.screen = "gameOver";
                 clearInterval(timerId);
-                setTimeout(render, 500);
+                render();
             }
         }
         GAME.selectedIdx = [];
-        render();
+        render(); // FIXED
     };
-    const cancelBtn = createElement('button', { className: 'win95-btn', textContent: '取消', onclick: () => { GAME.selectedIdx = []; render(); } });
+    const cancelBtn = createElement('button', { className: 'win95-btn', textContent: '取消', onclick: () => { GAME.selectedIdx = []; render(); } }); // FIXED
     const content = createElement('div', { className: 'game-play' }, [ hud, createElement('h2', {textContent: theme.name, style:{margin:'10px 0'}}), board, createElement('div', { className: 'game-actions' }, [submitBtn, cancelBtn]) ]);
-    
     if(GAME.isPaused){
         const pauseMenu = createElement('div', {className: 'win95-window', style: {position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 10}}, [
             createElement('div', {className: 'win95-content', style: {textAlign: 'center'}}, [
@@ -159,31 +174,27 @@ function gameScreen() {
         const pauseOverlay = createElement('div', {className: 'pause-overlay'}, [pauseMenu]);
         return buildWindow(`關卡 ${theme.level}`, createElement('div', null, [content, pauseOverlay]), theme.icon);
     }
-    
     return buildWindow(`關卡 ${theme.level}`, content, theme.icon);
 }
 
 function levelResultScreen(isWin) {
     const title = isWin ? '關卡完成！' : '挑戰失敗！';
     const message = isWin ? '太棒了！你解鎖了下一關！' : '別氣餒，再試一次吧！';
-
     const nextBtn = createElement('button', { className: 'win95-btn start-btn', textContent: isWin ? '前往下一關' : '重新挑戰' });
     nextBtn.onclick = () => {
-        if(isWin) GAME.currentLevel++;
+        if(isWin && GAME.currentLevel < THEMES.length) { GAME.currentLevel++; }
         GAME.screen = 'levelSelect';
-        render();
+        render(); // FIXED
     };
-    
     const content = createElement('div', { className: 'level-result-screen' }, [
         createElement('div', { className: 'level-result-title', textContent: title }),
         createElement('p', { textContent: message }),
         nextBtn,
-        createElement('button', { className: 'win95-btn', textContent: '返回主選單', onclick: () => { GAME.screen = 'levelSelect'; render(); } })
+        createElement('button', { className: 'win95-btn', textContent: '返回主選單', onclick: () => { GAME.screen = 'levelSelect'; render(); } }) // FIXED
     ]);
     return buildWindow('結算', content);
 }
 
-// --- 遊戲主迴圈與控制 ---
 function startTimer() {
   if (timerId) clearInterval(timerId);
   timerId = setInterval(() => {
@@ -204,19 +215,13 @@ function togglePause() {
     render();
 }
 
-// --- 初始啟動 ---
-function renderApp() {
-    render();
-}
-
-// --- 整合教學與啟動 ---
 function initTutorial() {
     const overlay = document.getElementById('tutorial-overlay');
     const closeBtn = document.getElementById('tutorial-close-btn');
     const tutorialKey = 'tutorialShown_word_commando';
     const startGame = () => {
         window.onload = null;
-        renderApp();
+        render(); // Use the main render function
     };
     if (!sessionStorage.getItem(tutorialKey)) {
         if (overlay) overlay.style.display = 'flex';
