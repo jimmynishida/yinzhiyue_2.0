@@ -5,17 +5,15 @@
   <title>情懷尋寶圖 (直式版)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <style>
-    @font-face { font-family: 'pixel-font'; src: url('https://fonts.gstatic.com/s/pressstart2p/v12/e3t4euO8KNyBfB3R0rGJ.ttf') format('truetype'); }
-    body { margin: 0; background: #222; font-family: 'Noto Sans TC', sans-serif; overflow: hidden; }
-    .crt-bg { background-image: url('https://i.imgur.com/JxAiJ8B.jpg'); background-size: cover; background-position: center; min-height: 100vh; width: 100vw; position: fixed; inset: 0; display: flex; /* ★★★ 移除 align-items: center ★★★ */ justify-content: center; padding-top: 20px; box-sizing: border-box; }
-    
+    /* ... 其他 CSS ... */
     .main-frame {
       position: relative;
       width: 95vw;
       max-width: 420px;
+      /* ★★★ 修正核心：讓高度自適應內容，並設定最大高度 ★★★ */
       height: auto;
       max-height: 95vh;
-      margin: 0; /* ★★★ 移除 margin: auto ★★★ */
+      margin: auto; /* 讓其在垂直置中和頂部對齊間取得平衡 */
       padding: 15px;
       background: rgba(35, 38, 50, 0.95);
       box-shadow: 0 0 80px #444, 0 0 0 6px #fce26a inset;
@@ -25,33 +23,11 @@
       display: flex;
       flex-direction: column;
     }
-    .title-screen, .game-over-screen { text-align: center; color: #fff; display: flex; flex-direction: column; justify-content: center; flex-grow: 1; padding: 20px 0; }
-    .pixel-font { font-family: 'pixel-font', monospace; letter-spacing: 2px; }
-    .start-btn { font-size: 1.5em; margin-top: 2em; background: #ffe5b5; border: 2px solid #f9df5b; color: #1d1821; border-radius: 8px; padding: 0.5em 1.5em; cursor: pointer; font-family: 'pixel-font', monospace; }
-    
-    .game-container { text-align: center; display: flex; flex-direction: column; height: 100%; }
-    .scene-container {
-      position: relative;
-      cursor: crosshair;
-      margin: 0 auto 15px auto;
-      width: 100%;
-      aspect-ratio: 3 / 4;
-      flex-shrink: 0;
-    }
-    .scene-background { width: 100%; height: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    .found-marker, .hint-marker { position: absolute; border-radius: 50%; box-sizing: border-box; pointer-events: none; }
-    .found-marker { border: 3px solid #00ff41; background: rgba(0, 255, 65, 0.2); animation: fadeIn 0.5s; }
-    .hint-marker { border: 4px dashed #ffeb3b; animation: pulse 1s infinite; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes pulse { 0% { transform: scale(0.9); opacity: 0.7; } 100% { transform: scale(1.2); opacity: 1; } }
-
-    .hud { background: rgba(0,0,0,0.5); border-radius: 10px; padding: 10px; overflow-y: auto; flex-grow: 1; }
-    .hud-title { color: #fce26a; font-family: 'pixel-font', monospace; margin-bottom: 10px; font-size: clamp(1em, 4vw, 1.2em); }
-    .object-list { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 15px; }
-    .object-item { color: #fff; font-size: clamp(1em, 4vw, 1.1em); transition: color 0.5s, text-decoration 0.5s; }
-    .object-item.found { color: #888; text-decoration: line-through; }
-    .game-actions { margin-top: 15px; display: flex; justify-content: center; gap: 20px; }
-    .action-btn { font-size: 1em; background: #5DADE2; border: none; color: #fff; padding: 8px 16px; border-radius: 5px; cursor: pointer; }
+     .title-screen, .game-over-screen {
+        padding: 20px 0;
+        min-height: 50vh; /* 為標題畫面設定最小高度，避免內容少時看起來太空 */
+     }
+    /* ... 其他 CSS ... */
   </style>
 </head>
 <body>
@@ -65,7 +41,7 @@
   
   <script>
     const e = React.createElement;
-    // --- JavaScript 內容與上次版本相同 ---
+    // --- JavaScript 內容與上次提供的最終版完全相同 ---
     const sceneData = {
       id: 'desk_90s_vertical',
       name: '90年代的書房',
