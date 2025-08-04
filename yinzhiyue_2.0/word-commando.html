@@ -103,10 +103,8 @@ function handleBoardClick(event) {
     if (GAME.isPaused) return;
     const target = event.target.closest('.word-btn');
     if (!target || target.disabled) return;
-    
     const index = parseInt(target.dataset.index, 10);
     const indexInSelection = GAME.selectedIdx.indexOf(index);
-
     if (indexInSelection > -1) {
         GAME.selectedIdx.splice(indexInSelection, 1);
         target.classList.remove('selected');
