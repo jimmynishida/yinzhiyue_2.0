@@ -7,16 +7,15 @@
   <style>
     @font-face { font-family: 'pixel-font'; src: url('https://fonts.gstatic.com/s/pressstart2p/v12/e3t4euO8KNyBfB3R0rGJ.ttf') format('truetype'); }
     body { margin: 0; background: #222; font-family: 'Noto Sans TC', sans-serif; overflow: hidden; }
-    .crt-bg { background-image: url('https://i.imgur.com/JxAiJ8B.jpg'); background-size: cover; background-position: center; min-height: 100vh; width: 100vw; position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .crt-bg { background-image: url('https://i.imgur.com/JxAiJ8B.jpg'); background-size: cover; background-position: center; min-height: 100vh; width: 100vw; position: fixed; inset: 0; display: flex; /* ★★★ 移除 align-items: center ★★★ */ justify-content: center; padding-top: 20px; box-sizing: border-box; }
     
     .main-frame {
       position: relative;
       width: 95vw;
       max-width: 420px;
-      /* ★★★ 修正核心：讓高度自適應內容，並設定最大高度 ★★★ */
       height: auto;
       max-height: 95vh;
-      margin: auto;
+      margin: 0; /* ★★★ 移除 margin: auto ★★★ */
       padding: 15px;
       background: rgba(35, 38, 50, 0.95);
       box-shadow: 0 0 80px #444, 0 0 0 6px #fce26a inset;
