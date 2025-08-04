@@ -42,27 +42,31 @@
   
   <script>
     const e = React.createElement;
-    const nostalgicItems = [  { name: "CD隨身聽", img: "assets/cdplayer. png ", value: 3500 },
-  { name: "Walkman隨身聽", img: "assets/sony-walkman.png", value: 3200 },
+  // --- 物品資料庫 (已清理並修正所有錯誤) ---
+    const nostalgicItems = [
+      // 建議檔名：全小寫英文、數字與橫線(-)，避免空格、大寫或特殊字元
+      { name: "CD隨身聽", img: "assets/cd-player.png", value: 3500 },
+      { name: "Walkman隨身聽", img: "assets/sony-walkman.png", value: 3200 },
       { name: "CPU", img: "assets/cpu.jpeg", value: 3000 },
-      { name: "箭牌口香糖", img: "assets/Doublemint.jpeg", value: 7 },
-      { name: "乖乖", img: "assets/guaiguåi.png ", value: 5 },
+      { name: "箭牌口香糖", img: "assets/doublemint.jpeg", value: 7 },
+      { name: "乖乖", img: "assets/guai-guai.png", value: 5 },
       { name: "黑松汽水", img: "assets/heysong.jpeg", value: 12 },
-      { name: "彈珠", img: "assets/marble.png", value: 3500 },
+      { name: "彈珠", img: "assets/marble.png", value: 5 }, // 修正了不合理的價格
       { name: "RAM 記憶體", img: "assets/memory.webp", value: 3000 },
       { name: "明星花露水", img: "assets/mingsing.png", value: 70 },
-      { name: "森永牛奶糖", img: "assets/mirukukyarameru.png ", value: 5 },
-      { name: "卡式錄音帶", img: "assets/music tape.png ", value: 12 },
-      { name: "王子麵", img: "assets/prince-noodles.png, value: 3 },
+      { name: "森永牛奶糖", img: "assets/morinaga-caramel.png", value: 5 },
+      { name: "卡式錄音帶", img: "assets/music-tape.png", value: 12 },
+      { name: "王子麵", img: "assets/prince-noodles.png", value: 3 }, // 修正了缺引號的錯誤
       { name: "黑松沙士", img: "assets/sarsaparilla.png", value: 12 },
-      { name: "尪仔標", img: "assets/Wangzaibiao.jpeg", value: 1 },
-      { name: "養樂多", img: "assets/Yakult.png", value: 2 },
-      { name: "大同電鍋", img: "assets/tatung.png ", value: 800 },
-{ name: "大哥大", img: "assets/motorola.webp ", value: 2800 }, 
- { name: "Game Boy", img: "assets/gameboy.png ", value: 2800 },
- { name: "B.B. Call 呼叫機", img: "assets/bb-call.webp", value: 1800 },
- { name: "3.5吋磁碟片", img: "assets/floppydisk.jpeg", value: 15 }, 
-{ name: "Tamagotchi 電子雞", img: "assets/tamagotchi.png", value: 700 },  ];
+      { name: "尪仔標", img: "assets/wangzaibiao.jpeg", value: 1 },
+      { name: "養樂多", img: "assets/yakult.png", value: 2 },
+      { name: "Game Boy", img: "assets/gameboy.png", value: 2800 }, 
+      { name: "B.B. Call 呼叫機", img: "assets/bb-call.webp", value: 1800 },
+      { name: "3.5吋磁碟片", img: "assets/floppydisk.jpeg", value: 15 }, 
+      { name: "Tamagotchi 電子雞", img: "assets/tamagotchi.png", value: 700 },
+      { name: "大同電鍋", img: "assets/tatung.png", value: 800 },
+      { name: "大哥大", img: "assets/motorola.webp", value: 28000 }, // 價格調整
+    ];
     
     // --- 已修正的拼圖設定 ---
     const puzzleData = { 
@@ -100,7 +104,7 @@
             link.href = canvas.toDataURL('image/png');
             link.click();
         };
-        img.onerror = () => { alert('海報圖片載入失敗，請確認 assets 資料夾中有名為 puzzle-image-01.png 的檔案。'); };
+        img.onerror = () => { alert('海報圖片載入失敗，請確認 assets 資料夾中有名為 simandin.png 的檔案。'); };
     }
 
     function TutorialModal({ onClose }) { const content = e('div', { className: 'tutorial-content' }, e('h4', null, '玩法說明'), e('div', { className: 'tutorial-image-placeholder' }, e('p', { style: { fontSize: '1.2em', color: '#E59866' } }, '[ 玩法說明圖 ]'), e('ul', null, e('li', null, '1. 記住貨架上出現的所有寶物！'), e('li', null, '2. 找出被調包的物品，或猜出物品的當年價格！')))); return e('div', { className: 'tutorial-overlay' }, e('div', { className: 'tutorial-modal' }, e('button', { className: 'tutorial-close-btn', onClick: onClose }, '我知道了 (略過)'), content)); }
