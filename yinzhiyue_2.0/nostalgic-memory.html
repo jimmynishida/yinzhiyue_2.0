@@ -5,21 +5,53 @@
   <title>我的時光寶物架 - 拼圖模式</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ... 其他 CSS ... */
-    .main-frame {
-      position: relative;
-      /* ★★★ 修正核心：讓寬度在手機上更合理 ★★★ */
-      width: 90vw; /* 基礎寬度設為螢幕寬度的90% */
-      max-width: 540px; /* 在大螢幕上最大寬度不超過540px */
-      margin: 20px auto;
-      padding: 1.5em;
-      background: rgba(35, 38, 50, 0.95);
-      box-shadow: 0 0 80px #444, 0 0 0 6px #fce26a inset;
-      border-radius: 18px;
-      z-index: 2;
+    @font-face { font-family: 'pixel-font'; src: url('https://fonts.gstatic.com/s/pressstart2p/v12/e3t4euO8KNyBfB3R0rGJ.ttf') format('truetype'); }
+    body { margin: 0; background: #222; font-family: Arial, 'pixel-font', monospace; letter-spacing: 1px; overflow-x: hidden; }
+    .crt-bg { background-image: url('assets/your-background.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 100vh; width: 100vw; position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .main-frame { position: relative; width: 540px; margin: 20px auto; padding: 1.5em; background: rgba(35, 38, 50, 0.95); box-shadow: 0 0 80px #444, 0 0 0 6px #fce26a inset; border-radius: 18px; z-index: 2; box-sizing: border-box; }
+    .title-screen, .game-over-screen { text-align: center; padding: 40px 0; }
+    .puzzle-container { margin-bottom: 20px; }
+    .puzzle-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 240px; height: 240px; margin: 10px auto; border: 3px solid #fce26a; }
+    .puzzle-piece { width: 100%; height: 100%; background-size: 300% 300%; filter: brightness(0.3) blur(2px); transition: filter 0.5s ease-in-out; }
+    .puzzle-piece.unlocked { filter: brightness(1) blur(0); }
+    .shelf { display: flex; justify-content: center; align-items: center; margin: 1.5em 0; gap: 15px; min-height: 120px; }
+    .shelf-slot { 
+      background-image: url('assets/shelf-bg.jpg'); 
+      background-size: cover; 
+      background-position: center; 
+      border: 3px solid #6b4f2c; 
+      width: 100px; 
+      height: 100px; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.3) inset; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      border-radius: 10px; 
+      position: relative; 
+      padding: 10px; /* 增加內邊距給圖片空間 */
       box-sizing: border-box;
     }
-    /* ... 其他 CSS ... */
+    
+    /* ★★★ Bug修正 ★★★ */
+    .item-realistic {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(4px 4px 6px rgba(0,0,0,0.4));
+    }
+
+    .timer-bar-container { height: 6px; background: #444; border-radius: 3px; margin: 1em 0; }
+    .timer-bar { height: 100%; background: linear-gradient(90deg, #ffec9e, #fce26a); border-radius: 3px; transition: width 0.2s linear; }
+    .price-btn { font-size: 1em; margin: 0.5em; background: #ffe5b5; border: 2px solid #f9df5b; color: #1d1821; border-radius: 8px; padding: 0.5em 1em; cursor: pointer; }
+    .feedback { text-align: center; font-size: 1.8em; color: #ffb96d; min-height: 50px; display:flex; align-items:center; justify-content:center; }
+    .pixel-font { font-family: 'pixel-font', monospace; letter-spacing: 2px; }
+    .pause-overlay, .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+    .pause-menu, .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; text-align: center; }
+    .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; font-family: inherit; }
+    .pause-menu h2, .tutorial-content h4 { font-family: 'VT323', monospace; color: #1A202C; font-size: 2em; margin-top: 10px; margin-bottom: 20px; text-align: center; }
+    @media (max-width: 600px) { body { overflow: auto; } .main-frame { width: 95vw; height: auto; min-height: 90vh; margin: auto; padding: 1em; display: flex; flex-direction: column; } h1 { font-size: clamp(1.5em, 6vw, 2em); } .title-screen, .game-over-screen { margin-top: 0; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; } .shelf { gap: 10px; flex-wrap: wrap; height: auto; } .shelf-slot { width: 28vw; height: 28vw; } .pixel-font { font-size: clamp(1.2em, 4vw, 1.8em); } .price-btn { font-size: 1.1em; padding: 0.8em 1em; margin: 0.5em; } .feedback { font-size: clamp(1.5em, 5vw, 2em); margin-top: 20px; } }
   </style>
 </head>
 <body>
@@ -33,7 +65,6 @@
   <script crossorigin src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
   
   <script>
-    // --- JavaScript 內容與上次提供的最終版完全相同 ---
     const e = React.createElement;
     const nostalgicItems = [ { name: "Game Boy", img: "assets/gameboy.jpeg", value: 2800 }, { name: "B.B. Call 傳呼機", img: "assets/bb-call.webp", value: 1800 }, { name: "3.5吋磁碟片", img: "assets/floppydisk.jpeg", value: 15 }, { name: "Tamagotchi 電子雞", img: "assets/tamagotchi.jpeg", value: 700 }, { name: "王子麵", img: "assets/prince-noodles.png", value: 3 }, { name: "養樂多", img: "assets/yakult.jpg", value: 2 }, ];
     const puzzleData = { id: 'puz01', name: '我的 Game Boy', image: 'assets/puzzle-image-01.png' };
