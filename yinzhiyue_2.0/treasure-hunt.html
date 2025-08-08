@@ -9,13 +9,13 @@
     body { margin: 0; background: #222; font-family: 'Noto Sans TC', sans-serif; overflow: hidden; }
     .crt-bg { background-image: url('https://i.imgur.com/JxAiJ8B.jpg'); background-size: cover; background-position: center; min-height: 100vh; width: 100vw; position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
     
-    /* --- ★★★ 直式佈局核心修改 ★★★ --- */
     .main-frame {
       position: relative;
-      width: 95vw; /* 寬度佔螢幕95% */
-      max-width: 420px; /* 最大寬度不超過420px，適合手機 */
-      height: 90vh; /* 高度佔螢幕90% */
-      max-height: 800px;
+      width: 95vw;
+      max-width: 420px;
+      /* ★★★ 修正核心：讓高度自適應內容，並設定最大高度 ★★★ */
+      height: auto;
+      max-height: 95vh;
       margin: auto;
       padding: 15px;
       background: rgba(35, 38, 50, 0.95);
@@ -24,9 +24,13 @@
       z-index: 2;
       box-sizing: border-box;
       display: flex;
-      flex-direction: column; /* 讓內部元素垂直排列 */
+      flex-direction: column;
     }
-    .title-screen, .game-over-screen { text-align: center; color: #fff; display: flex; flex-direction: column; justify-content: center; flex-grow: 1; }
+    .title-screen, .game-over-screen {
+        text-align: center; color: #fff; display: flex;
+        flex-direction: column; justify-content: center; flex-grow: 1;
+        padding: 20px 0; min-height: 50vh; /* 為標題畫面設定最小高度 */
+    }
     .pixel-font { font-family: 'pixel-font', monospace; letter-spacing: 2px; }
     .start-btn { font-size: 1.5em; margin-top: 2em; background: #ffe5b5; border: 2px solid #f9df5b; color: #1d1821; border-radius: 8px; padding: 0.5em 1.5em; cursor: pointer; font-family: 'pixel-font', monospace; }
     
@@ -36,7 +40,7 @@
       cursor: crosshair;
       margin: 0 auto 15px auto;
       width: 100%;
-      aspect-ratio: 3 / 4; /* 設定為 3:4 的直式比例 */
+      aspect-ratio: 3 / 4;
       flex-shrink: 0;
     }
     .scene-background { width: 100%; height: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
@@ -66,11 +70,10 @@
   
   <script>
     const e = React.createElement;
-
+    // --- JavaScript 內容與上次提供的最終版完全相同 ---
     const sceneData = {
       id: 'desk_90s_vertical',
       name: '90年代的書房',
-      // ★★★ 重要：需要一張新的直式場景圖 ★★★
       background: 'assets/scene-desk-90s-vertical.jpg', 
       objects: [
         { id: 'gameboy', name: 'Game Boy', coords: { x: 65, y: 75, size: 18 } },
@@ -79,21 +82,13 @@
         { id: 'yakult', name: '養樂多', coords: { x: 20, y: 65, size: 8 } }
       ]
     };
-    
     const sfxElements = { found: () => document.getElementById("sfx-found"), hint: () => document.getElementById("sfx-hint") };
     function playSfx(name) { const el = sfxElements[name](); if (el) { el.currentTime = 0; el.play().catch(()=>{}); } }
-    
     function App() {
       const [gameStatus, setGameStatus] = React.useState("TITLE");
       const [foundObjects, setFoundObjects] = React.useState([]);
       const [markers, setMarkers] = React.useState([]);
-
-      const resetGame = () => {
-        setFoundObjects([]);
-        setMarkers([]);
-        setGameStatus('PLAYING');
-      };
-
+      const resetGame = () => { setFoundObjects([]); setMarkers([]); setGameStatus('PLAYING'); };
       const handleSceneClick = (event) => {
         if (gameStatus !== 'PLAYING') return;
         const rect = event.target.getBoundingClientRect();
@@ -115,7 +110,6 @@
           }
         });
       };
-      
       const useHint = () => {
         const unfoundObject = sceneData.objects.find(obj => !foundObjects.includes(obj.id));
         if (unfoundObject) {
@@ -127,9 +121,7 @@
             }, 1500);
         }
       };
-
       const shareForHelp = () => { alert('【分享求助】功能將會截取目前畫面，並讓您傳送給朋友一起來幫忙找喔！'); };
-
       const renderContent = () => {
         switch (gameStatus) {
           case 'PLAYING':
@@ -163,7 +155,6 @@
             );
         }
       };
-
       return e("div", { className: "crt-bg" },
         e("div", { className: "main-frame" }, renderContent())
       );
