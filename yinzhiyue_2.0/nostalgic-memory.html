@@ -6,18 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* ... 其他 CSS ... */
-    .main-frame {
-      position: relative;
-      /* ★★★ 修正核心：讓寬度在手機上更合理 ★★★ */
-      width: 90vw; /* 基礎寬度設為螢幕寬度的90% */
-      max-width: 540px; /* 在大螢幕上最大寬度不超過540px */
-      margin: 20px auto;
-      padding: 1.5em;
-      background: rgba(35, 38, 50, 0.95);
-      box-shadow: 0 0 80px #444, 0 0 0 6px #fce26a inset;
-      border-radius: 18px;
-      z-index: 2;
+    .shelf-slot { 
+      /* ... 其他樣式 ... */
+      padding: 10px; /* 增加內邊距給圖片空間 */
       box-sizing: border-box;
+    }
+    .item-realistic {
+      /* ★★★ 修正核心：讓圖片100%填滿父容器 ★★★ */
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* 確保圖片等比例縮放不變形 */
+      filter: drop-shadow(4px 4px 6px rgba(0,0,0,0.4));
     }
     /* ... 其他 CSS ... */
   </style>
