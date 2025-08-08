@@ -6,6 +6,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* CSS 與上次修正版相同 */
+    @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+    body {
+      background: #222 url('assets/win95-bg.png'); margin: 0; min-height: 100vh;
+      font-family: 'VT323', 'monospace', 'DFKai-SB', 'MingLiU', sans-serif; letter-spacing: 0.03em;
+    }
+    .pixel-bg { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; padding: 10px 0; }
+    .win95-window { border: 3px solid #000; background: #c3c7cb; box-shadow: 4px 4px 0 #888; width: 480px; max-width: 95vw; position: relative; z-index: 1; }
+    .win95-titlebar { background: #215dc6; color: #fff; display: flex; align-items: center; padding: 2px 8px; font-size: 1.2rem; user-select: none; }
+    .win95-title { flex: 1; display: flex; align-items: center; gap: 4px; }
+    .win95-content { padding: 20px; font-family: 'VT323', monospace; background: #f7f7f7; min-height: 300px; position: relative; z-index: 1; }
+    .win95-btn { border: 2px outset #fff; background: #ededed; padding: 2px 14px; font-size: 1.1rem; margin: 2px; box-shadow: 2px 2px #aaa; cursor: pointer; }
+    .start-btn { font-size: 1.4rem; margin-top: 32px; background: #215dc6; color: #fff; }
+    .dialup-screen, .level-select-screen, .level-result-screen { display: flex; flex-direction: column; align-items: center; text-align: center; }
+    .dialup-animation { width: 72px; height: 72px; background: url('assets/dialup.gif') center/contain no-repeat; margin: 20px 0; }
+    .dialup-text { margin-bottom: 12px; font-size: 1.2rem; color: #215dc6; text-shadow: 0 1px #fff, 1px 0 #000, 2px 2px #7c7d7e; }
+    .folders-row { display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; }
+    .folder-icon { display: flex; flex-direction: column; align-items: center; cursor: pointer; margin: 16px 0; width: 84px; }
+    .folder-icon img { width: 60px; filter: drop-shadow(2px 2px #888); }
+    .folder-icon.locked { filter: grayscale(1) brightness(0.7); cursor: not-allowed; }
+    .folder-label { margin-top: 2px; font-size: 1.08rem; color: #333; }
+    .game-play { display: flex; flex-direction: column; align-items: center; }
+    .game-hud { display: flex; width: 100%; justify-content: space-between; font-size: 1.1rem; margin-bottom: 8px; align-items: center; }
+    .timer { color: #215dc6; font-weight: bold; font-size: 1.18rem; }
+    .word-board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 18px 0; width: 100%; }
+    .word-btn { font-family: 'DFKai-SB', 'MingLiU', 'VT323', monospace; font-size: 1.12rem; padding: 7px 5px; border: 2px solid #7c7d7e; border-radius: 4px; background: #fafafa; box-shadow: 2px 2px #bbb; cursor: pointer; transition: background 0.1s, color 0.1s; }
+    .word-btn.selected { background: #215dc6; color: #fff; }
+    .game-actions { margin-top: 10px; display: flex; gap: 14px; justify-content: center;}
+    .pause-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: none; align-items: center; justify-content: center; z-index: 10000; }
+    .level-result-title { font-size: 2rem; color: #215dc6; text-shadow: 0 1px #fff, 1px 0 #000, 2px 2px #7c7d7e; margin: 20px 0; }
+    @media (max-width: 600px) { .win95-window { width: 95vw; } .win95-content { padding: 15px; min-height: auto; } .word-board { gap: 5px; margin: 10px 0; } .word-btn { font-size: clamp(1em, 3.8vw, 1.2em); padding: 5px 3px; } .win95-btn { font-size: 1em; padding: 4px 10px; } .game-hud { font-size: 1em; flex-wrap: wrap; } h1, h2, .level-result-title { font-size: 1.5em; } }
+    .tutorial-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26, 32, 44, 0.85); display: none; align-items: center; justify-content: center; z-index: 10000; }
+    .tutorial-modal { background: #E2E8F0; color: #1A202C; padding: 20px 30px; border-radius: 12px; width: 90%; max-width: 450px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); border: 2px solid #F7FAFC; position: relative; font-family: 'Noto Sans TC', sans-serif; }
+    .tutorial-close-btn { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 16px; color: #555; cursor: pointer; }
+    .tutorial-content h4 { font-family: 'VT323', monospace; color: #1A202C; font-size: 2em; margin-top: 10px; margin-bottom: 20px; text-align: center; }
   </style>
 </head>
 <body>
